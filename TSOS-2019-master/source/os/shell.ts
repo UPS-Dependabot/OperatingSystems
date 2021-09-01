@@ -73,6 +73,21 @@ module TSOS {
                                   "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
 
+            //whereami
+            sc  = new ShellCommand(this.shellWhereami,
+                                    "whereami",
+                                    "- Informs you about your current where abouts.");
+            this.commandList[this.commandList.length]  = sc;
+
+            sc  = new ShellCommand(this.shellDate,
+                                    "date",
+                                    "- Tells you the current date");
+            this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shellFerb,
+                                    "ferb",
+                                    "- Ferb I know what we are going to do today");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -204,7 +219,7 @@ module TSOS {
         // actual parameter list when this function is called, so I feel like we need it.
 
         public shellVer(args: string[]) {
-            _StdOut.putText(APP_NAME + " version " + APP_VERSION);
+            _StdOut.putText(APP_NAME + " version " + APP_VERSION + " authored by Brian Coppola");
         }
 
         public shellHelp(args: string[]) {
@@ -233,6 +248,29 @@ module TSOS {
                 switch (topic) {
                     case "help":
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
+                        break;
+                    case "shutdown":
+                        _StdOut.putText("It's the off button mate.");
+                        break;
+                    case "cls":
+                        _StdOut.putText("Makes all of your problems vanish.");
+                        break;
+                    case "man":
+                        _StdOut.putText("Is suppose to tell you what <command> means.");
+                        break;
+                    case "trace":
+                        _StdOut.putText("Pauses and unpauses the host log.");
+                        break;
+                    case "rot13":
+                        _StdOut.putText("Cypher that rotates each letter by 13 letters.");
+                        break;
+                    case "prompt":
+                        _StdOut.putText("Resets the prompt of where you begin typing the command line.");
+                    case "whereami":
+                        _StdOut.putText("Tells you your location");
+                        break;
+                    case "date":
+                        _StdOut.putText("Prints the current date");
                         break;
                     // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
                     default:
@@ -284,5 +322,44 @@ module TSOS {
             }
         }
 
+        public shellWhereami(args: string[]){
+            _StdOut.putText("Chark Town DAAWG");
+        }
+
+        public shellDate(args: string[]){
+            _StdOut.putText(Date());
+        }
+
+        //Phineas tells Ferb what they are going to d today based off of the day of the week
+        public shellFerb(args: string[]){
+            var activity = "poop";
+             switch (Date().slice(0, 3)) {
+                 case "Mon":
+                    activity = "build a rocket!";
+                     break;
+                case "Tue":
+                    activity = "fight a mummy!";
+                    break;
+                case "Wed":
+                    activity = "climb up the Effel Tower!";
+                    break;
+                case "Thu":
+                    activity = "discover something that doesn't exist!";
+                    break;
+
+                case "Fri":
+                    activity = "give a monkey a shower!";
+                    break;
+                case "Sat":
+                    activity = "locate Frankenstein's brain!";
+                    break;
+                case "Sun":
+                    activity = ".. Wait! Where's Perry?";
+                    break;
+                default:
+                    activity = "take a break.";
+             }
+             _StdOut.putText("Hey Ferb! Lets " + activity);
+        }
     }
 }
