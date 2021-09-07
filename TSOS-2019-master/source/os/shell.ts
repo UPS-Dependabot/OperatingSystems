@@ -346,7 +346,6 @@ module TSOS {
                 case "Thu":
                     activity = "discover something that doesn't exist!";
                     break;
-
                 case "Fri":
                     activity = "give a monkey a shower!";
                     break;

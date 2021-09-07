@@ -1,15 +1,15 @@
 /* TSOS.css */
 
 body {
-  background: #909193 url(distrib/images/linen.png) repeat;
+  background: #274b94;
   font-family: Helvetica, Verdana, Arial, sans-serif;
   font-size: 12pt;
   font-weight: normal;
   font-style: normal;
+  color: #DFDBC3;
 }
 
 h1 {
-  color: black;
   font-size: 24pt;
   font-weight: normal;
   font-style: normal;
@@ -17,7 +17,6 @@ h1 {
 }
 
 h2 {
-  color: black;
   font-size: 20pt;
   font-weight: normal;
   font-style: normal;
@@ -30,10 +29,20 @@ h3 {
   font-style: normal;
 }
 
+
+
 #display {
   background-color:#DFDBC3;
   border: 2px solid red;
   cursor: default;
+}
+
+#divConsole{
+  margin-top: 4rem;
+  width:100%; 
+  height:100%; 
+  display: inline;
+  /* float:right; */
 }
 
 .normal_button {
@@ -41,7 +50,6 @@ h3 {
 }
 
 .footerText {
-  color: black;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 8pt;
   text-align: center;
