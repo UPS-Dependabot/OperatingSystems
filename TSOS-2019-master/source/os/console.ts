@@ -41,7 +41,21 @@ module TSOS {
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
-                } else {
+                } else if(chr === String.fromCharCode(8)){ //user clicks backspace
+                    this.backspace();
+                }//if
+                else if(chr === String.fromCharCode(9)){//user clicks tab
+                    for (var i in _OsShell.commandList) {
+                        //Compares the current string in the buffer against each command in the list
+                        //slices the name of the command from 0 to the current length of the string in the buffer
+                        if(this.buffer == _OsShell.commandList[i].substring(0,this.buffer.length)){
+                            this.buffer = _OsShell.commandList[i];
+                        }//if
+
+                    }//for
+
+                }//if
+                else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
                     this.putText(chr);
@@ -68,7 +82,6 @@ module TSOS {
                 this.currentXPosition = this.currentXPosition + offset;
             }
          }
-
         public advanceLine(): void {
             this.currentXPosition = 0;
             /*
@@ -94,9 +107,41 @@ module TSOS {
             }//if
             else{
                 this.currentYPosition += lineAdvance;
+            }//else
+            
+        }//advanceLine
+
+        public backspace(): void{
+            // //stores the character to be deleted
+            // var characterDeleted  = this.buffer.charAt(this.buffer.length-1);
+            // //move the cursor
+            // var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, characterDeleted);
+            // this.currentXPosition = this.currentXPosition - offset;
+            // // remove char function
+            // _DrawingContext.eraseText(this.currentFont,this.currentFontSize, this.currentXPosition, this.currentYPosition, characterDeleted);
+            // //Removes the character from the buffer
+            // this.buffer = this.buffer.substring(0, this.buffer.length-1);
+
+            if (this.buffer.length > 0) { //if there is something in the buffer
+                //get the last character typed and erase it from the canvas
+                let lastChar = this.buffer[this.buffer.length - 1];
+                
+                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, lastChar);
+
+                this.currentXPosition = this.currentXPosition - offset;
+
+                var height = _DefaultFontSize + 
+                _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
+                _FontHeightMargin;
+                // remove char function
+                //.clearRect(x, y + fontheight, width, height)
+                _DrawingContext.clearRect(this.currentXPosition,this.currentYPosition, offset, -1 * height)
+                // _DrawingContext.eraseText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, lastChar);
+
+                //remove the last letter in the buffer
+                this.buffer = this.buffer.slice(0, -1);
             }
             
-            
-        }
+        }//backspace
     }
  }

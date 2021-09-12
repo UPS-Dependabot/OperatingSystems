@@ -88,6 +88,18 @@ module TSOS {
                                     "ferb",
                                     "- Ferb I know what we are going to do today");
             this.commandList[this.commandList.length] = sc;
+
+            //Adding this so I can know when the best time to scroll the screen is --Should Probably delete this later
+            sc = new ShellCommand(this.shellParrot,
+                                    "parrot",
+                                    "- Tells you what is currently stored in the buffer");
+            this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shellLoad,
+                                    "load",
+                                    "- validates user code in the User Program Input. Only hex digits and spaces are valid");
+            this.commandList[this.commandList.length] = sc;
+
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -324,11 +336,11 @@ module TSOS {
 
         public shellWhereami(args: string[]){
             _StdOut.putText("Chark Town DAAWG");
-        }
+        }//whereami
 
         public shellDate(args: string[]){
             _StdOut.putText(Date());
-        }
+        }//date
 
         //Phineas tells Ferb what they are going to d today based off of the day of the week
         public shellFerb(args: string[]){
@@ -359,6 +371,33 @@ module TSOS {
                     activity = "take a break.";
              }
              _StdOut.putText("Hey Ferb! Lets " + activity);
-        }
-    }
+        }//ferb
+
+        public shellParrot(args: string[]){
+            _StdOut.putText(_StdIn.buffer.toString);
+        }//parrot
+
+        public shellLoad(args: string[]){
+            // Initialize the _UserInput
+            var userProgramInput = <HTMLInputElement> document.getElementById("taProgramInput");
+            var userInput = userProgramInput.value.trim(); 
+
+            // Regex selects all valid hex characters (uppercase or lowercase) and spaces
+            var regExp = new RegExp("[0-9A-Fa-f \n]", "g");
+            if(userInput !== ""){
+                if(regExp.test(userInput)){
+                    _StdOut.putText("Valid program detected.");
+                }
+                else{
+                    _StdOut.putText("Invalid program, only use 0-9, A-F, a-f, and space.");
+                }
+            }//if
+            else{
+                _StdOut.putText("There is currently no program :(");
+            }
+    
+        }//load
+
+
+    }//Shell
 }
