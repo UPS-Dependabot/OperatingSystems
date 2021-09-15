@@ -72,7 +72,12 @@ module TSOS {
                                   "prompt",
                                   "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
-
+            
+            //status
+            sc = new ShellCommand(this.shellStatus,
+                                "status",
+                                "<string> - Tell me your status");
+            this.commandList[this.commandList.length] = sc;
             //whereami
             sc  = new ShellCommand(this.shellWhereami,
                                     "whereami",
@@ -89,17 +94,15 @@ module TSOS {
                                     "- Ferb I know what we are going to do today");
             this.commandList[this.commandList.length] = sc;
 
-            //Adding this so I can know when the best time to scroll the screen is --Should Probably delete this later
-            sc = new ShellCommand(this.shellParrot,
-                                    "parrot",
-                                    "- Tells you what is currently stored in the buffer");
-            this.commandList[this.commandList.length] = sc;
-
             sc = new ShellCommand(this.shellLoad,
                                     "load",
                                     "- validates user code in the User Program Input. Only hex digits and spaces are valid");
             this.commandList[this.commandList.length] = sc;
 
+            sc = new ShellCommand(this.shellCSOD,
+                                    "csod",
+                                    " - crashes the console and displays the Chark screen of Death :)");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -258,6 +261,9 @@ module TSOS {
             if (args.length > 0) {
                 var topic = args[0];
                 switch (topic) {
+                    case "ver":
+                        _StdOut.putText("Provides version info");
+                        break;
                     case "help":
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
                         break;
@@ -278,11 +284,23 @@ module TSOS {
                         break;
                     case "prompt":
                         _StdOut.putText("Resets the prompt of where you begin typing the command line.");
+                    case "status":
+                        _StdOut.putText("User can enter their status");
+                        break;
                     case "whereami":
                         _StdOut.putText("Tells you your location");
                         break;
                     case "date":
                         _StdOut.putText("Prints the current date");
+                        break;
+                    case "ferb":
+                        _StdOut.putText("Phineas tell you what you are going to do today");
+                        break;
+                    case "load":
+                        _StdOut.putText("Validates program input");
+                        break;
+                    case "csod":
+                        _StdOut.putText("Crashes the OS and displays screen of death");
                         break;
                     // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
                     default:
@@ -333,6 +351,18 @@ module TSOS {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
         }
+        public shellStatus(args: string[]){
+             var userStatus = <HTMLInputElement> document.getElementById("status");
+             var input = ""; 
+
+             if (args.length > 0) {
+                for(var i in args){
+                    input += args[i]+" "; //user input from the shell
+                }//for 
+
+                userStatus.innerText = input;
+             }//if
+        }
 
         public shellWhereami(args: string[]){
             _StdOut.putText("Chark Town DAAWG");
@@ -373,10 +403,6 @@ module TSOS {
              _StdOut.putText("Hey Ferb! Lets " + activity);
         }//ferb
 
-        public shellParrot(args: string[]){
-            _StdOut.putText(_StdIn.buffer.toString);
-        }//parrot
-
         public shellLoad(args: string[]){
             // Initialize the _UserInput
             var userProgramInput = <HTMLInputElement> document.getElementById("taProgramInput");
@@ -394,9 +420,64 @@ module TSOS {
             }//if
             else{
                 _StdOut.putText("There is currently no program :(");
-            }
+            }//else
     
         }//load
+
+
+        public shellCSOD(args: string[]){
+            _StdOut.clearScreen();     
+
+            _StdOut.putText("   ############        ####         ####");
+            _StdOut.advanceLine();
+            _StdOut.putText(" ######   #######      ####         ####");
+            _StdOut.advanceLine();
+            _StdOut.putText("#####                     ###############");
+            _StdOut.advanceLine();
+            _StdOut.putText("#####                     ###############");
+            _StdOut.advanceLine();
+            _StdOut.putText(" ######     #######    ####         ####");
+            _StdOut.advanceLine();
+            _StdOut.putText("   ##############      ####         ####");
+            _StdOut.advanceLine();
+            _StdOut.putText("                                           ");
+            _StdOut.advanceLine();
+
+            _StdOut.putText("     ##############      ############                ");
+            _StdOut.advanceLine();
+            _StdOut.putText("     ####      #####      ####         ####           ");
+            _StdOut.advanceLine();
+            _StdOut.putText("     ##############     ##############           ");
+            _StdOut.advanceLine();
+            _StdOut.putText("     ####      #####     #############              ");
+            _StdOut.advanceLine();
+            _StdOut.putText("     ####      #####     ####       #####          ");
+            _StdOut.advanceLine();
+            _StdOut.putText("     ####      #####     ####          ####       ");
+            _StdOut.advanceLine();
+            _StdOut.putText("                                                     ");
+            _StdOut.advanceLine();
+
+            _StdOut.putText("     ####      #####          ");
+            _StdOut.advanceLine();
+            _StdOut.putText("     ####      #####           ");
+            _StdOut.advanceLine();
+            _StdOut.putText("     #############         ");
+            _StdOut.advanceLine();
+            _StdOut.putText("     ####    #####         ");
+            _StdOut.advanceLine();
+            _StdOut.putText("     ####      #####         ");
+            _StdOut.advanceLine();
+            _StdOut.putText("     ####         #####        ");
+            _StdOut.advanceLine();
+            _StdOut.putText("                                                                 ");
+            _StdOut.advanceLine();
+
+            _Kernel.krnShutdown();
+            // Stop the interval that's simulating our clock pulse.
+            clearInterval(_hardwareClockID);
+
+        }
 
 
     }//Shell

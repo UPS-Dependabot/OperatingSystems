@@ -194,7 +194,7 @@ module TSOS {
             ctx.fontDescent = function(font,size) { return CanvasTextFunctions.descent(font,size); };
             ctx.drawTextRight = function(font,size,x,y,text) {
                 var w = CanvasTextFunctions.measure(font,size,text);
-                return CanvasTextFunctions.draw( ctx, font,size,x-w,y,text);
+                return CanvasTextFunctions.draw(ctx, font,size,x-w,y,text);
             };
             ctx.drawTextCenter = function(font,size,x,y,text) {
                 var w = CanvasTextFunctions.measure(font,size,text);

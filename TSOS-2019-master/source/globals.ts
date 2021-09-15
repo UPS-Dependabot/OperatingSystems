@@ -52,6 +52,8 @@ var _StdOut: TSOS.Console = null;
 // UI
 var _Console: TSOS.Console;
 var _OsShell: TSOS.Shell;
+var _Counter: Number = 0;//added to play arounf with for scrolling
+
 
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode: boolean = false;
