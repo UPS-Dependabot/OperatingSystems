@@ -99,8 +99,7 @@ module TSOS {
             }//if
             else{
                 this.currentYPosition += lineAdvance;
-            }//else
-            
+            }//else            
         }//advanceLine
 
         public backspace(): void{
@@ -118,7 +117,7 @@ module TSOS {
                 _FontHeightMargin;
                 // remove char function
                 //.clearRect(x, y + fontheight, width, height)
-                _DrawingContext.clearRect(this.currentXPosition,this.currentYPosition, offset, -1 * height);
+                _DrawingContext.clearRect(this.currentXPosition,this.currentYPosition + .1, offset, -1 * height);
 
                 //remove the last letter in the buffer
                 this.buffer = this.buffer.slice(0, -1);
@@ -126,14 +125,37 @@ module TSOS {
         }//backspace
 
         public tab():void{
+            var indexPC = 0;
+            var potentialCommands  = [];
             for (var i in _OsShell.commandList) {
                 //Compares the current string in the buffer against each command in the list
                 //slices the name of the command from 0 to the current length of the string in the buffer
-                if(this.buffer == _OsShell.commandList[i].substring(0,this.buffer.length)){
-                    this.buffer = _OsShell.commandList[i];
+                if(this.buffer == _OsShell.commandList[i].command.substring(0,this.buffer.length)){
+                    potentialCommands[indexPC] = _OsShell.commandList[i].command;
+                    indexPC++;
                 }//if
-
             }//for
+
+            // if(indexPC == 0){
+            //     //Nothing Happens
+            //     this.putText("")
+            // }//if
+            if(indexPC  == 1){ //enters the command into the cli    
+                this.buffer = potentialCommands[indexPC];
+            }//if
+            else{
+                //Prints out potential commands that the user may want to input
+                this.advanceLine();
+                for(var j = 0;  potentialCommands.length > j; j++){
+                    this.putText(" "+potentialCommands[j]+" ");
+                    if(j%7 == 0){//goes to the next line so the user can see all of the options
+                        this.advanceLine();
+                    }//if
+                }//for
+                //Pushes user to the next line after printing out text
+                this.advanceLine();
+            }//else
+
         }//tab
     }
  }
