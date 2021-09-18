@@ -44,7 +44,7 @@ module TSOS {
                 _KernelInputQueue.enqueue(chr);
             } 
             else if( (keyCode >= 48 && keyCode <= 57) && isShifted == true)
-            {// special characters
+            {// special shifted characters (0 - 9 on the top of the keyboard)
                 switch (keyCode) 
                 {
                     case 48:
@@ -96,11 +96,15 @@ module TSOS {
                 // }//if
 
             }//if Shifted KeyCodes 48 - 57
+            else if(keyCode == 38){//upArrow
+                chr = "upArrow";
+                _KernelInputQueue.enqueue(chr);
+            }//if upArrow
             else if (((keyCode >= 48) && (keyCode <= 57))   ||   // digits
                         (keyCode == 32)                     ||   // space
                         (keyCode == 13)                     ||   // enter
                         (keyCode == 8)                      ||   // backspace
-                        (keyCode == 9)                           // tab
+                        (keyCode == 9)                           //tab
                        ){                       
                 chr = String.fromCharCode(keyCode);
                 _KernelInputQueue.enqueue(chr);

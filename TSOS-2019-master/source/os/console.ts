@@ -13,7 +13,10 @@ module TSOS {
                     public currentFontSize = _DefaultFontSize,
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
-                    public buffer = "") {
+                    public buffer = "",
+                    public bufferInput = new Array(),
+                    public bufferIndex = 0
+                    ) {
         }
 
         public init(): void {
@@ -39,14 +42,25 @@ module TSOS {
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
+
+                     //array that keeps track of the user input commands
+                     this.bufferInput.push(this.buffer);
+                     //resets the buffer Index to the newest command inserted each time the user presses enter
+                     this.bufferIndex = this.bufferInput.length;
+
                     // ... and reset our buffer.
                     this.buffer = "";
-                } else if(chr === String.fromCharCode(8)){ //user clicks backspace
+                } else if(chr === String.fromCharCode(8)){ //backspace
                     this.backspace();
                 }//if
-                else if(chr === String.fromCharCode(9)){//user clicks tab
+                else if(chr === String.fromCharCode(9)){// tab
                     this.tab();
                 }//if
+
+                //cannot use String.fromCharCode() because there is no string value associated with the upArrow key
+                else if(chr == "upArrow"){ //up arrow key
+                    this.recall();
+                }
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -99,7 +113,7 @@ module TSOS {
             }//if
             else{
                 this.currentYPosition += lineAdvance;
-            }//else            
+            }//else
         }//advanceLine
 
         public backspace(): void{
@@ -117,7 +131,7 @@ module TSOS {
                 _FontHeightMargin;
                 // remove char function
                 //.clearRect(x, y + fontheight, width, height)
-                _DrawingContext.clearRect(this.currentXPosition,this.currentYPosition + .1, offset, -1 * height);
+                _DrawingContext.clearRect(this.currentXPosition,this.currentYPosition + 9, offset, -1 * height);
 
                 //remove the last letter in the buffer
                 this.buffer = this.buffer.slice(0, -1);
@@ -162,6 +176,33 @@ module TSOS {
                 this.buffer = "";
                 //adds the prompt (defined in the shell)
                 this.putText(_OsShell.promptStr);
+            }//else
         }//tab
+
+        public recall():void{
+            //ensures that we never go out of bounds of the array.
+            if(this.bufferIndex >= 0){
+
+                //resets the position
+                this.currentXPosition = 0;
+
+                //BAC Todo: make the prompt width dynamic
+                this.putText(_OsShell.promptStr);
+                var promptWidth = 11;
+
+                //sets the buffer to the last command entered in the stack
+                this.buffer = this.bufferInput[this.bufferIndex];
+
+                //.clearRect(x, y + fontheight, width, height) 
+                _DrawingContext.clearRect(promptWidth,this.currentYPosition + 10, 500, -1 * 25);
+
+                //Write text in cli
+                //Stirng() converts to string
+                this.putText(String(this.bufferInput[this.bufferIndex]));
+
+                //go further down the array
+                this.bufferIndex--;
+            }//if
+        }//recall
     }
  }
