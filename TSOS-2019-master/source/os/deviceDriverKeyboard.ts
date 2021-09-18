@@ -100,6 +100,10 @@ module TSOS {
                 chr = "upArrow";
                 _KernelInputQueue.enqueue(chr);
             }//if upArrow
+            else if(keyCode == 40){//downArrow
+                chr = "downArrow";
+                _KernelInputQueue.enqueue(chr);
+            }//else
             else if (((keyCode >= 48) && (keyCode <= 57))   ||   // digits
                         (keyCode == 32)                     ||   // space
                         (keyCode == 13)                     ||   // enter

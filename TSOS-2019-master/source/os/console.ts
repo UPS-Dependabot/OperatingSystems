@@ -46,7 +46,7 @@ module TSOS {
                      //array that keeps track of the user input commands
                      this.bufferInput.push(this.buffer);
                      //resets the buffer Index to the newest command inserted each time the user presses enter
-                     this.bufferIndex = this.bufferInput.length;
+                     this.bufferIndex = this.bufferInput.length -1;
 
                     // ... and reset our buffer.
                     this.buffer = "";
@@ -58,8 +58,8 @@ module TSOS {
                 }//if
 
                 //cannot use String.fromCharCode() because there is no string value associated with the upArrow key
-                else if(chr == "upArrow"){ //up arrow key
-                    this.recall();
+                else if(chr == "upArrow" || chr == "downArrow"){ //up arrow key
+                    this.recall(chr);
                 }
                 else {
                     // This is a "normal" character, so ...
@@ -179,10 +179,7 @@ module TSOS {
             }//else
         }//tab
 
-        public recall():void{
-            //ensures that we never go out of bounds of the array.
-            if(this.bufferIndex >= 0){
-
+        public recall(arrow):void{
                 //resets the position
                 this.currentXPosition = 0;
 
@@ -199,10 +196,16 @@ module TSOS {
                 //Write text in cli
                 //Stirng() converts to string
                 this.putText(String(this.bufferInput[this.bufferIndex]));
-
-                //go further down the array
-                this.bufferIndex--;
-            }//if
+                
+                //BufferIndex never goes out of bounds of the bufferIndex
+                switch(arrow){
+                    case "upArrow":
+                        if(this.bufferIndex > 0) this.bufferIndex--;
+                        break;
+                    case "downArrow":
+                        if(this.bufferIndex < this.bufferInput.length -1) this.bufferIndex++;
+                        break;
+                }//switch
         }//recall
     }
  }
