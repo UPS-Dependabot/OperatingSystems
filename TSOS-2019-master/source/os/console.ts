@@ -155,8 +155,8 @@ module TSOS {
                 }//for
                 //Pushes user to the next line after printing out text
                 this.advanceLine();
-            }//else
-
+                //adds the prompt (defined in the shell)
+                this.putText(_OsShell.promptStr);
         }//tab
     }
  }
