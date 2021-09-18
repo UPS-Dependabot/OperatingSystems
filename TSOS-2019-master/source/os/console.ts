@@ -136,12 +136,13 @@ module TSOS {
                 }//if
             }//for
 
-            // if(indexPC == 0){
-            //     //Nothing Happens
-            //     this.putText("")
-            // }//if
             if(indexPC  == 1){ //enters the command into the cli    
-                this.buffer = potentialCommands[indexPC];
+
+                //inputs the rest of the command into the canvas
+                this.putText(potentialCommands[0].substring(this.buffer.length,potentialCommands[0].length));
+
+                //inserts the command into the buffer
+                this.buffer = potentialCommands[0];
             }//if
             else{
                 //Prints out potential commands that the user may want to input
