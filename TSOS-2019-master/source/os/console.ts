@@ -147,14 +147,19 @@ module TSOS {
             else{
                 //Prints out potential commands that the user may want to input
                 this.advanceLine();
-                for(var j = 0;  potentialCommands.length > j; j++){
-                    this.putText(" "+potentialCommands[j]+" ");
-                    if(j%7 == 0){//goes to the next line so the user can see all of the options
+
+                //Pushed the value of j and the length of commands by one so the first command will not immediatley print
+                //and advance to the next line.
+                for(var j = 1;  potentialCommands.length+1 > j; j++){
+                    this.putText(" "+potentialCommands[j-1]+" ");
+                    if(j%8 == 0){//goes to the next line so the user can see all of the options
                         this.advanceLine();
                     }//if
                 }//for
                 //Pushes user to the next line after printing out text
                 this.advanceLine();
+                //Need to clear the buffer or else the previous line will still be saved in the buffer
+                this.buffer = "";
                 //adds the prompt (defined in the shell)
                 this.putText(_OsShell.promptStr);
         }//tab
