@@ -79,23 +79,87 @@ module TSOS {
                         break;
                 }//switch
                 _KernelInputQueue.enqueue(chr);
-                //TODO ADD
-                // else if(keyCode >= 89 && keyCode <=90){
-                //         switch (keyCode){
-                //             case 89:
-                //                 chr = ",";
-                //                 break;
-                //             case 90:
-                //                 chr = ".";
-                //                 break;
-                //             case 91:
-                //                 chr = "/"
-                //                 break;
-                //         }//switch
-                //         _KernelInputQueue.enqueue(chr);
-                // }//if
-
             }//if Shifted KeyCodes 48 - 57
+            //BAC TODO 
+            else if((keyCode >= 186 && keyCode <=192) || keyCode >= 219 && keyCode <= 222){
+                if(isShifted){
+                    switch(keyCode){
+                        case 186:
+                            chr = ":";
+                            break;
+                        case 187:
+                            chr = "+";
+                            break;
+                        case 188:
+                            chr = "<";
+                            break;
+                        case 189:
+                            chr = "_";
+                            break;
+                        case 190:
+                            chr = ">";
+                            break;
+                        case 191:
+                            chr = "?";
+                            break;
+                        case 192:
+                            chr = "~";
+                            break;
+                        case 219:
+                            chr = "{"
+                            break;
+                        case 220:
+                            chr = "|"; 
+                            break;
+                        case 221:
+                            chr = "}";
+                            break;
+                        case 222:
+                            chr = "\"";//this is for " we need to escape out of it so it is reconized in the program
+                            break;
+                    }//switch
+                }//if shift
+                else{
+                    switch (keyCode){
+                        case 186:
+                            chr = ";";
+                            break;
+                        case 187:
+                            chr = "=";
+                            break;
+                        case 188:
+                            chr = ",";
+                            break;
+                        case 189:
+                            chr = "-";
+                            break;
+                        case 190:
+                            chr = ".";
+                            break;
+                        case 191:
+                            chr = "/"
+                            break;
+                        case 192:
+                            chr = "`";
+                            break;
+                        case 219:
+                            chr = "[";
+                            break;
+                        case 220:
+                            chr = "\/"; //this is for / we need to escape out of it so it is reconized in the program
+                            break;
+                        case 221:
+                            chr = "]";
+                            break;
+                        case 222:
+                            chr = "'";
+                            break;
+                        
+                    }//switch
+                }//else
+                
+                _KernelInputQueue.enqueue(chr);
+        }//if
             else if(keyCode == 38){//upArrow
                 chr = "upArrow";
                 _KernelInputQueue.enqueue(chr);
