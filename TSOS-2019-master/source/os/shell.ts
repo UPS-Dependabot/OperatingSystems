@@ -408,19 +408,81 @@ module TSOS {
             var userProgramInput = <HTMLInputElement> document.getElementById("taProgramInput");
             var userInput = userProgramInput.value.trim(); 
 
-            // Regex selects all valid hex characters (uppercase or lowercase) and spaces
-            var regExp = new RegExp("[0-9A-Fa-f \n]", "g");
-            if(userInput !== ""){
-                if(regExp.test(userInput)){
-                    _StdOut.putText("Valid program detected.");
-                }
-                else{
-                    _StdOut.putText("Invalid program, only use 0-9, A-F, a-f, and space.");
-                }
-            }//if
+            var valid = true;
+            var characterIndex = 0;
+            while(valid && characterIndex < userInput.length ){
+                switch(userInput[characterIndex]){
+                    case "0":
+                        break;
+                    case "1":
+                        break;
+                    case "2":
+                        break;
+                    case "3":
+                        break;
+                    case "4":
+                        break;
+                    case "5":
+                        break;
+                    case "6":
+                        break;
+                    case "7":
+                        break;
+                    case "8":
+                        break;
+                    case "9":
+                        break;
+                    case "a":
+                        break;
+                    case "b":
+                        break;
+                    case "c":
+                        break;
+                    case "d":
+                        break;
+                    case "e":
+                        break;
+                    case "f":
+                        break;
+                    case "A":
+                        break;
+                    case "B":
+                        break;
+                    case "C":
+                        break;
+                    case "D":
+                        break;
+                    case "E":
+                        break;
+                    case "F":
+                        break;
+                    case " ":
+                        break;
+                    default:
+                        valid = false;
+                }//switch
+                characterIndex++;
+            }//for
+
+            if(valid){
+                _StdOut.putText("Valid Program :)");
+            }
             else{
-                _StdOut.putText("There is currently no program :(");
-            }//else
+                _StdOut.putText("Invalid Program :( Only usee 0-9, A-F, a-f")
+            }
+            // Regex selects all valid hex characters (uppercase or lowercase) and spaces
+            //var regExp = new RegExp("[0-9A-Fa-f \n]", "g");
+            // if(userInput !== ""){
+            //     if(regExp.test(userInput)){
+            //         _StdOut.putText("Valid program detected.");
+            //     }
+            //     else{
+            //         _StdOut.putText("Invalid program, only use 0-9, A-F, a-f, and space.");
+            //     }
+            // }//if
+            // else{
+            //     _StdOut.putText("There is currently no program :(");
+            // }//else
     
         }//load
 
