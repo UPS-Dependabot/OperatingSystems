@@ -470,16 +470,22 @@ module TSOS {
                 characterIndex++;
             }//while
 
+            
             //formats the user input
             var noSpaceLength= userInput.length
-            var formattedUserInput = "";
-            for(var i = 0; noSpaceLength > i; i++){
-               if(i % 2 == 0){
-                formattedUserInput +=  userInput.substr(i-2,2) +" ";
-               }//if
-            }
-            //inserts the formatted user input in to back into the program
-            userProgramInput.value = formattedUserInput;
+            if(noSpaceLength > 2){ //no need to format input if the size is less than 2
+                var formattedUserInput = "";
+                for(var i = 2; noSpaceLength >= i; i++){
+                   if(i % 2 == 0){
+                    formattedUserInput +=  userInput.substr(i-2,2) +" ";
+                   }//if
+                }//for
+                if(noSpaceLength % 2 == 1){// Adds the last character if odd
+                    formattedUserInput +=userInput.substr(noSpaceLength-1,1);
+                }
+                //inserts the formatted user input in to back into the program
+                userProgramInput.value = formattedUserInput;
+            }//if
             
             if(valid){
                 if(userProgramInput.value == "")
