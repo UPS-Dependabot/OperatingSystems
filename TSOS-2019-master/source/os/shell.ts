@@ -360,6 +360,7 @@ module TSOS {
                     input += args[i]+" "; //user input from the shell
                 }//for 
 
+                
                 userStatus.innerText = input;
              }//if
         }
@@ -407,7 +408,11 @@ module TSOS {
             // Initialize the _UserInput
             var userProgramInput = <HTMLInputElement> document.getElementById("taProgramInput");
             var userInput = userProgramInput.value.trim(); 
+            
+            //removes all spaces
+            userInput = userInput.replace(/\s/g, '');
 
+            //Finds if the program is valid
             var valid = true;
             var characterIndex = 0;
             while(valid && characterIndex < userInput.length ){
@@ -461,15 +466,31 @@ module TSOS {
                     default:
                         valid = false;
                 }//switch
-                characterIndex++;
-            }//for
 
+                characterIndex++;
+            }//while
+
+            //formats the user input
+            var noSpaceLength= userInput.length
+            var formattedUserInput = "";
+            for(var i = 0; noSpaceLength > i; i++){
+               if(i % 2 == 0){
+                formattedUserInput +=  userInput.substr(i-2,2) +" ";
+               }//if
+            }
+            //inserts the formatted user input in to back into the program
+            userProgramInput.value = formattedUserInput;
+            
             if(valid){
-                _StdOut.putText("Valid Program :)");
+                if(userProgramInput.value == "")
+                    _StdOut.putText("There is no program inputted");
+                else
+                    _StdOut.putText("Valid Program :)");
             }
             else{
-                _StdOut.putText("Invalid Program :( Only usee 0-9, A-F, a-f")
+                _StdOut.putText("Invalid Program :( Only usee 0-9, A-F, a-f");
             }
+
             // Regex selects all valid hex characters (uppercase or lowercase) and spaces
             //var regExp = new RegExp("[0-9A-Fa-f \n]", "g");
             // if(userInput !== ""){
@@ -489,6 +510,7 @@ module TSOS {
 
         public shellCSOD(args: string[]){
             _StdOut.clearScreen();     
+            
 
             _StdOut.putText("   ############        ####         ####");
             _StdOut.advanceLine();
