@@ -355,13 +355,13 @@ module TSOS {
              var userStatus = <HTMLInputElement> document.getElementById("status");
              var input = ""; 
 
+             var usrStatus = _StdOut.buffer.split(" ");
              if (args.length > 0) {
                 for(var i in args){
                     input += args[i]+" "; //user input from the shell
                 }//for 
-
                 
-                userStatus.innerText = input;
+               userStatus.innerText = input;
              }//if
         }
 

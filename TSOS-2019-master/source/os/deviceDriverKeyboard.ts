@@ -42,8 +42,25 @@ module TSOS {
                 }
                 // TODO: Check for caps-lock and handle as shifted if so.
                 _KernelInputQueue.enqueue(chr);
-            } 
-            else if( (keyCode >= 48 && keyCode <= 57) && isShifted == true)
+            }
+            else if(keyCode == 38){//upArrow
+                chr = "upArrow";
+                _KernelInputQueue.enqueue(chr);
+            }//if upArrow
+            else if(keyCode == 40){//downArrow
+                chr = "downArrow";
+                _KernelInputQueue.enqueue(chr);
+            }//else
+            else if (((keyCode >= 48) && (keyCode <= 57) && isShifted == false)   ||   // digits
+                        (keyCode == 32)                     ||   // space
+                        (keyCode == 13)                     ||   // enter
+                        (keyCode == 8)                      ||   // backspace
+                        (keyCode == 9)                           //tab
+                       ){                       
+                chr = String.fromCharCode(keyCode);
+                _KernelInputQueue.enqueue(chr);
+            }//if
+            else if( (keyCode >= 48 && keyCode <= 57)) 
             {// special shifted characters (0 - 9 on the top of the keyboard)
                 switch (keyCode) 
                 {
@@ -154,27 +171,8 @@ module TSOS {
                         case 222:
                             chr = "'";
                             break;
-                        
                     }//switch
                 }//else
-                
-                _KernelInputQueue.enqueue(chr);
-        }//if
-            else if(keyCode == 38){//upArrow
-                chr = "upArrow";
-                _KernelInputQueue.enqueue(chr);
-            }//if upArrow
-            else if(keyCode == 40){//downArrow
-                chr = "downArrow";
-                _KernelInputQueue.enqueue(chr);
-            }//else
-            else if (((keyCode >= 48) && (keyCode <= 57))   ||   // digits
-                        (keyCode == 32)                     ||   // space
-                        (keyCode == 13)                     ||   // enter
-                        (keyCode == 8)                      ||   // backspace
-                        (keyCode == 9)                           //tab
-                       ){                       
-                chr = String.fromCharCode(keyCode);
                 _KernelInputQueue.enqueue(chr);
             }//if
         }//krnKbdDispatchKeyPress
