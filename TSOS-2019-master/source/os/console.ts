@@ -132,7 +132,7 @@ module TSOS {
 
                 // remove char function
                 //.clearRect(x, y + fontheight, width, height)
-                //On the CLI a rectangle erases the character that is being deleted (bumpped up the y position by 5 to ensure that the whole character get deleted)
+                //On the CLI a rectangle erases the character that is being deleted (bumpped up the y position by 5 to ensure that the whole character gets deleted)
                 _DrawingContext.clearRect(this.currentXPosition,this.currentYPosition + 5, offset, -1 * height);
 
                 //remove the last letter in the buffer
@@ -154,22 +154,19 @@ module TSOS {
 
             //The input matches none of the commands
             if(indexPC == 0){
-
-            }
-            //When there is only a single match the rest of the command is automatically inputted into the CLI
-            else if(indexPC  == 1){    
+                //Do nothing
+            }else if(indexPC  == 1){//When there is only a single match the rest of the command is automatically inputted into the CLI
 
                 //inputs the rest of the command into the canvas
                 this.putText(potentialCommands[0].substring(this.buffer.length,potentialCommands[0].length));
 
                 //inserts the command into the buffer
                 this.buffer = potentialCommands[0];
-            }//if
-            else{
-                //Prints out potential commands that the user may want to input
+            } 
+            else{//Prints out potential commands that the user may want to input
                 this.advanceLine();
 
-                //Pushed the value of j and the length of commands by one so the first command will not immediatley print
+                //j starts at one and the length of commands is incremented by one, so the first command will not immediatley print
                 //and advance to the next line.
                 for(var j = 1;  potentialCommands.length+1 > j; j++){
                     this.putText(" "+potentialCommands[j-1]+" ");
@@ -190,18 +187,21 @@ module TSOS {
                 //resets the position
                 this.currentXPosition = 0;
 
-                //BAC Todo: make the prompt width dynamic
+                var promptWidth;
+
+                //Prompt width dynamic :)
+                promptWidth = _DrawingContext.measureText(this.currentFont, this.currentFontSize, String(_OsShell.promptStr));
+
                 this.putText(_OsShell.promptStr);
-                var promptWidth = 11;
 
                 //sets the buffer to the last command entered in the stack
                 this.buffer = this.bufferInput[this.bufferIndex];
 
                 //.clearRect(x, y + fontheight, width, height) 
+                //promptWidth
                 _DrawingContext.clearRect(promptWidth,this.currentYPosition + 10, 500, -1 * 25);
 
-                //Write text in cli
-                //Stirng() converts to string
+                //Write previous input back into the cli                             
                 this.putText(String(this.bufferInput[this.bufferIndex]));
                 
                 //BufferIndex never goes out of bounds of the bufferIndex
