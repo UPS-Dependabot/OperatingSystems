@@ -111,7 +111,7 @@ module TSOS {
                 //Inserts the the canvas's current state above where the user will input their next line 
                 _DrawingContext.putImageData(canvasImg, 0, -lineAdvance);
             }//if
-            else{
+            else{//Normal Scrollling
                 this.currentYPosition += lineAdvance;
             }//else
         }//advanceLine
@@ -122,16 +122,18 @@ module TSOS {
                 //get the last character typed and erase it from the canvas
                 let lastChar = this.buffer[this.buffer.length - 1];
                 
+                //Cursor is moved back by the width of the character that was just deleted
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, lastChar);
-
                 this.currentXPosition = this.currentXPosition - offset;
 
                 var height = _DefaultFontSize + 
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
+
                 // remove char function
                 //.clearRect(x, y + fontheight, width, height)
-                _DrawingContext.clearRect(this.currentXPosition,this.currentYPosition + 9, offset, -1 * height);
+                //On the CLI a rectangle erases the character that is being deleted (bumpped up the y position by 5 to ensure that the whole character get deleted)
+                _DrawingContext.clearRect(this.currentXPosition,this.currentYPosition + 5, offset, -1 * height);
 
                 //remove the last letter in the buffer
                 this.buffer = this.buffer.slice(0, -1);
@@ -143,14 +145,19 @@ module TSOS {
             var potentialCommands  = [];
             for (var i in _OsShell.commandList) {
                 //Compares the current string in the buffer against each command in the list
-                //slices the name of the command from 0 to the current length of the string in the buffer
+                //Slices the name of the command from 0 to the current length of the string in the buffer to see if it matches the user input
                 if(this.buffer == _OsShell.commandList[i].command.substring(0,this.buffer.length)){
                     potentialCommands[indexPC] = _OsShell.commandList[i].command;
                     indexPC++;
                 }//if
             }//for
 
-            if(indexPC  == 1){ //enters the command into the cli    
+            //The input matches none of the commands
+            if(indexPC == 0){
+
+            }
+            //When there is only a single match the rest of the command is automatically inputted into the CLI
+            else if(indexPC  == 1){    
 
                 //inputs the rest of the command into the canvas
                 this.putText(potentialCommands[0].substring(this.buffer.length,potentialCommands[0].length));
