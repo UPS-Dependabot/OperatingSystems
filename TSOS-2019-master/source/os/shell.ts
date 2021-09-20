@@ -406,10 +406,11 @@ module TSOS {
              _StdOut.putText("Hey Ferb! Lets " + activity);
         }//ferb
 
+
         public shellLoad(args: string[]){
             // Initialize the _UserInput
             var userProgramInput = <HTMLInputElement> document.getElementById("taProgramInput");
-            var userInput = userProgramInput.value.trim(); 
+            var userInput = userProgramInput.value.trim();  //gets rid of the trailing white space
             
             //removes all spaces
             userInput = userInput.replace(/\s/g, '');
@@ -417,6 +418,14 @@ module TSOS {
             //Finds if the program is valid
             var valid = true;
             var characterIndex = 0;
+
+            /*
+            // I Originally tried to implement a regular expression to execute this command
+            // but when I tried to use the test() command to validate whether or not the user input was valid hex 
+            // it would always say it was valid as long as there was a single valid character withiin the user program.
+            // I have never used regular expressions before this class so I decided to stick with what I know. 
+            // Unfortuanately, I know how to make long switch statements so here you go!
+            */
             while(valid && characterIndex < userInput.length ){
                 switch(userInput[characterIndex]){
                     case "0":
@@ -488,6 +497,9 @@ module TSOS {
                 //inserts the formatted user input in to back into the program
                 userProgramInput.value = formattedUserInput;
             }//if
+            else{// strips any extra spaces when there are 2 or less characters in the user program
+                userProgramInput.value = userInput;
+            }
             
             if(valid){
                 if(userProgramInput.value == "")
@@ -497,22 +509,7 @@ module TSOS {
             }
             else{
                 _StdOut.putText("Invalid Program :( Only usee 0-9, A-F, a-f");
-            }
-
-            // Regex selects all valid hex characters (uppercase or lowercase) and spaces
-            //var regExp = new RegExp("[0-9A-Fa-f \n]", "g");
-            // if(userInput !== ""){
-            //     if(regExp.test(userInput)){
-            //         _StdOut.putText("Valid program detected.");
-            //     }
-            //     else{
-            //         _StdOut.putText("Invalid program, only use 0-9, A-F, a-f, and space.");
-            //     }
-            // }//if
-            // else{
-            //     _StdOut.putText("There is currently no program :(");
-            // }//else
-    
+            }    
         }//load
 
 
