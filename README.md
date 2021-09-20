@@ -1,3 +1,3 @@
 # OperatingSystems
 
-Professor Labouseur grade main for projects
+Professor Labouseur grade the main branch for projects
