@@ -373,7 +373,9 @@ module TSOS {
             _StdOut.putText(Date());
         }//date
 
-        //Phineas tells Ferb what they are going to d today based off of the day of the week
+        //Phineas tells Ferb what they are going to do today based off of the day of the week!
+        //
+        //Phineas and Ferb is a cartoon show on Disney if you don't understand the reference
         public shellFerb(args: string[]){
             var activity = "poop";
              switch (Date().slice(0, 3)) {
@@ -515,58 +517,10 @@ module TSOS {
 
 
         public shellCSOD(args: string[]){
-            _StdOut.clearScreen();     
-            
-
-            _StdOut.putText("   ############        ####         ####");
-            _StdOut.advanceLine();
-            _StdOut.putText(" ######   #######      ####         ####");
-            _StdOut.advanceLine();
-            _StdOut.putText("#####                     ###############");
-            _StdOut.advanceLine();
-            _StdOut.putText("#####                     ###############");
-            _StdOut.advanceLine();
-            _StdOut.putText(" ######     #######    ####         ####");
-            _StdOut.advanceLine();
-            _StdOut.putText("   ##############      ####         ####");
-            _StdOut.advanceLine();
-            _StdOut.putText("                                           ");
-            _StdOut.advanceLine();
-
-            _StdOut.putText("     ##############      ############                ");
-            _StdOut.advanceLine();
-            _StdOut.putText("     ####      #####      ####         ####           ");
-            _StdOut.advanceLine();
-            _StdOut.putText("     ##############     ##############           ");
-            _StdOut.advanceLine();
-            _StdOut.putText("     ####      #####     #############              ");
-            _StdOut.advanceLine();
-            _StdOut.putText("     ####      #####     ####       #####          ");
-            _StdOut.advanceLine();
-            _StdOut.putText("     ####      #####     ####          ####       ");
-            _StdOut.advanceLine();
-            _StdOut.putText("                                                     ");
-            _StdOut.advanceLine();
-
-            _StdOut.putText("     ####      #####          ");
-            _StdOut.advanceLine();
-            _StdOut.putText("     ####      #####           ");
-            _StdOut.advanceLine();
-            _StdOut.putText("     #############         ");
-            _StdOut.advanceLine();
-            _StdOut.putText("     ####    #####         ");
-            _StdOut.advanceLine();
-            _StdOut.putText("     ####      #####         ");
-            _StdOut.advanceLine();
-            _StdOut.putText("     ####         #####        ");
-            _StdOut.advanceLine();
-            _StdOut.putText("                                                                 ");
-            _StdOut.advanceLine();
-
-            _Kernel.krnShutdown();
             // Stop the interval that's simulating our clock pulse.
             clearInterval(_hardwareClockID);
-
+            //Crash the OS
+            _Kernel.krnTrapError("Chark Screen of Death");
         }
 
 

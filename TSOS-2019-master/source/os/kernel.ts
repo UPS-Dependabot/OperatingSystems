@@ -170,6 +170,11 @@ module TSOS {
         public krnTrapError(msg) {
             Control.hostLog("OS ERROR - TRAP: " + msg);
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
+            TSOS.Control.hostLog("OS ERROR - TRAP: " + msg);
+            _OsShell.promptStr = ""; // Prompt string is still displayed after this function so it would still appear without "clearing" it
+            _DrawingContext.fillStyle = "#555555";
+            _DrawingContext.fillRect(0, 0, 500, 500);
+            _DrawingContext.drawTextCenter(_StdOut.currentFont, _StdOut.currentFontSize, _Canvas.width / 2, _Canvas.height / 2, "CharkOS error message: " + msg);
             this.krnShutdown();
         }
     }
