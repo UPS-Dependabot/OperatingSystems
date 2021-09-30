@@ -45,6 +45,20 @@ var TSOS;
             // prompt <string>
             sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
+            //status
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Tell me your status");
+            this.commandList[this.commandList.length] = sc;
+            //whereami
+            sc = new TSOS.ShellCommand(this.shellWhereami, "whereami", "- Informs you about your current where abouts.");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellDate, "date", "- Tells you the current date");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellFerb, "ferb", "- Ferb I know what we are going to do today");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- validates user code in the User Program Input. Only hex digits and spaces are valid");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellCSOD, "csod", " - crashes the console and displays the Chark screen of Death :)");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             // Display the initial prompt.
@@ -167,7 +181,7 @@ var TSOS;
         // Although args is unused in some of these functions, it is always provided in the 
         // actual parameter list when this function is called, so I feel like we need it.
         shellVer(args) {
-            _StdOut.putText(APP_NAME + " version " + APP_VERSION);
+            _StdOut.putText(APP_NAME + " version " + APP_VERSION + " authored by Brian Coppola");
         }
         shellHelp(args) {
             _StdOut.putText("Commands:");
@@ -190,8 +204,46 @@ var TSOS;
             if (args.length > 0) {
                 var topic = args[0];
                 switch (topic) {
+                    case "ver":
+                        _StdOut.putText("Provides version info");
+                        break;
                     case "help":
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
+                        break;
+                    case "shutdown":
+                        _StdOut.putText("It's the off button mate.");
+                        break;
+                    case "cls":
+                        _StdOut.putText("Makes all of your problems vanish.");
+                        break;
+                    case "man":
+                        _StdOut.putText("Is suppose to tell you what <command> means.");
+                        break;
+                    case "trace":
+                        _StdOut.putText("Pauses and unpauses the host log.");
+                        break;
+                    case "rot13":
+                        _StdOut.putText("Cypher that rotates each letter by 13 letters.");
+                        break;
+                    case "prompt":
+                        _StdOut.putText("Resets the prompt of where you begin typing the command line.");
+                    case "status":
+                        _StdOut.putText("User can enter their status");
+                        break;
+                    case "whereami":
+                        _StdOut.putText("Tells you your location");
+                        break;
+                    case "date":
+                        _StdOut.putText("Prints the current date");
+                        break;
+                    case "ferb":
+                        _StdOut.putText("Phineas tell you what you are going to do today");
+                        break;
+                    case "load":
+                        _StdOut.putText("Validates program input");
+                        break;
+                    case "csod":
+                        _StdOut.putText("Crashes the OS and displays screen of death");
                         break;
                     // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
                     default:
@@ -244,7 +296,168 @@ var TSOS;
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
         }
-    }
+        shellStatus(args) {
+            var userStatus = document.getElementById("status");
+            var input = "";
+            var usrStatus = _StdOut.buffer.split(" ");
+            if (args.length > 0) {
+                for (var i in args) {
+                    input += args[i] + " "; //user input from the shell
+                } //for 
+                userStatus.innerText = input;
+            } //if
+        }
+        shellWhereami(args) {
+            _StdOut.putText("Chark Town DAAWG");
+        } //whereami
+        shellDate(args) {
+            _StdOut.putText(Date());
+        } //date
+        //Phineas tells Ferb what they are going to do today based off of the day of the week!
+        //
+        //Phineas and Ferb is a cartoon show on Disney if you don't understand the reference
+        shellFerb(args) {
+            var activity = "poop";
+            switch (Date().slice(0, 3)) {
+                case "Mon":
+                    activity = "build a rocket!";
+                    break;
+                case "Tue":
+                    activity = "fight a mummy!";
+                    break;
+                case "Wed":
+                    activity = "climb up the Effel Tower!";
+                    break;
+                case "Thu":
+                    activity = "discover something that doesn't exist!";
+                    break;
+                case "Fri":
+                    activity = "give a monkey a shower!";
+                    break;
+                case "Sat":
+                    activity = "locate Frankenstein's brain!";
+                    break;
+                case "Sun":
+                    activity = ".. Wait! Where's Perry?";
+                    break;
+                default:
+                    activity = "take a break.";
+            }
+            _StdOut.putText("Hey Ferb! Lets " + activity);
+        } //ferb
+        shellLoad(args) {
+            // Initialize the _UserInput
+            var userProgramInput = document.getElementById("taProgramInput");
+            var userInput = userProgramInput.value.trim(); //gets rid of the trailing white space
+            //removes all spaces
+            userInput = userInput.replace(/\s/g, '');
+            //Finds if the program is valid
+            var valid = true;
+            var characterIndex = 0;
+            /*
+            // I Originally tried to implement a regular expression to execute this command
+            // but when I tried to use the test() command to validate whether or not the user input was valid hex
+            // it would always say it was valid as long as there was a single valid character withiin the user program.
+            // I have never used regular expressions before this class so I decided to stick with what I know.
+            // Unfortuanately, I know how to make long switch statements so here you go!
+            */
+            while (valid && characterIndex < userInput.length) {
+                switch (userInput[characterIndex]) {
+                    case "0":
+                        break;
+                    case "1":
+                        break;
+                    case "2":
+                        break;
+                    case "3":
+                        break;
+                    case "4":
+                        break;
+                    case "5":
+                        break;
+                    case "6":
+                        break;
+                    case "7":
+                        break;
+                    case "8":
+                        break;
+                    case "9":
+                        break;
+                    case "a":
+                        break;
+                    case "b":
+                        break;
+                    case "c":
+                        break;
+                    case "d":
+                        break;
+                    case "e":
+                        break;
+                    case "f":
+                        break;
+                    case "A":
+                        break;
+                    case "B":
+                        break;
+                    case "C":
+                        break;
+                    case "D":
+                        break;
+                    case "E":
+                        break;
+                    case "F":
+                        break;
+                    case " ":
+                        break;
+                    default:
+                        valid = false;
+                } //switch
+                characterIndex++;
+            } //while
+            //formats the user input
+            var noSpaceLength = userInput.length;
+            if (noSpaceLength > 2) { //no need to format input if the size is less than 2
+                var formattedUserInput = "";
+                for (var i = 2; noSpaceLength >= i; i++) {
+                    if (i % 2 == 0) {
+                        formattedUserInput += userInput.substr(i - 2, 2) + " ";
+                    } //if
+                } //for
+                if (noSpaceLength % 2 == 1) { // Adds the last character if odd
+                    formattedUserInput += userInput.substr(noSpaceLength - 1, 1);
+                }
+                //inserts the formatted user input in to back into the program
+                userProgramInput.value = formattedUserInput;
+            } //if
+            else { // strips any extra spaces when there are 2 or less characters in the user program
+                userProgramInput.value = userInput;
+            }
+            if (valid) {
+                if (userProgramInput.value == "")
+                    _StdOut.putText("There is no program inputted");
+                else if (userProgramInput.value.length > Segment_Length) {
+                    _StdOut.putText("The program you entered will not fit into memory");
+                }
+                else {
+                    _StdOut.putText("Valid Program :)");
+                    //Send to Memory Accessor to store in Memory
+                    //Splits so the array generated by spaces
+                    _MemAcc.loadIn(userProgramInput.value.split(" "));
+                    //Initiates the execution of the program
+                    _CPU.isExecuting = true;
+                } //else
+            }
+            else {
+                _StdOut.putText("Invalid Program :( Only usee 0-9, A-F, a-f");
+            }
+        } //load
+        shellCSOD(args) {
+            // Stop the interval that's simulating our clock pulse.
+            clearInterval(_hardwareClockID);
+            //Crash the OS
+            _Kernel.krnTrapError("Chark Screen of Death");
+        }
+    } //Shell
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));
 //# sourceMappingURL=shell.js.map
