@@ -29,6 +29,30 @@ var TSOS;
             this.Zflag = 0;
             this.isExecuting = false;
         }
+        getPC() {
+            return this.PC;
+        }
+        setPC(newPC) {
+            this.PC = newPC;
+        }
+        setAcc(newAcc) {
+            this.Acc = newAcc;
+        }
+        getAcc() {
+            return this.Acc;
+        }
+        setXReg(newX) {
+            this.Xreg = newX;
+        }
+        getXReg() {
+            return this.Xreg;
+        }
+        setYReg(newY) {
+            this.Yreg = newY;
+        }
+        getYReg() {
+            return this.Yreg;
+        }
         cycle() {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
@@ -43,81 +67,132 @@ var TSOS;
         fetchOpCode(hex, memIndex) {
             switch (hex) {
                 case "A9":
-                    this.loadConstant;
+                    this.loadConstant(memIndex);
+                    this.PC++;
                     break;
                 case "AD":
-                    this.loadMemory;
+                    this.loadMemory(memIndex);
+                    this.PC++;
                     break;
                 case "8D":
-                    this.store;
+                    this.store(memIndex);
+                    this.PC++;
                     break;
                 case "6D":
-                    this.addCarry;
+                    this.addCarry(memIndex);
+                    this.PC++;
                     break;
                 case "A2":
-                    this.XregCon;
+                    this.XregCon(memIndex);
+                    this.PC++;
                     break;
                 case "AE":
-                    this.XregMem;
+                    this.XregMem(memIndex);
                     break;
                 case "A0":
-                    this.YregCon;
+                    this.YregCon(memIndex);
+                    this.PC++;
                     break;
                 case "AC":
-                    this.YregMem;
+                    this.YregMem(memIndex);
+                    this.PC++;
                     break;
                 case "00":
                     this.NoOperation;
+                    this.PC++;
                     break;
                 case "EC":
-                    this.compare;
+                    this.compare(memIndex);
                     break;
                 case "D0":
-                    this.branch;
+                    this.branch(memIndex);
+                    this.PC++;
                     break;
                 case "EE":
-                    this.increment;
+                    this.increment(memIndex);
+                    this.PC++;
                     break;
                 case "FF":
-                    this.sysCall;
+                    this.sysCall(memIndex);
+                    this.PC++;
                     break;
                 //add a defualt (not sure what it should be yet)
             } //switch
         } //fetchOPCode
-        loadConstant() {
+        //Always increment the program counter to match the index of the hexcode in the program
+        loadConstant(index) {
             //fetches the next index in Memory and sets it to the accumulator
-            this.Acc = _Mem.Mem[this.PC + 1];
-            this.PC++;
+            this.Acc = _MemAcc.read(this.PC + 1);
+            this.PC += 2;
         } //loadConstabnt
-        loadMemory() {
+        loadMemory(index) {
             //loads from the Specified Addresss in Memory
-            this.Acc = _Mem.Mem[_Mem.Mem[this.PC + 1]];
-            this.PC++;
+            var val1 = _MemAcc.read(this.PC + 1);
+            var val2 = _MemAcc.read(this.PC + 2);
+            var newVal = val1 + val2;
+            //converts the new Value to hex
+            this.Acc = parseInt(newVal.toString(16), 16);
+            //Program Counter
+            this.PC = +3;
         } //loadMemory
-        store() {
+        //There must be a better way to snatch the next hexcode and store it. 
+        store(index) {
+            var val1 = _MemAcc.read(this.PC + 1);
+            var val2 = _MemAcc.read(this.PC + 2);
+            var newVal = val1 + val2;
+            _MemAcc.write(parseInt(newVal.toString(16), 16), this.Acc);
+            this.PC = +3;
         } //store
-        addCarry() {
+        addCarry(index) {
+            //Adds the hex
+            var address1 = _MemAcc.read(this.PC + 1);
+            var address2 = _MemAcc.read(this.PC + 2);
+            var wholeAddress = address1 + address2;
+            //adds the contents of the address into the accumulator
+            this.Acc = +parseInt(wholeAddress.toString(16), 16);
         } //addCarry
-        XregCon() {
+        XregCon(index) {
+            this.Xreg = _MemAcc.read(this.PC + 1);
+            this.PC += 2;
         } //XregCon
-        XregMem() {
+        XregMem(index) {
+            //loads from the Specified Addresss in Memory
+            var val1 = _MemAcc.read(this.PC + 1);
+            var val2 = _MemAcc.read(this.PC + 2);
+            var newVal = val1 + val2;
+            //converts the new Value to hex
+            this.Xreg = parseInt(newVal.toString(16), 16);
+            //Program Counter
+            this.PC = +3;
         } //XregMem
-        YregCon() {
+        YregCon(index) {
+            this.Yreg = _MemAcc.read(this.PC + 1);
+            this.PC += 2;
         } //YregCon
-        YregMem() {
+        YregMem(index) {
+            //loads from the Specified Addresss in Memory
+            var val1 = _MemAcc.read(this.PC + 1);
+            var val2 = _MemAcc.read(this.PC + 2);
+            var newVal = val1 + val2;
+            //converts the new Value to hex
+            this.Yreg = parseInt(newVal.toString(16), 16);
+            //Program Counter
+            this.PC = +3;
         } //YregMem
-        NoOperation() {
+        NoOperation(index) {
             //Except increment the Program Counter
+            this.PC++;
         } //No Operation
-        programBreak() {
+        programBreak(index) {
         } //programBreak
-        compare() {
+        compare(index) {
         } //compare
-        branch() {
+        branch(index) {
         } //branch
-        increment() {
+        increment(index) {
+            this.Acc++;
         } //increment
-        sysCall() {
+        sysCall(index) {
             //Call 1
             //print the int stored in the Y register
             //Call2

@@ -33,6 +33,38 @@ module TSOS {
             this.isExecuting = false;
         }
 
+        getPC(){
+            return this.PC;
+        }
+
+        setPC(newPC){
+            this.PC = newPC;
+        }
+
+        setAcc(newAcc){
+            this.Acc = newAcc;
+        }
+        getAcc(){
+            return this.Acc;
+        }
+
+        setXReg(newX){
+            this.Xreg = newX;
+        }
+        
+        getXReg(){
+            return this.Xreg;
+        }
+
+        setYReg(newY){
+            this.Yreg = newY;
+        }
+        
+        getYReg(){
+            return this.Yreg;
+        }
+
+
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
@@ -49,105 +81,155 @@ module TSOS {
         public fetchOpCode(hex, memIndex){
             switch(hex){
                 case "A9":
-                    this.loadConstant;
+                    this.loadConstant(memIndex);
+                    this.PC++;
                     break;
                 case "AD":
-                    this.loadMemory;
+                    this.loadMemory(memIndex);
+                    this.PC++;
                     break;
                 case "8D": 
-                    this.store;
+                    this.store(memIndex);
+                    this.PC++;
                     break;
                 case "6D":
-                    this.addCarry;
+                    this.addCarry(memIndex);
+                    this.PC++;
                     break;
                 case "A2":
-                    this.XregCon;
+                    this.XregCon(memIndex);
+                    this.PC++;
                     break;
                 case "AE":
-                    this.XregMem;
+                    this.XregMem(memIndex);
                     break;
                 case "A0":
-                    this.YregCon;
+                    this.YregCon(memIndex);
+                    this.PC++;
                     break;
                 case "AC":
-                    this.YregMem;
+                    this.YregMem(memIndex);
+                    this.PC++;
                     break;
                 case "00":
                     this.NoOperation;
+                    this.PC++;
                     break;
                 case "EC":
-                    this.compare;
+                    this.compare(memIndex);
                     break;
                 case "D0":
-                    this.branch;
+                    this.branch(memIndex);
+                    this.PC++;
                     break; 
                 case "EE":
-                    this.increment;
+                    this.increment(memIndex);
+                    this.PC++;
                     break;
                 case "FF":
-                    this.sysCall;
+                    this.sysCall(memIndex);
+                    this.PC++;
                     break;
                 //add a defualt (not sure what it should be yet)
             }//switch
         }//fetchOPCode
 
-        public loadConstant (){//load accumulator with constant
+        //Always increment the program counter to match the index of the hexcode in the program
+
+        public loadConstant (index){//load accumulator with constant
             //fetches the next index in Memory and sets it to the accumulator
-            this.Acc = _Mem.Mem[this.PC+1];
-            this.PC++;
+            this.Acc = _MemAcc.read(this.PC+1);
+            this.PC += 2;
         }//loadConstabnt
 
-        public loadMemory(){//load accumulator from memory
+        public loadMemory(index){//load accumulator from memory
             //loads from the Specified Addresss in Memory
-            this.Acc = _Mem.Mem[_Mem.Mem[this.PC+1]];
-            this.PC++;
+            var val1  = _MemAcc.read(this.PC+1);
+            var val2 = _MemAcc.read(this.PC+2);
+            var newVal = val1 + val2;
+            //converts the new Value to hex
+            this.Acc = parseInt(newVal.toString(16), 16);
+
+            //Program Counter
+            this.PC =+ 3;
         }//loadMemory
 
-        public store(){//store accumulator in memory
+        //There must be a better way to snatch the next hexcode and store it. 
+        public store(index){//store accumulator in memory
+            var val1  = _MemAcc.read(this.PC+1);
+            var val2 = _MemAcc.read(this.PC+2);
+            var newVal = val1 + val2;
 
+            _MemAcc.write(parseInt(newVal.toString(16), 16), this.Acc);
+            this.PC =+ 3;
         }//store
 
-        public addCarry(){//Add with carry
+        public addCarry(index){//Add with carry
+            //Adds the hex
+            var address1  = _MemAcc.read(this.PC+1);
+            var address2 = _MemAcc.read(this.PC+2);
+            var wholeAddress = address1 + address2;
 
+            //adds the contents of the address into the accumulator
+            this.Acc =+ parseInt(wholeAddress.toString(16), 16);
         }//addCarry
 
-        public XregCon(){//Load X register with constant
-
+        public XregCon(index){//Load X register with constant
+            this.Xreg = _MemAcc.read(this.PC+1);
+            this.PC += 2;
         }//XregCon
 
-        public XregMem(){//Load X register from memory
-        
+        public XregMem(index){//Load X register from memory
+            //loads from the Specified Addresss in Memory
+            var val1  = _MemAcc.read(this.PC+1);
+            var val2 = _MemAcc.read(this.PC+2);
+            var newVal = val1 + val2;
+            //converts the new Value to hex
+            this.Xreg = parseInt(newVal.toString(16), 16);
+
+            //Program Counter
+            this.PC =+ 3;
         }//XregMem
 
-        public YregCon(){// Load Y register with constant
-
+        public YregCon(index){// Load Y register with constant
+            this.Yreg = _MemAcc.read(this.PC+1);
+            this.PC += 2;
         }//YregCon
 
-        public YregMem(){//Load Y register from memory
-        
+        public YregMem(index){//Load Y register from memory
+            //loads from the Specified Addresss in Memory
+            var val1  = _MemAcc.read(this.PC+1);
+            var val2 = _MemAcc.read(this.PC+2);
+            var newVal = val1 + val2;
+            //converts the new Value to hex
+            this.Yreg = parseInt(newVal.toString(16), 16);
+
+            //Program Counter
+            this.PC =+ 3;
         }//YregMem
 
-        public NoOperation(){// Does nothing
+        public NoOperation(index){// Does nothing
             //Except increment the Program Counter
+            this.PC++;
         }//No Operation
 
-        public programBreak(){//Ends the program (It is really a system call)
+        public programBreak(index){//Ends the program (It is really a system call)
 
         }//programBreak
 
-        public compare(){//Compare a byte in memory to X reg & sets the zero flag if equal
+        public compare(index){//Compare a byte in memory to X reg & sets the zero flag if equal
         
         }//compare
 
-        public branch(){// Hops to another line in the program if Z Flag  = 0
+        public branch(index){// Hops to another line in the program if Z Flag  = 0
         
         }//branch
 
-        public increment(){//increments the value of a byte
-        
+        public increment(index){//increments the value of a byte
+            this.Acc++;
         }//increment
 
-        public sysCall(){
+        public sysCall(index){
             //Call 1
             //print the int stored in the Y register
 

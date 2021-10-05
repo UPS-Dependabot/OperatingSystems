@@ -1,7 +1,7 @@
 var TSOS;
 (function (TSOS) {
     class Memory {
-        constructor(Mem = new Array(256)) {
+        constructor(Mem = new Array(Segment_Length)) {
             this.Mem = Mem;
         } //constructor
         init() {

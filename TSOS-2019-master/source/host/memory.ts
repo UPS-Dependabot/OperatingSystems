@@ -1,7 +1,7 @@
 module TSOS{
     export class Memory{
         constructor(
-            public Mem = new Array(256)
+            public Mem = new Array(Segment_Length)
             ) {
         }//constructor
 
