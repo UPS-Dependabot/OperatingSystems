@@ -173,12 +173,8 @@ module TSOS {
         }//XregCon
 
         public XregMem(index){//Load X register from memory
-            //loads from the Specified Addresss in Memory
-            var val1  = _MemAcc.read(this.PC+1);
-            var val2 = _MemAcc.read(this.PC+2);
-            var newVal = val1 + val2;
             //converts the new Value to hex
-            this.Xreg = parseInt(newVal.toString(16), 16);
+            this.Xreg = parseInt(this.valueHelper().toString(16), 16);
 
             //Program Counter
             this.PC += 3;
@@ -190,12 +186,8 @@ module TSOS {
         }//YregCon
 
         public YregMem(index){//Load Y register from memory
-            //loads from the Specified Addresss in Memory
-            var val1  = _MemAcc.read(this.PC+1);
-            var val2 = _MemAcc.read(this.PC+2);
-            var newVal = val1 + val2;
             //converts the new Value to hex
-            this.Yreg = parseInt(newVal.toString(16), 16);
+            this.Yreg = parseInt(this.valueHelper().toString(16), 16);
 
             //Program Counter
             this.PC += 3;
@@ -205,6 +197,14 @@ module TSOS {
             //Except increment the Program Counter
             this.PC++;
         }//No Operation
+        
+        //---------REMINDER-------
+        /*
+        /BRIAN DO NOT FORGET THAT SYSCALL AND PROGRAM BREAK ARE NOT COMPLETED 
+        /
+        /IMPLEMENT THE INTERPUT QUEUE!!!!!!!!
+        /PLEASSSSEEEEEEE!!!!!!!!!!!!!!!!!!!!!
+        */
 
         public programBreak(index){//Ends the program (It is really a system call)
             
@@ -213,13 +213,8 @@ module TSOS {
         }//programBreak
 
         public compare(index){//Compare a byte in memory to X reg & sets the zero flag if equal
-            //converts the memory in the address to a number (I assigned it to the hex variable for readability)
-            var hex1 = _MemAcc.read(this.PC+1);
-            var hex2 = _MemAcc.read(this.PC+2);
-            var hex = hex1+hex2;
-            var newHex = parseInt(newHex.toString(16), 16);
             //sets the Zero Flag to the appropriate state
-            if(this.Xreg == newHex){
+            if(this.Xreg == this.valueHelper()){
                 this.Zflag = 1;
             }//if
             else{
@@ -238,26 +233,44 @@ module TSOS {
             }//if
 
             else{//No Branch 
-                //Just increment as normal to go past the rest of Op Code and address
+                //Just increment as normal to go past the rest of Op Code and the address
                 this.PC += 2;
             }//else
         }//branch
 
         public increment(index){//increments the value of a byte
-            this.Acc++;
-            var hex1 = _MemAcc.read(this.PC+1);
-            var hex2 = _MemAcc.read(this.PC+2);
-            var hex = hex1 + hex2;
-            var newHex = parseInt(_MemAcc.read(newHex).toString(16),16)
+            //The value of the byte in front of the Increment OP Code is incremented 
+            //      hence why the Program Counter is looking one place ahead
+            //
+            //We then fetch the value of the byte and add it by one! :)
+            //
+            _MemAcc.write(this.PC+1, this.valueHelper()+1);
             this.PC += 3; 
         }//increment
 
-        public sysCall(index){
-            //Call 1
-            //print the int stored in the Y register
+        //---------REMINDER-------
+        /*
+        /BRIAN DO NOT FORGET THAT SYSCALL AND PROGRAM BREAK ARE NOT COMPLETED 
+        /
+        /IMPLEMENT THE INTERPUT QUEUE!!!!!!!!
+        /PLEASSSSEEEEEEE!!!!!!!!!!!!!!!!!!!!!
+        */
 
-            //Call2
-            //print the 00-terminated string stored at the address in the Y register
+        public sysCall(index){
+
+            switch(this.Xreg){
+                //Call 1
+                //print the int stored in the Y register
+                case 1:
+                    //Prints Value of Y Register in Hex
+                    _StdOut.putText(this.Yreg.toString(16));
+                    break;
+                //Call2
+                //print the 00-terminated string stored at the address in the Y register
+                case 2:
+                    _StdOut.putText(_MemAcc.read(this.Yreg));
+                    break;
+            }//switch
 
         }//sysCall
 
