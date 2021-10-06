@@ -97,59 +97,53 @@ var TSOS;
                     this.YregMem(memIndex);
                     this.PC++;
                     break;
-                case "00":
+                case "EA":
                     this.NoOperation;
-                    this.PC++;
+                    break;
+                case "00":
+                    this.programBreak;
                     break;
                 case "EC":
                     this.compare(memIndex);
                     break;
                 case "D0":
                     this.branch(memIndex);
-                    this.PC++;
                     break;
                 case "EE":
                     this.increment(memIndex);
-                    this.PC++;
                     break;
                 case "FF":
                     this.sysCall(memIndex);
-                    this.PC++;
                     break;
                 //add a defualt (not sure what it should be yet)
             } //switch
         } //fetchOPCode
         //Always increment the program counter to match the index of the hexcode in the program
+        //
+        //NOTE TO SELF: parseInt(value, base)
+        //             OUTPUTS: CONVERTED value from the specificied base
+        //                      to a base of 10
         loadConstant(index) {
             //fetches the next index in Memory and sets it to the accumulator
-            this.Acc = _MemAcc.read(this.PC + 1);
+            this.Acc = parseInt(_MemAcc.read(this.PC + 1), 16);
             this.PC += 2;
         } //loadConstabnt
         loadMemory(index) {
             //loads from the Specified Addresss in Memory
-            var val1 = _MemAcc.read(this.PC + 1);
-            var val2 = _MemAcc.read(this.PC + 2);
-            var newVal = val1 + val2;
             //converts the new Value to hex
-            this.Acc = parseInt(newVal.toString(16), 16);
+            this.Acc = parseInt(this.valueHelper().toString(16), 16);
             //Program Counter
-            this.PC = +3;
+            this.PC += 3;
         } //loadMemory
         //There must be a better way to snatch the next hexcode and store it. 
         store(index) {
-            var val1 = _MemAcc.read(this.PC + 1);
-            var val2 = _MemAcc.read(this.PC + 2);
-            var newVal = val1 + val2;
-            _MemAcc.write(parseInt(newVal.toString(16), 16), this.Acc);
-            this.PC = +3;
+            _MemAcc.write(parseInt(this.valueHelper().toString(16), 16), this.Acc);
+            this.PC += 3;
         } //store
         addCarry(index) {
-            //Adds the hex
-            var address1 = _MemAcc.read(this.PC + 1);
-            var address2 = _MemAcc.read(this.PC + 2);
-            var wholeAddress = address1 + address2;
             //adds the contents of the address into the accumulator
-            this.Acc = +parseInt(wholeAddress.toString(16), 16);
+            this.Acc += parseInt(this.valueHelper().toString(16), 16);
+            this.PC += 3;
         } //addCarry
         XregCon(index) {
             this.Xreg = _MemAcc.read(this.PC + 1);
@@ -163,7 +157,7 @@ var TSOS;
             //converts the new Value to hex
             this.Xreg = parseInt(newVal.toString(16), 16);
             //Program Counter
-            this.PC = +3;
+            this.PC += 3;
         } //XregMem
         YregCon(index) {
             this.Yreg = _MemAcc.read(this.PC + 1);
@@ -177,20 +171,49 @@ var TSOS;
             //converts the new Value to hex
             this.Yreg = parseInt(newVal.toString(16), 16);
             //Program Counter
-            this.PC = +3;
+            this.PC += 3;
         } //YregMem
         NoOperation(index) {
             //Except increment the Program Counter
             this.PC++;
         } //No Operation
         programBreak(index) {
+            this.PC++;
         } //programBreak
         compare(index) {
+            //converts the memory in the address to a number (I assigned it to the hex variable for readability)
+            var hex1 = _MemAcc.read(this.PC + 1);
+            var hex2 = _MemAcc.read(this.PC + 2);
+            var hex = hex1 + hex2;
+            var newHex = parseInt(newHex.toString(16), 16);
+            //sets the Zero Flag to the appropriate state
+            if (this.Xreg == newHex) {
+                this.Zflag = 1;
+            } //if
+            else {
+                this.Zflag = 0;
+            }
+            //increase three on the program counter for: compare OP code and the address(which takes up 2 space) that is being 
+            //  examined in memory
+            this.PC += 3;
         } //compare
         branch(index) {
+            if (this.Zflag == 0) { //branch when the Z flag is zero
+                //Increments the program counter by x number of bytes
+                this.PC += parseInt(_MemAcc.read(this.PC + 1).toString(16), 16);
+            } //if
+            else { //No Branch 
+                //Just increment as normal to go past the rest of Op Code and address
+                this.PC += 2;
+            } //else
         } //branch
         increment(index) {
             this.Acc++;
+            var hex1 = _MemAcc.read(this.PC + 1);
+            var hex2 = _MemAcc.read(this.PC + 2);
+            var hex = hex1 + hex2;
+            var newHex = parseInt(_MemAcc.read(newHex).toString(16), 16);
+            this.PC += 3;
         } //increment
         sysCall(index) {
             //Call 1
@@ -198,6 +221,12 @@ var TSOS;
             //Call2
             //print the 00-terminated string stored at the address in the Y register
         } //sysCall
+        //Grabs the next 2 hex numbers in Memory
+        valueHelper() {
+            var val1 = parseInt(_MemAcc.read(this.PC + 1), 16);
+            var val2 = parseInt(_MemAcc.read(this.PC + 2), 16);
+            return val1 + val2;
+        } //valueHelper
     }
     TSOS.Cpu = Cpu;
 })(TSOS || (TSOS = {}));

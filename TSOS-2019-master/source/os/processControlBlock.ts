@@ -1,5 +1,5 @@
 module TSOS{
-    export class ProcecControlBlock{
+    export class ProcessControlBlock{
         constructor(
             public ProgramCounter: number = 0,
             public ProcesState = "",

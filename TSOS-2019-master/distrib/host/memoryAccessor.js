@@ -16,11 +16,12 @@ var TSOS;
         //Returns the hex at the specified address
         read(address) {
             //The Memory is a string so I convert to a number
-            return parseInt(_Mem.Mem[address]);
+            var hex = parseInt(_Mem.Mem[address]);
+            return hex;
         } //read
         write(address, value) {
             _Mem.Mem[address] = value;
-        }
+        } //write
         store() {
         }
     } //MemoryAccessor
