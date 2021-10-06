@@ -34,9 +34,10 @@ const Segment_Length: number = 256;
 var _Mem: TSOS.Memory;
 //Memory Accessor
 var _MemAcc: TSOS.MemoryAccessor;
+var _MemoryManager: any = null;
 
 //Program Control Block
-var _PCB: TSOS.ProcecControlBlock;
+var _PCB: TSOS.ProcessControlBlock;
 
 var _OSclock: number = 0;  // Page 23.
 
