@@ -20,9 +20,7 @@ module TSOS{
 
         //Returns the hex at the specified address
         read(address){
-            //The Memory is a string so I convert to a number
-            var hex: number = parseInt(_Mem.Mem[address]);
-            return hex;
+            return _Mem.Mem[address];
         }//read
 
         write(address, value){

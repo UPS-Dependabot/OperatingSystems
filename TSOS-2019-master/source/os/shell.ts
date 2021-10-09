@@ -107,6 +107,7 @@ module TSOS {
             sc = new ShellCommand(this.shellRun,
                                 "run",
                                 " - Runs the program that is currently loaded into memory");
+            
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -521,6 +522,15 @@ module TSOS {
 
                     //creates the process control 
                     var pcb :TSOS.ProcessControlBlock;
+
+                    //Assigns a Process ID to the control block 
+                    pcb.PID = _PIDNumber;
+
+                    //stores the new process control block
+                    _PCBs[_PIDNumber] = pcb;
+
+                    //Increments PCB number
+                    _PIDNumber++;
                     
                      //Initiates the execution of the program
                      //_CPU.isExecuting = true;
@@ -542,7 +552,11 @@ module TSOS {
 
         //Runs the program loaded into memory
         public shellRun(args: string[]){
-            
+            var pcbID = args[0];
+
+            for(var i in _PCBs){
+                
+            }
 
         }
 

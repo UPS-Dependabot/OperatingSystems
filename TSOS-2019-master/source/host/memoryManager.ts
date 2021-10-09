@@ -3,7 +3,7 @@ module TSOS{
         constructor(
             public space  = false
             ) {
-        }//constructor
+        }//constructorP
 
         public init(): void{
 
