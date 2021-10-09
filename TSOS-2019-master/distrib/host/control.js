@@ -94,6 +94,32 @@ var TSOS;
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
         }
+        static update_PCB_GUI() {
+            var tableBody = document.getElementById("pcbBody");
+            //tableBody.innerHTML = "";
+            for (var i in _PCBs) {
+                //creates the new row for the  PCB
+                var row = document.createElement("tr");
+                //Inserts all of the PCB data into the GUI
+                var td = document.createElement("td");
+                td.innerHTML = _PCBs[i].PID.toString();
+                row.appendChild(td);
+                td = document.createElement("td");
+                td.innerHTML = _PCBs[i].ProgramCounter;
+                row.appendChild(td);
+                td = document.createElement("td");
+                td.innerHTML = _PCBs[i].ProcesState;
+                row.appendChild(td);
+                td = document.createElement("td");
+                td.innerHTML = _PCBs[i].Xreg;
+                row.appendChild(td);
+                td = document.createElement("td");
+                td.innerHTML = _PCBs[i].Yreg;
+                row.appendChild(td);
+            } //for
+            //Inserts the row
+            tableBody.appendChild(row);
+        } //update_PCB_GUI
     }
     TSOS.Control = Control;
 })(TSOS || (TSOS = {}));

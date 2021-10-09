@@ -7,6 +7,8 @@ var TSOS;
         init() {
             //initialize all memory to be 0
             this.clearMem();
+            //Inserts memory into the GUI
+            //this.memoryInsert();
         } //init
         getMem() {
             return this.Mem;

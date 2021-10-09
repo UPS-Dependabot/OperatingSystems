@@ -3,12 +3,12 @@ var TSOS;
     class MemoryManager {
         constructor(space = false) {
             this.space = space;
-        } //constructor
+        } //constructorP
         init() {
         } //init
         //Determines wether or not there is space in memory
-        isSpace(program) {
-            if (program.length <= Segment_Length) {
+        isSpace(programLength) {
+            if (programLength <= Segment_Length) {
                 this.space = true;
             } //if
             return this.space;

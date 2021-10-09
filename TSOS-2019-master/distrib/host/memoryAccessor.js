@@ -15,9 +15,7 @@ var TSOS;
         } //load in
         //Returns the hex at the specified address
         read(address) {
-            //The Memory is a string so I convert to a number
-            var hex = parseInt(_Mem.Mem[address]);
-            return hex;
+            return _Mem.Mem[address];
         } //read
         write(address, value) {
             _Mem.Mem[address] = value;

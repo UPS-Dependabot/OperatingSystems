@@ -1,16 +1,22 @@
 var TSOS;
 (function (TSOS) {
-    class ProcecControlBlock {
-        constructor(ProgramCounter = 0, ProcesState = "", ProcessNumber = 0, Xreg = "", YReg = "") {
+    class ProcessControlBlock {
+        constructor(PID = 0, ProgramCounter = "00", ProcesState = "Resident", Xreg = "00", Yreg = "00") {
+            this.PID = PID;
             this.ProgramCounter = ProgramCounter;
             this.ProcesState = ProcesState;
-            this.ProcessNumber = ProcessNumber;
             this.Xreg = Xreg;
-            this.YReg = YReg;
+            this.Yreg = Yreg;
         } //constructor
         init() {
         } //init
-    } //MemoryAccessor
-    TSOS.ProcecControlBlock = ProcecControlBlock;
+        getPID() {
+            return this.PID;
+        } //getPID
+        setPID(newPID) {
+            this.PID = newPID;
+        } //setPID
+    } //Process Control Block
+    TSOS.ProcessControlBlock = ProcessControlBlock;
 })(TSOS || (TSOS = {})); //TSOS
 //# sourceMappingURL=processControlBlock.js.map
