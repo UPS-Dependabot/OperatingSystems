@@ -38,6 +38,8 @@ var _MemoryManager: any = null;
 
 //Program Control Block
 var _PCB: TSOS.ProcessControlBlock;
+var _PIDNumber: number = 0;
+var _PCBs = new Array(Segment_Length);
 
 var _OSclock: number = 0;  // Page 23.
 
@@ -64,7 +66,7 @@ var _StdOut: TSOS.Console = null;
 // UI
 var _Console: TSOS.Console;
 var _OsShell: TSOS.Shell;
-var _Counter: Number = 0;//added to play arounf with for scrolling
+var _Counter: Number = 0;//added to play around with for scrolling
 
 
 // At least this OS is not trying to kill you. (Yet.)
