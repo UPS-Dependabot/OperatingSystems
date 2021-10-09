@@ -542,7 +542,8 @@ module TSOS {
 
                     //Update: Memory GUI
                     //        PCB GUI
-                    TSOS.Control.update_PCB_GUI();        
+                    TSOS.Control.update_PCB_GUI();  
+                    TSOS.Control.update_Mem_GUI();     
                 }//else
             }
             else{
