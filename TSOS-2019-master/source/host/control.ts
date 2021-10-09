@@ -119,5 +119,60 @@ module TSOS {
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
         }
+
+        public static update_PCB_GUI(){
+            var tableBody = document.getElementById("pcbBody");
+            //tableBody.innerHTML = "";
+            for(var i in _PCBs){
+                //creates the new row for the  PCB
+                var row = document.createElement("tr");
+
+                //Inserts all of the PCB data into the GUI
+                var td = document.createElement("td");
+                td.innerHTML = _PCBs[i].PID.toString();
+                row.appendChild(td);
+
+                td = document.createElement("td");
+                td.innerHTML = _PCBs[i].ProgramCounter;
+                row.appendChild(td);
+
+                td = document.createElement("td");
+                td.innerHTML = _PCBs[i].ProcesState;
+                row.appendChild(td);
+
+                td = document.createElement("td");
+                td.innerHTML = _PCBs[i].Xreg;
+                row.appendChild(td);
+
+                td = document.createElement("td");
+                td.innerHTML = _PCBs[i].Yreg;
+                row.appendChild(td);
+
+            }//for
+            //Inserts the row
+            tableBody.appendChild(row);
+            
+        }//update_PCB_GUI
+
+                //----------FOR SOME RESAON THIS HAS BEEN CRASHING EVERYTHING-------------
+        //Finish GUI later
+        //
+        //Inserts memory into the GUI TBH not sure if this is the proper area for this function but idk where else to put it
+        // public memoryInsert() : void{
+        //
+        //     //Initialize the GUI so the user can see memory 
+        //     var memGUI: HTMLTableElement = <HTMLTableElement> document.getElementById("memTable");
+        //     //Makes the code in the loop look cleaner
+        //     var byteLength = 8;
+        //     for(var tableRow = 0; tableRow < (Segment_Length/8) ; tableRow++){
+        //         var row = memGUI.insertRow(tableRow);
+        //         //Loop 8 times because we know this is for each individual byte
+        //         for(var rowCell = 0; rowCell < byteLength; rowCell++){
+        //             //This is definately a weird way of fetching the data from the Memory array but it works
+        //             var cell = row.insertCell(rowCell);
+        //             cell.innerHTML = _MemAcc.read(tableRow*byteLength + rowCell);
+        //         }//for
+        //     }//for
+        // }//memoryInsert
     }
 }

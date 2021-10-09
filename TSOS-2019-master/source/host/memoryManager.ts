@@ -10,8 +10,8 @@ module TSOS{
         }//init
         
         //Determines wether or not there is space in memory
-        public isSpace(program){
-            if(program.length <= Segment_Length){
+        public isSpace(programLength){
+            if(programLength <= Segment_Length){
                 this.space =  true;
             }//if
             return this.space;
