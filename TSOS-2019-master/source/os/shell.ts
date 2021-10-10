@@ -254,6 +254,10 @@ module TSOS {
         public shellShutdown(args: string[]) {
              _StdOut.putText("Shutting down...");
              // Call Kernel shutdown routine.
+            
+             //Ensure that the Cpu is no longer executing
+            _CPU.isExecuting = false;
+            
             _Kernel.krnShutdown();
             // TODO: Stop the final prompt from being displayed. If possible. Not a high priority. (Damn OCD!)
         }
@@ -567,14 +571,11 @@ module TSOS {
             var found = false;
             var index = 0;
             
-
             //Find if the id the user entered exists
             if(_PCBs[userPCB] != null){
                 _StdOut.putText("Process "+userPCB+": Ready");
                 _PCBs[userPCB].ProcesState = "Ready"
                 _CPU.start(_PCBs[userPCB]);
-
-
 
                 TSOS.Control.update_PCB_GUI();
                 //begins the program execution
@@ -586,7 +587,5 @@ module TSOS {
                 _StdOut.putText("There is no program associated with this PID");
             }
         }//Run
-
-
     }//Shell
 }

@@ -195,6 +195,8 @@ var TSOS;
         shellShutdown(args) {
             _StdOut.putText("Shutting down...");
             // Call Kernel shutdown routine.
+            //Ensure that the Cpu is no longer executing
+            _CPU.isExecuting = false;
             _Kernel.krnShutdown();
             // TODO: Stop the final prompt from being displayed. If possible. Not a high priority. (Damn OCD!)
         }

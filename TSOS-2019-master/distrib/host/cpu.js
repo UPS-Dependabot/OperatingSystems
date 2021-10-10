@@ -31,9 +31,9 @@ var TSOS;
             this.isExecuting = false;
         }
         start(pcb) {
-            this.PC = pcb.ProgramCounter;
-            this.Xreg = pcb.Xreg;
-            this.Yreg = pcb.Yreg;
+            _CPU.PC = parseInt(pcb.ProgramCounter);
+            _CPU.Xreg = parseInt(pcb.Xreg, 16);
+            _CPU.Yreg = parseInt(pcb.Yreg, 16);
             TSOS.Control.update_CPU_GUI();
         } //start
         cycle() {
@@ -166,12 +166,10 @@ var TSOS;
             this.PC++;
         } //No Operation
         programBreak() {
-            TSOS.Control.update_CPU_GUI();
             this.isExecuting = false;
             this.PC++;
         } //programBreak
         compare() {
-            TSOS.Control.update_CPU_GUI();
             //sets the Zero Flag to the appropriate state
             if (this.Xreg == this.valueHelper()) {
                 this.Zflag = 1;
@@ -184,7 +182,6 @@ var TSOS;
             this.PC += 3;
         } //compare
         branch() {
-            TSOS.Control.update_CPU_GUI();
             if (this.Zflag == 0) { //branch when the Z flag is zero
                 //Increments the program counter by x number of bytes
                 this.PC += parseInt(_MemAcc.read(this.PC + 1).toString(16), 16);
@@ -210,7 +207,6 @@ var TSOS;
         /PLEASSSSEEEEEEE!!!!!!!!!!!!!!!!!!!!!
         */
         sysCall() {
-            TSOS.Control.update_CPU_GUI();
             switch (this.Xreg) {
                 //Call 1
                 //print the int stored in the Y register
@@ -226,15 +222,28 @@ var TSOS;
                 case 2:
                     //Outputs to text
                     _StdOut.advanceLine();
+                    //Remebers where the PC left off before jumping somewhere else in memory
+                    var currentPlace = this.PC;
+                    //Hop to the index in mmemory that the Y reg is pointing to
+                    this.PC = this.Yreg;
                     while (this.IR != "00") {
-                        //I dont think I need to decode this from hex when storing into the Y reg
-                        this.Yreg = parseInt((_MemAcc.read(this.PC)));
-                        //For whatever reason the OS doesn't like it when we use _Stdout
-                        //register updates
-                        this.IR = _MemAcc.read(this.PC);
+                        //Must be converted back into Hex for the IR to read the instruction correctly
+                        this.IR = _MemAcc.read(this.PC.toString(16));
+                        //ALSO For Some reason the Op code started working when I put this comment below here...  
+                        //WHAT?
+                        //
+                        //I know this is kind of a mess but here is the explaination:
+                        //  For whatever resaon in parse int it cannot convert from string to String (idk why)
+                        //  Therefore I wrapped the IR in the String method and from there I wrapped around parseInt
+                        //  Finally I convert the actual Char Code once it is a number and turn it into the actual
+                        //  ASCII text
+                        var IRString = String(this.IR);
+                        var IRnumber = parseInt(IRString);
+                        _StdOut.putText(String.fromCharCode(IRnumber));
                         this.PC++;
-                        _StdOut.putText(String.fromCharCode(this.Yreg));
                     } //while   
+                    //hops to the next op code in memory
+                    this.PC = currentPlace++;
                     break;
             } //switch
         } //sysCall
