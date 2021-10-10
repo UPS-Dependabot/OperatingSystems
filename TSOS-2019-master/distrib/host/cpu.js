@@ -185,20 +185,60 @@ var TSOS;
             if (this.Zflag == 0) { //branch when the Z flag is zero
                 //Increments the program counter by x number of bytes
                 this.PC += parseInt(_MemAcc.read(this.PC + 1).toString(16), 16);
+                if (this.PC > 127) {
+                    //Invoke 2's complement to find where to branch to in memory
+                    //Converts the place we are hopping to an array in binary;
+                    var locationBinary = this.PC.toString(2).split('');
+                    //Flips the digits in the array
+                    for (var i in locationBinary) {
+                        if (locationBinary[i] == '0')
+                            locationBinary[i] = '1';
+                        if (locationBinary[i] == '1')
+                            locationBinary[i] = '0';
+                    } //for
+                    //Add one to the result
+                }
             } //if
             else { //No Branch 
                 //Just increment as normal to go past the rest of Op Code and the address
                 this.PC += 2;
             } //else
         } //branch
+        //FULL CANDOR: Fetched these from stack overflow to do 2s comp
+        //Source: https://stackoverflow.com/questions/40353000/javascript-add-two-binary-numbers-returning-binary
+        //Logic Gates
+        xor(a, b) { return (a === b ? 0 : 1); }
+        and(a, b) { return a == 1 && b == 1 ? 1 : 0; }
+        or(a, b) { return (a || b); }
+        fullAdder(a, b, carry) {
+            var halfAdd = this.halfAdder(a, b);
+            const sum = this.xor(carry, halfAdd[0]);
+            carry = this.and(carry, halfAdd[0]);
+            carry = this.or(carry, halfAdd[1]);
+            return [sum, carry];
+        }
+        halfAdder(a, b) {
+            const sum = this.xor(a, b);
+            const carry = this.and(a, b);
+            return [sum, carry];
+        }
+        //######################################################################
         increment() {
             //The value of the byte in front of the Increment OP Code is incremented 
             //      hence why the Program Counter is looking one place ahead
             //
             //We then fetch the value of the byte and add it by one! :)
             //
-            //execute
-            _MemAcc.write(this.PC + 1, this.valueHelper() + 1);
+            // decode the hex to decimal from the location in memory
+            var memValue = this.decodeHex(_MemAcc.read(this.valueHelper()));
+            //Not sure what we should increment to when the byte is at its max value
+            if (memValue == 255) {
+                memValue = 0; //For now I will set it to "01" so it "loops" around
+            } //if
+            //increment and convert to a hex string
+            var incMemValue = (memValue + 1).toString(16);
+            // Write the incremented value into memory
+            _MemAcc.write(this.valueHelper(), incMemValue);
             this.PC += 3;
         } //increment
         //---------REMINDER-------
@@ -229,9 +269,6 @@ var TSOS;
                     while (this.IR != "00") {
                         //Must be converted back into Hex for the IR to read the instruction correctly
                         this.IR = _MemAcc.read(this.PC.toString(16));
-                        //ALSO For Some reason the Op code started working when I put this comment below here...  
-                        //WHAT?
-                        //
                         //I know this is kind of a mess but here is the explaination:
                         //  For whatever resaon in parse int it cannot convert from string to String (idk why)
                         //  Therefore I wrapped the IR in the String method and from there I wrapped around parseInt
@@ -247,15 +284,17 @@ var TSOS;
                     break;
             } //switch
         } //sysCall
-        //8D "01" "02"
-        //8D "40" "00"
-        //   "00"+"40"
-        //    "0040"
-        //    parse
-        //   64 - 1
-        //   63 (index 63 in mem is index 64)
-        //Grabs the next 2 hex numbers in Memory
         valueHelper() {
+            //Example:
+            //  8D "01" "02"
+            //  8D "40" "00"
+            //    "00"+"40"
+            //    "0040"
+            //     parse
+            //     64 - 1
+            //     63 (index 63 in mem is index 64)
+            //
+            //Grabs the next 2 hex numbers in Memory
             var wholeHex = _MemAcc.read(this.PC + 2) + _MemAcc.read(this.PC + 1);
             return this.decodeHex(wholeHex);
         } //valueHelper

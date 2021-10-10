@@ -1,9 +1,9 @@
 module TSOS{
     export class MemoryManager{
         constructor(
-            public space  = false
+            public space  = false,
             ) {
-        }//constructorP
+        }//constructor
 
         public init(): void{
 

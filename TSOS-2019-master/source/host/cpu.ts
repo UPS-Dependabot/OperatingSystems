@@ -205,6 +205,26 @@ module TSOS {
             if(this.Zflag == 0){//branch when the Z flag is zero
                 //Increments the program counter by x number of bytes
                 this.PC += parseInt(_MemAcc.read(this.PC+1).toString(16),16)
+
+                if(this.PC > 127){
+                    //Invoke 2's complement to find where to branch to in memory
+
+                    //Converts the place we are hopping to an array in binary;
+                    var locationBinary = this.PC.toString(2).split('');
+
+                    //Flips the digits in the array
+                    for(var i in locationBinary){
+                        if(locationBinary[i] == '0')
+                            locationBinary[i] = '1';
+                            
+                        if(locationBinary[i] == '1')
+                            locationBinary[i] = '0';
+                    }//for
+
+                    //Add one to the result
+                    
+                    
+                }
             }//if
 
             else{//No Branch 
@@ -213,14 +233,47 @@ module TSOS {
             }//else
         }//branch
 
+        //FULL CANDOR: Fetched these from stack overflow to do 2s comp
+        //Source: https://stackoverflow.com/questions/40353000/javascript-add-two-binary-numbers-returning-binary
+        //Logic Gates
+        public  xor(a, b){return (a === b ? 0 : 1);}
+        public and(a, b){return a == 1 && b == 1 ? 1 : 0;}
+        public  or(a, b){return (a || b);}
+
+        public fullAdder(a, b, carry){
+            var halfAdd = this.halfAdder(a,b);
+            const sum = this.xor(carry, halfAdd[0]);
+            carry = this.and(carry, halfAdd[0]);
+            carry = this.or(carry, halfAdd[1]);
+            return [sum, carry];
+        }
+
+         public  halfAdder(a, b){
+            const sum = this.xor(a,b);
+            const carry = this.and(a,b);
+            return [sum, carry];
+        }
+        //######################################################################
+
         public increment(){//increments the value of a byte
             //The value of the byte in front of the Increment OP Code is incremented 
             //      hence why the Program Counter is looking one place ahead
             //
             //We then fetch the value of the byte and add it by one! :)
             //
-            //execute
-            _MemAcc.write(this.PC+1, this.valueHelper()+1);
+            // decode the hex to decimal from the location in memory
+            var memValue = this.decodeHex(_MemAcc.read(this.valueHelper()));
+
+            //Not sure what we should increment to when the byte is at its max value
+            if(memValue == 255){
+                memValue = 0; //For now I will set it to "01" so it "loops" around
+            }//if
+            
+            //increment and convert to a hex string
+            var incMemValue = (memValue+1).toString(16);
+            
+            // Write the incremented value into memory
+            _MemAcc.write(this.valueHelper(), incMemValue);
             this.PC += 3; 
         }//increment
 
@@ -240,6 +293,7 @@ module TSOS {
                     _StdOut.advanceLine();
                     _StdOut.putText(this.Yreg.toString(16));
                     break;
+
                 //Call2
                 //print the 00-terminated string stored at the address in the Y register
                 //

@@ -3,7 +3,7 @@ var TSOS;
     class MemoryManager {
         constructor(space = false) {
             this.space = space;
-        } //constructorP
+        } //constructor
         init() {
         } //init
         //Determines wether or not there is space in memory
