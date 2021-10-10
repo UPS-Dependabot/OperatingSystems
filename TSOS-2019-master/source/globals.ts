@@ -39,7 +39,7 @@ var _MemoryManager: any = null;
 //Program Control Block
 var _PCB: TSOS.ProcessControlBlock;
 var _PIDNumber: number = 0;
-var _PCBs = new Array(Segment_Length);
+var _PCBs = new Array(Segment_Length); //basically my resident Queue
 
 var _OSclock: number = 0;  // Page 23.
 

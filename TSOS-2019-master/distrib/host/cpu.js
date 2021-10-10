@@ -13,12 +13,13 @@
 var TSOS;
 (function (TSOS) {
     class Cpu {
-        constructor(PC = 0, Acc = 0, Xreg = 0, Yreg = 0, Zflag = 0, isExecuting = false) {
+        constructor(PC = 0, Acc = 0, Xreg = 0, Yreg = 0, Zflag = 0, IR = "", isExecuting = false) {
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
             this.Yreg = Yreg;
             this.Zflag = Zflag;
+            this.IR = IR;
             this.isExecuting = isExecuting;
         }
         init() {
@@ -29,30 +30,12 @@ var TSOS;
             this.Zflag = 0;
             this.isExecuting = false;
         }
-        getPC() {
-            return this.PC;
-        }
-        setPC(newPC) {
-            this.PC = newPC;
-        }
-        setAcc(newAcc) {
-            this.Acc = newAcc;
-        }
-        getAcc() {
-            return this.Acc;
-        }
-        setXReg(newX) {
-            this.Xreg = newX;
-        }
-        getXReg() {
-            return this.Xreg;
-        }
-        setYReg(newY) {
-            this.Yreg = newY;
-        }
-        getYReg() {
-            return this.Yreg;
-        }
+        start(pcb) {
+            this.PC = pcb.ProgramCounter;
+            this.Xreg = pcb.Xreg;
+            this.Yreg = pcb.Yreg;
+            TSOS.Control.update_CPU_GUI();
+        } //start
         cycle() {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
@@ -61,125 +44,134 @@ var TSOS;
                 for (var optCode in _Mem.Mem) {
                     this.fetchOpCode(_Mem.Mem[optCode], optCode);
                 } //for
+                TSOS.Control.update_PCB_GUI();
             } //if
         } //cycle
         //finds the Op Code associated with the hex nnumbers
         fetchOpCode(hex, memIndex) {
             switch (hex) {
                 case "A9":
-                    this.loadConstant(memIndex);
-                    this.PC++;
+                    this.IR = "A9";
+                    this.loadConstant();
                     break;
                 case "AD":
-                    this.loadMemory(memIndex);
-                    this.PC++;
+                    this.IR = "AD";
+                    this.loadMemory();
                     break;
                 case "8D":
-                    this.store(memIndex);
-                    this.PC++;
+                    this.IR = "8D";
+                    this.store();
                     break;
                 case "6D":
-                    this.addCarry(memIndex);
-                    this.PC++;
+                    this.IR = "6D";
+                    this.addCarry();
                     break;
                 case "A2":
-                    this.XregCon(memIndex);
-                    this.PC++;
+                    this.IR = "A2";
+                    this.XregCon();
                     break;
                 case "AE":
-                    this.XregMem(memIndex);
+                    this.IR = "AE";
+                    this.XregMem();
                     break;
                 case "A0":
-                    this.YregCon(memIndex);
-                    this.PC++;
+                    this.IR = "A0";
+                    this.YregCon();
                     break;
                 case "AC":
-                    this.YregMem(memIndex);
-                    this.PC++;
+                    this.IR = "AC";
+                    this.YregMem();
                     break;
                 case "EA":
-                    this.NoOperation;
+                    this.IR = "EA";
+                    this.NoOperation();
                     break;
                 case "00":
-                    this.programBreak;
+                    this.IR = "00";
+                    this.programBreak();
                     break;
                 case "EC":
-                    this.compare(memIndex);
+                    this.IR = "EC";
+                    this.compare();
                     break;
                 case "D0":
-                    this.branch(memIndex);
+                    this.IR = "D0";
+                    this.branch();
                     break;
                 case "EE":
-                    this.increment(memIndex);
+                    this.IR = "EE";
+                    this.increment();
                     break;
                 case "FF":
-                    this.sysCall(memIndex);
+                    this.IR = "FF";
+                    this.sysCall();
                     break;
                 //add a defualt (not sure what it should be yet)
             } //switch
+            //Update everything on the GUI
+            TSOS.Control.update_Mem_GUI();
+            TSOS.Control.update_CPU_GUI();
         } //fetchOPCode
         //Always increment the program counter to match the index of the hexcode in the program
         //
         //NOTE TO SELF: parseInt(value, base)
         //             OUTPUTS: CONVERTED value from the specificied base
         //                      to a base of 10
-        loadConstant(index) {
+        loadConstant() {
             //fetches the next index in Memory and sets it to the accumulator
-            this.Acc = parseInt(_MemAcc.read(this.PC + 1), 16);
+            this.Acc = this.decodeHex(String(_MemAcc.read(this.PC + 1)));
             this.PC += 2;
         } //loadConstabnt
-        loadMemory(index) {
+        loadMemory() {
             //loads from the Specified Addresss in Memory
-            //converts the new Value to hex
-            this.Acc = parseInt(this.valueHelper().toString(16), 16);
+            //              Stores in the accumulator as a decimal because I think this is how Alan wants it 
+            this.Acc = this.decodeHex(_MemAcc.read(this.valueHelper()));
             //Program Counter
             this.PC += 3;
         } //loadMemory
         //There must be a better way to snatch the next hexcode and store it. 
-        store(index) {
-            _MemAcc.write(parseInt(this.valueHelper().toString(16), 16), this.Acc);
+        store() {
+            _MemAcc.write(this.valueHelper(), this.Acc);
             this.PC += 3;
         } //store
-        addCarry(index) {
+        addCarry() {
             //adds the contents of the address into the accumulator
             this.Acc += parseInt(this.valueHelper().toString(16), 16);
             this.PC += 3;
         } //addCarry
-        XregCon(index) {
-            this.Xreg = _MemAcc.read(this.PC + 1);
+        XregCon() {
+            this.Xreg = this.decodeHex(String(_MemAcc.read(this.PC + 1)));
             this.PC += 2;
         } //XregCon
-        XregMem(index) {
+        XregMem() {
             //converts the new Value to hex
-            this.Xreg = parseInt(this.valueHelper().toString(16), 16);
+            //this.Xreg =  _MemAcc.read(this.valueHelper());
+            this.Xreg = this.decodeHex(_MemAcc.read(this.valueHelper()));
             //Program Counter
             this.PC += 3;
         } //XregMem
-        YregCon(index) {
-            this.Yreg = _MemAcc.read(this.PC + 1);
+        YregCon() {
+            this.Yreg = this.decodeHex(String(_MemAcc.read(this.PC + 1)));
             this.PC += 2;
         } //YregCon
-        YregMem(index) {
+        YregMem() {
             //converts the new Value to hex
-            this.Yreg = parseInt(this.valueHelper().toString(16), 16);
+            //this.Yreg = _MemAcc.read(this.valueHelper());
+            this.Yreg = this.decodeHex(_MemAcc.read(this.valueHelper()));
             //Program Counter
             this.PC += 3;
         } //YregMem
-        NoOperation(index) {
+        NoOperation() {
             //Except increment the Program Counter
             this.PC++;
         } //No Operation
-        //---------REMINDER-------
-        /*
-        /BRIAN DO NOT FORGET THAT SYSCALL AND PROGRAM BREAK ARE NOT COMPLETED
-        /
-        /IMPLEMENT THE INTERPUT QUEUE!!!!!!!!
-        /PLEASSSSEEEEEEE!!!!!!!!!!!!!!!!!!!!!
-        */
-        programBreak(index) {
+        programBreak() {
+            TSOS.Control.update_CPU_GUI();
+            this.isExecuting = false;
             this.PC++;
         } //programBreak
-        compare(index) {
+        compare() {
+            TSOS.Control.update_CPU_GUI();
             //sets the Zero Flag to the appropriate state
             if (this.Xreg == this.valueHelper()) {
                 this.Zflag = 1;
@@ -191,7 +183,8 @@ var TSOS;
             //  examined in memory
             this.PC += 3;
         } //compare
-        branch(index) {
+        branch() {
+            TSOS.Control.update_CPU_GUI();
             if (this.Zflag == 0) { //branch when the Z flag is zero
                 //Increments the program counter by x number of bytes
                 this.PC += parseInt(_MemAcc.read(this.PC + 1).toString(16), 16);
@@ -201,43 +194,92 @@ var TSOS;
                 this.PC += 2;
             } //else
         } //branch
-        increment(index) {
+        increment() {
             //The value of the byte in front of the Increment OP Code is incremented 
             //      hence why the Program Counter is looking one place ahead
             //
             //We then fetch the value of the byte and add it by one! :)
             //
+            //execute
             _MemAcc.write(this.PC + 1, this.valueHelper() + 1);
             this.PC += 3;
         } //increment
         //---------REMINDER-------
         /*
-        /BRIAN DO NOT FORGET THAT SYSCALL AND PROGRAM BREAK ARE NOT COMPLETED
-        /
         /IMPLEMENT THE INTERPUT QUEUE!!!!!!!!
         /PLEASSSSEEEEEEE!!!!!!!!!!!!!!!!!!!!!
         */
-        sysCall(index) {
+        sysCall() {
+            TSOS.Control.update_CPU_GUI();
             switch (this.Xreg) {
                 //Call 1
                 //print the int stored in the Y register
                 case 1:
                     //Prints Value of Y Register in Hex
+                    _StdOut.advanceLine();
                     _StdOut.putText(this.Yreg.toString(16));
                     break;
                 //Call2
                 //print the 00-terminated string stored at the address in the Y register
+                //
+                //Convert the ASCII to text and output on the Console
                 case 2:
-                    _StdOut.putText(_MemAcc.read(this.Yreg));
+                    //Outputs to text
+                    _StdOut.advanceLine();
+                    while (this.IR != "00") {
+                        //I dont think I need to decode this from hex when storing into the Y reg
+                        this.Yreg = parseInt((_MemAcc.read(this.PC)));
+                        //For whatever reason the OS doesn't like it when we use _Stdout
+                        //register updates
+                        this.IR = _MemAcc.read(this.PC);
+                        this.PC++;
+                        _StdOut.putText(String.fromCharCode(this.Yreg));
+                    } //while   
                     break;
             } //switch
         } //sysCall
+        //8D "01" "02"
+        //8D "40" "00"
+        //   "00"+"40"
+        //    "0040"
+        //    parse
+        //   64 - 1
+        //   63 (index 63 in mem is index 64)
         //Grabs the next 2 hex numbers in Memory
         valueHelper() {
-            var val1 = parseInt(_MemAcc.read(this.PC + 1), 16);
-            var val2 = parseInt(_MemAcc.read(this.PC + 2), 16);
-            return val1 + val2;
+            var wholeHex = _MemAcc.read(this.PC + 2) + _MemAcc.read(this.PC + 1);
+            return this.decodeHex(wholeHex);
         } //valueHelper
+        //This serves as a means of decoding the hexidecimal to decimal
+        decodeHex(charHex) {
+            var hexdecimals = charHex.split('');
+            var decimal = 0;
+            //These variables are not nessasary but they make the code easier to disect
+            var hexNumber;
+            var hexPlace;
+            for (var index = 0; index < hexdecimals.length; index++) {
+                //Starts from the begining of the hex string and multiplies to the power of 16 based off of the index
+                //Do this inorder to convert the string to hex
+                //Example:   "1040"                    "01"
+                //  1 * 16^3 = 4096           0 * 16^1 = 0  
+                //  0 * 16^2 = 0              1 * 16^0 = 1
+                //  4 * 16^1 = 64            
+                //  0 * 16^0 = 0
+                // +                          +
+                //-----------------           --------------                   
+                //             4160                       1             
+                //Originally had this all in one line but it is difficult to debug 
+                //Therefore I separated it into separate lines
+                hexNumber = parseInt(String(hexdecimals[index]), 16);
+                // Takes into account that is in zero based
+                hexPlace = hexdecimals.length - (index + 1); // EX: (16^ (4 - (index + 1)))
+                decimal += hexNumber * (16 ** hexPlace);
+            } //for
+            //May consider:
+            //Returning the index in the Memory array by
+            //decrementing by one because it is 0 based
+            return decimal;
+        } //decode
     }
     TSOS.Cpu = Cpu;
 })(TSOS || (TSOS = {}));

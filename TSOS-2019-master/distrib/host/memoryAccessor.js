@@ -15,10 +15,14 @@ var TSOS;
         } //load in
         //Returns the hex at the specified address
         read(address) {
-            return _Mem.Mem[address];
+            var opCodeString = _Mem.Mem[parseInt(address)];
+            return opCodeString;
         } //read
         write(address, value) {
             _Mem.Mem[address] = value;
+            TSOS.Control.update_Mem_GUI();
+            TSOS.Control.update_CPU_GUI();
+            TSOS.Control.update_PCB_GUI();
         } //write
         store() {
         }

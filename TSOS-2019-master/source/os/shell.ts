@@ -107,6 +107,7 @@ module TSOS {
             sc = new ShellCommand(this.shellRun,
                                 "run",
                                 " - Runs the program that is currently loaded into memory");
+            this.commandList[this.commandList.length] = sc;
             
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -566,23 +567,24 @@ module TSOS {
             var found = false;
             var index = 0;
             
-            //search for Process Control Block
-            while(!found || index < _PCBs.length){
-                if(_PCBs[index].PID == userPCB){
-                    runPCB = _PCBs[index];
-                    found = true;
-                }//if
-                index++;
-            }//for
 
-            if(found){
-                //Run the control block
-                
+            //Find if the id the user entered exists
+            if(_PCBs[userPCB] != null){
+                _StdOut.putText("Process "+userPCB+": Ready");
+                _PCBs[userPCB].ProcesState = "Ready"
+                _CPU.start(_PCBs[userPCB]);
+
+
+
+                TSOS.Control.update_PCB_GUI();
+                //begins the program execution
+                _CPU.isExecuting = true;
+
+                _CPU.cycle();
             }//if
             else{
-                _StdOut.putText("The PID you entered is not associated with a program.");
-            }//else
-
+                _StdOut.putText("There is no program associated with this PID");
+            }
         }//Run
 
 

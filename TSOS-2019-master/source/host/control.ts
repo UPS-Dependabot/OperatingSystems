@@ -122,6 +122,7 @@ module TSOS {
 
         public static update_PCB_GUI(){
             var tableBody = document.getElementById("pcbBody");
+
             //tableBody.innerHTML = "";
             for(var i in _PCBs){
                 //creates the new row for the  PCB
@@ -154,6 +155,16 @@ module TSOS {
             
         }//update_PCB_GUI
         
+        public static update_CPU_GUI(){
+            document.getElementById("cpuPC").innerHTML = String(_CPU.PC);
+            document.getElementById("cpuAcc").innerHTML = String(_CPU.Acc.toString(16));
+            document.getElementById("cpuX").innerHTML = String(_CPU.Xreg.toString(16));
+            document.getElementById("cpuY").innerHTML = String(_CPU.Yreg.toString(16));
+            document.getElementById("cpuZ").innerHTML = String(_CPU.Zflag);
+            document.getElementById("cpuIR").innerHTML = String(_CPU.IR);
+
+        }//update_CPU_GUI
+
         //Inserts memory into the GUI
         public static update_Mem_GUI() : void{
         
@@ -189,5 +200,6 @@ module TSOS {
             }
         }
         
+
     }
 }

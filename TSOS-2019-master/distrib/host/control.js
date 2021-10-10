@@ -120,6 +120,42 @@ var TSOS;
             //Inserts the row
             tableBody.appendChild(row);
         } //update_PCB_GUI
+        static update_CPU_GUI() {
+            document.getElementById("cpuPC").innerHTML = String(_CPU.PC);
+            document.getElementById("cpuAcc").innerHTML = String(_CPU.Acc.toString(16));
+            document.getElementById("cpuX").innerHTML = String(_CPU.Xreg.toString(16));
+            document.getElementById("cpuY").innerHTML = String(_CPU.Yreg.toString(16));
+            document.getElementById("cpuZ").innerHTML = String(_CPU.Zflag);
+            document.getElementById("cpuIR").innerHTML = String(_CPU.IR);
+        } //update_CPU_GUI
+        //Inserts memory into the GUI
+        static update_Mem_GUI() {
+            //Initialize the GUI so the user can see memory 
+            var memGUI = document.getElementById("memTable");
+            //Clear the old memory so we don't see every iteration when someone loads.
+            this.removeAllChildNodes(memGUI);
+            //Makes the code in the loop look cleaner
+            var byteLength = 8;
+            for (var tableRow = 0; tableRow < (Segment_Length / 8); tableRow++) {
+                var row = document.createElement("tr");
+                //Loop 8 times because we know this is for each individual byte
+                for (var rowCell = 0; rowCell < byteLength; rowCell++) {
+                    //This is definately a weird way of fetching the data from the Memory array but it works
+                    var cell = document.createElement("td");
+                    cell.innerHTML = _MemAcc.read(tableRow * byteLength + rowCell);
+                    //Inserts each byte into the row
+                    row.appendChild(cell);
+                } //for
+                //Inserts the row into the memory GUI
+                memGUI.appendChild(row);
+            } //for
+        } //memoryInsert
+        //Removes all childeren
+        static removeAllChildNodes(parent) {
+            while (parent.firstChild) {
+                parent.removeChild(parent.firstChild);
+            }
+        }
     }
     TSOS.Control = Control;
 })(TSOS || (TSOS = {}));

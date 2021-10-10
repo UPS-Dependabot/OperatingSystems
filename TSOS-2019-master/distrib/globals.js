@@ -30,7 +30,7 @@ var _MemoryManager = null;
 //Program Control Block
 var _PCB;
 var _PIDNumber = 0;
-var _PCBs = new Array(Segment_Length);
+var _PCBs = new Array(Segment_Length); //basically my resident Queue
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().
