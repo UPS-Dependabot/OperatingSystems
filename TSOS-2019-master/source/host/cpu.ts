@@ -258,9 +258,6 @@ module TSOS {
                         //Must be converted back into Hex for the IR to read the instruction correctly
                         this.IR = _MemAcc.read(this.PC.toString(16));
                         
-                        //ALSO For Some reason the Op code started working when I put this comment below here...  
-                        //WHAT?
-                        //
                         //I know this is kind of a mess but here is the explaination:
                         //  For whatever resaon in parse int it cannot convert from string to String (idk why)
                         //  Therefore I wrapped the IR in the String method and from there I wrapped around parseInt
@@ -281,15 +278,17 @@ module TSOS {
 
         }//sysCall
 
-        //8D "01" "02"
-        //8D "40" "00"
-        //   "00"+"40"
-        //    "0040"
-        //    parse
-        //   64 - 1
-        //   63 (index 63 in mem is index 64)
-        //Grabs the next 2 hex numbers in Memory
         public valueHelper(){
+        //Example:
+        //  8D "01" "02"
+        //  8D "40" "00"
+        //    "00"+"40"
+        //    "0040"
+        //     parse
+        //     64 - 1
+        //     63 (index 63 in mem is index 64)
+        //
+        //Grabs the next 2 hex numbers in Memory
             var wholeHex = _MemAcc.read(this.PC+2)+_MemAcc.read(this.PC+1);
             return this.decodeHex(wholeHex);
         }//valueHelper
