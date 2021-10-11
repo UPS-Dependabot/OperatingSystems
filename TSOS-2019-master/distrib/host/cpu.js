@@ -283,7 +283,7 @@ var TSOS;
                     //Hop to the index in mmemory that the Y reg is pointing to
                     this.PC = this.Yreg;
                     //Stops when you begin counting past memory or when you specify the printing to end 
-                    while (this.IR != "00" || this.PC > 255) {
+                    while (this.IR != "00" && this.PC < 255) {
                         //Must be converted back into Hex for the IR to read the instruction correctly
                         this.IR = _MemAcc.read(this.PC.toString(16));
                         //I know this is kind of a mess but here is the explaination:
@@ -296,8 +296,10 @@ var TSOS;
                         _StdOut.putText(String.fromCharCode(IRnumber));
                         this.PC++;
                     } //while   
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
                     //hops to the next op code in memory
-                    this.PC = currentPlace++;
+                    this.PC = currentPlace + 1;
                     break;
                 //Increments the PC when it is neither 1 or 2
                 default:
