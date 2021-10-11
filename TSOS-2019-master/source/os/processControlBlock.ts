@@ -6,6 +6,9 @@ module TSOS{
             public ProcesState = "Resident",
             public Xreg = "00",
             public Yreg = "00",
+            public Acc =  "00",
+            public Zflag : number,
+            public IR = ""
           ) {
         }//constructor
 

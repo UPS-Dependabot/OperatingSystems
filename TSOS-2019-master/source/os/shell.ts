@@ -550,10 +550,10 @@ module TSOS {
                     TSOS.Control.update_PCB_GUI();  
                     TSOS.Control.update_Mem_GUI();     
                 }//else
-            }
+            }//valid
             else{
                 _StdOut.putText("Invalid Program :( Only usee 0-9, A-F, a-f");
-            }    
+            }//else    
         }//load
 
 
@@ -580,8 +580,6 @@ module TSOS {
                 TSOS.Control.update_PCB_GUI();
                 //begins the program execution
                 _CPU.isExecuting = true;
-
-                _CPU.cycle();
             }//if
             else{
                 _StdOut.putText("There is no program associated with this PID");

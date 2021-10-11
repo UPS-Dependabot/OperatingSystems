@@ -41,10 +41,14 @@ var TSOS;
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             if (this.isExecuting) {
-                while (_Mem.Mem.length > this.PC) {
+                //Make we don't go past 255 (FF) instead of 256
+                //  Didn't do this before and I ran into an infinite loop when I branched on FF
+                while (_Mem.Mem.length - 1 > this.PC) {
                     this.fetchOpCode(_Mem.Mem[this.PC]);
                 } //for
                 TSOS.Control.update_PCB_GUI();
+                //Ends the program
+                _CPU.isExecuting = false;
             } //if
         } //cycle
         //finds the Op Code associated with the hex nnumbers
@@ -190,7 +194,7 @@ var TSOS;
                     //Increment 
                     //this.PC += parseInt(_MemAcc.read(this.PC+1).toString(16),16);
                     //Increment the PC by the byte that is next to it
-                    this.PC += this.decodeBase(_MemAcc.read(this.PC + 1), 16);
+                    this.PC = this.decodeBase(_MemAcc.read(this.PC + 1), 16);
                 }
                 else if (this.PC > 127) {
                     //Invoke 2's complement to find where to branch to in memory
