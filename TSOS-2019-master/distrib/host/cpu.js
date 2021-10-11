@@ -119,13 +119,13 @@ var TSOS;
         //                      to a base of 10
         loadConstant() {
             //fetches the next index in Memory and sets it to the accumulator
-            this.Acc = this.decodeHex(String(_MemAcc.read(this.PC + 1)));
+            this.Acc = this.decodeBase(String(_MemAcc.read(this.PC + 1)), 16);
             this.PC += 2;
         } //loadConstabnt
         loadMemory() {
             //loads from the Specified Addresss in Memory
             //              Stores in the accumulator as a decimal because I think this is how Alan wants it 
-            this.Acc = this.decodeHex(_MemAcc.read(this.valueHelper()));
+            this.Acc = this.decodeBase(_MemAcc.read(this.valueHelper()), 16);
             //Program Counter
             this.PC += 3;
         } //loadMemory
@@ -140,24 +140,24 @@ var TSOS;
             this.PC += 3;
         } //addCarry
         XregCon() {
-            this.Xreg = this.decodeHex(String(_MemAcc.read(this.PC + 1)));
+            this.Xreg = this.decodeBase(String(_MemAcc.read(this.PC + 1)), 16);
             this.PC += 2;
         } //XregCon
         XregMem() {
             //converts the new Value to hex
             //this.Xreg =  _MemAcc.read(this.valueHelper());
-            this.Xreg = this.decodeHex(_MemAcc.read(this.valueHelper()));
+            this.Xreg = this.decodeBase(_MemAcc.read(this.valueHelper()), 16);
             //Program Counter
             this.PC += 3;
         } //XregMem
         YregCon() {
-            this.Yreg = this.decodeHex(String(_MemAcc.read(this.PC + 1)));
+            this.Yreg = this.decodeBase(String(_MemAcc.read(this.PC + 1)), 16);
             this.PC += 2;
         } //YregCon
         YregMem() {
             //converts the new Value to hex
             //this.Yreg = _MemAcc.read(this.valueHelper());
-            this.Yreg = this.decodeHex(_MemAcc.read(this.valueHelper()));
+            this.Yreg = this.decodeBase(_MemAcc.read(this.valueHelper()), 16);
             //Program Counter
             this.PC += 3;
         } //YregMem
@@ -189,13 +189,15 @@ var TSOS;
                     //Invoke 2's complement to find where to branch to in memory
                     //Converts the place we are hopping to an array in binary;
                     var locationBinary = this.PC.toString(2).split('');
+                    var twoCompResBin = "";
                     //Flips the digits in the array
                     for (var i in locationBinary) {
                         if (locationBinary[i] == '0')
-                            locationBinary[i] = '1';
+                            twoCompResBin += '1';
                         if (locationBinary[i] == '1')
-                            locationBinary[i] = '0';
+                            twoCompResBin += '0';
                     } //for
+                    var result = this.decodeBase(twoCompResBin, 2);
                     //Add one to the result
                 }
             } //if
@@ -230,7 +232,7 @@ var TSOS;
             //We then fetch the value of the byte and add it by one! :)
             //
             // decode the hex to decimal from the location in memory
-            var memValue = this.decodeHex(_MemAcc.read(this.valueHelper()));
+            var memValue = this.decodeBase(_MemAcc.read(this.valueHelper()), 16);
             //Not sure what we should increment to when the byte is at its max value
             if (memValue == 255) {
                 memValue = 0; //For now I will set it to "01" so it "loops" around
@@ -296,17 +298,17 @@ var TSOS;
             //
             //Grabs the next 2 hex numbers in Memory
             var wholeHex = _MemAcc.read(this.PC + 2) + _MemAcc.read(this.PC + 1);
-            return this.decodeHex(wholeHex);
+            return this.decodeBase(wholeHex, 16);
         } //valueHelper
-        //This serves as a means of decoding the hexidecimal to decimal
-        decodeHex(charHex) {
-            var hexdecimals = charHex.split('');
+        //This serves as a means of decoding the hexidecimal and binary to decimal
+        decodeBase(charBase, base) {
+            var baseDecimals = charBase.split('');
             var decimal = 0;
             //These variables are not nessasary but they make the code easier to disect
-            var hexNumber;
-            var hexPlace;
-            for (var index = 0; index < hexdecimals.length; index++) {
-                //Starts from the begining of the hex string and multiplies to the power of 16 based off of the index
+            var baseNumber;
+            var basePlace;
+            for (var index = 0; index < baseDecimals.length; index++) {
+                //Starts from the begining of the hex/binary string and multiplies to the power of the base based off of the index
                 //Do this inorder to convert the string to hex
                 //Example:   "1040"                    "01"
                 //  1 * 16^3 = 4096           0 * 16^1 = 0  
@@ -318,10 +320,10 @@ var TSOS;
                 //             4160                       1             
                 //Originally had this all in one line but it is difficult to debug 
                 //Therefore I separated it into separate lines
-                hexNumber = parseInt(String(hexdecimals[index]), 16);
+                baseNumber = parseInt(String(baseDecimals[index]), base);
                 // Takes into account that is in zero based
-                hexPlace = hexdecimals.length - (index + 1); // EX: (16^ (4 - (index + 1)))
-                decimal += hexNumber * (16 ** hexPlace);
+                basePlace = baseDecimals.length - (index + 1); // EX: (16^ (4 - (index + 1)))
+                decimal += baseNumber * (base ** basePlace);
             } //for
             //May consider:
             //Returning the index in the Memory array by
