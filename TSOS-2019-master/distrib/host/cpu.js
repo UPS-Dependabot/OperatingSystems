@@ -41,14 +41,14 @@ var TSOS;
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             if (this.isExecuting) {
-                for (var optCode in _Mem.Mem) {
-                    this.fetchOpCode(_Mem.Mem[optCode], optCode);
+                while (_Mem.Mem.length > this.PC) {
+                    this.fetchOpCode(_Mem.Mem[this.PC]);
                 } //for
                 TSOS.Control.update_PCB_GUI();
             } //if
         } //cycle
         //finds the Op Code associated with the hex nnumbers
-        fetchOpCode(hex, memIndex) {
+        fetchOpCode(hex) {
             switch (hex) {
                 case "A9":
                     this.IR = "A9";
@@ -106,7 +106,10 @@ var TSOS;
                     this.IR = "FF";
                     this.sysCall();
                     break;
-                //add a defualt (not sure what it should be yet)
+                default:
+                    //Increments the program counter through the rest of memory when there is no Opcode
+                    this.PC++;
+                    break;
             } //switch
             //Update everything on the GUI
             TSOS.Control.update_Mem_GUI();
@@ -183,12 +186,16 @@ var TSOS;
         } //compare
         branch() {
             if (this.Zflag == 0) { //branch when the Z flag is zero
-                //Increments the program counter by x number of bytes
-                this.PC += parseInt(_MemAcc.read(this.PC + 1).toString(16), 16);
-                if (this.PC > 127) {
+                if (this.PC <= 127) {
+                    //Increment 
+                    //this.PC += parseInt(_MemAcc.read(this.PC+1).toString(16),16);
+                    //Increment the PC by the byte that is next to it
+                    this.PC += this.decodeBase(_MemAcc.read(this.PC + 1), 16);
+                }
+                else if (this.PC > 127) {
                     //Invoke 2's complement to find where to branch to in memory
                     //Converts the place we are hopping to an array in binary;
-                    var locationBinary = this.PC.toString(2).split('');
+                    var locationBinary = (this.PC + 1).toString(2).split('');
                     var twoCompResBin = "";
                     //Flips the digits in the array
                     for (var i in locationBinary) {
@@ -197,8 +204,10 @@ var TSOS;
                         if (locationBinary[i] == '1')
                             twoCompResBin += '0';
                     } //for
-                    var result = this.decodeBase(twoCompResBin, 2);
                     //Add one to the result
+                    var result = this.decodeBase(twoCompResBin, 2) + 1;
+                    //Set the PC to the result in to hop to it in memory                                        
+                    this.PC = result;
                 }
             } //if
             else { //No Branch 
@@ -256,6 +265,7 @@ var TSOS;
                     //Prints Value of Y Register in Hex
                     _StdOut.advanceLine();
                     _StdOut.putText(this.Yreg.toString(16));
+                    this.PC++;
                     break;
                 //Call2
                 //print the 00-terminated string stored at the address in the Y register
@@ -268,7 +278,8 @@ var TSOS;
                     var currentPlace = this.PC;
                     //Hop to the index in mmemory that the Y reg is pointing to
                     this.PC = this.Yreg;
-                    while (this.IR != "00") {
+                    //Stops when you begin counting past memory or when you specify the printing to end 
+                    while (this.IR != "00" || this.PC > 255) {
                         //Must be converted back into Hex for the IR to read the instruction correctly
                         this.IR = _MemAcc.read(this.PC.toString(16));
                         //I know this is kind of a mess but here is the explaination:
@@ -283,6 +294,10 @@ var TSOS;
                     } //while   
                     //hops to the next op code in memory
                     this.PC = currentPlace++;
+                    break;
+                //Increments the PC when it is neither 1 or 2
+                default:
+                    this.PC++;
                     break;
             } //switch
         } //sysCall
