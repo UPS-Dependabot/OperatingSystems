@@ -166,7 +166,7 @@ module TSOS {
         public XregMem(){//Load X register from memory
             //converts the new Value to hex
             //this.Xreg =  _MemAcc.read(this.valueHelper());
-            this.Xreg = this.decodeBase(_MemAcc.read(this.valueHelper()),16);
+            this.Xreg = this.decodeBase(String(_MemAcc.read(this.valueHelper())),16);
 
             //Program Counter
             this.PC += 3;
@@ -180,7 +180,10 @@ module TSOS {
         public YregMem(){//Load Y register from memory
             //converts the new Value to hex
             //this.Yreg = _MemAcc.read(this.valueHelper());
-            this.Yreg = this.decodeBase(_MemAcc.read(this.valueHelper()),16);
+
+            //NEED THIS to be a STRING for when decode parses everything
+            var num =  this.decodeBase(String(_MemAcc.read(this.valueHelper())),16);
+            this.Yreg = num;
             //Program Counter
             this.PC += 3;
         }//YregMem
@@ -210,36 +213,43 @@ module TSOS {
 
         public branch(){// Hops to another line in the program if Z Flag = 0
             if(this.Zflag == 0){//branch when the Z flag is zero
-                
-                if(this.PC <= 127){
-                    //Increment 
-                    //this.PC += parseInt(_MemAcc.read(this.PC+1).toString(16),16);
+                var currPlace = this.PC;
 
-                    //Increment the PC by the byte that is next to it
-                    this.PC = this.decodeBase(_MemAcc.read(this.PC+1),16);
-                    
-                }
+                //Adds the next byte to the program counter
+                this.PC += this.decodeBase(_MemAcc.read(this.PC+1),16);
+
+                // if(this.PC <= 127){
+                //     //Increment 
+                //     //this.PC += parseInt(_MemAcc.read(this.PC+1).toString(16),16);
+
+                //     //Increment the PC by the byte that is next to it
+                // }
                    
-                else if(this.PC > 127){
+                if(this.PC > 127){
                     //Invoke 2's complement to find where to branch to in memory
 
                     //Converts the place we are hopping to an array in binary;
-                    var locationBinary = (this.PC+1).toString(2).split('');
+
+                    //var locationDec = this.PC + this.decodeBase(_MemAcc.read(currPlace+1),16);
+                    //var locationDec = _MemAcc.read()
+
+                    var locationBinary = (this.PC.toString(2));
                     var twoCompResBin = "";
                     //Flips the digits in the array
-                    for(var i in locationBinary){
-                        if(locationBinary[i] == '0')
+                    for(var i = 0;  i < locationBinary.length; i++){
+                        if(locationBinary[i] == "0")
                             twoCompResBin += '1';
                             
-                        if(locationBinary[i] == '1')
+                        if(locationBinary[i] == "1")
                             twoCompResBin += '0';
                     }//for
                     
-                    //Add one to the result
-                    var result = this.decodeBase(twoCompResBin,2)+1;
+                    //DONT Add one to the result
+                    var twosComp = this.decodeBase(twoCompResBin,2) + 1;
 
+                    var actualLoaction = 255 - twosComp;
                     //Set the PC to the result in to hop to it in memory                                        
-                    this.PC = result;
+                    this.PC = actualLoaction;
                 }
             }//if
 
@@ -278,7 +288,7 @@ module TSOS {
             //We then fetch the value of the byte and add it by one! :)
             //
             // decode the hex to decimal from the location in memory
-            var memValue = this.decodeBase(_MemAcc.read(this.valueHelper()),16);
+            var memValue = this.decodeBase(String(_MemAcc.read(this.valueHelper())),16);
 
             //Not sure what we should increment to when the byte is at its max value
             if(memValue == 255){
@@ -306,7 +316,7 @@ module TSOS {
                 //print the int stored in the Y register
                 case 1:
                     //Prints Value of Y Register in Hex
-                    _StdOut.advanceLine();
+                    //_StdOut.advanceLine();
                     _StdOut.putText(this.Yreg.toString(16));
 
                     this.PC++;
@@ -373,8 +383,8 @@ module TSOS {
         }//valueHelper
 
         //This serves as a means of decoding the hexidecimal and binary to decimal
-        public decodeBase(charBase, base){
-            var baseDecimals = charBase.split('');
+        public decodeBase(baseDecimals, base){
+            //var baseDecimals = charBase.split('');
             var decimal  = 0;
             //These variables are not nessasary but they make the code easier to disect
             var baseNumber;
