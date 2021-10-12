@@ -46,7 +46,9 @@ var TSOS;
                 while (_Mem.Mem.length - 1 > this.PC) {
                     this.fetchOpCode(_Mem.Mem[this.PC]);
                 } //for
-                TSOS.Control.update_PCB_GUI();
+                //updates the PCB
+                //  bool tell us not to create a new PCB in the GUI
+                TSOS.Control.update_PCB_GUI(_PCBs[_PIDNumber], false);
                 //Ends the program
                 _CPU.isExecuting = false;
             } //if
@@ -132,7 +134,7 @@ var TSOS;
         loadMemory() {
             //loads from the Specified Addresss in Memory
             //              Stores in the accumulator as a decimal because I think this is how Alan wants it 
-            this.Acc = this.decodeBase(_MemAcc.read(this.valueHelper()), 16);
+            this.Acc = this.decodeBase(String(_MemAcc.read(this.valueHelper())), 16);
             //Program Counter
             this.PC += 3;
         } //loadMemory
@@ -180,7 +182,8 @@ var TSOS;
         } //programBreak
         compare() {
             //sets the Zero Flag to the appropriate state
-            if (this.Xreg == this.valueHelper()) {
+            var data = _MemAcc.read(this.valueHelper());
+            if (this.Xreg == this.decodeBase(String(data), 16)) {
                 this.Zflag = 1;
             } //if
             else {
@@ -194,7 +197,7 @@ var TSOS;
             if (this.Zflag == 0) { //branch when the Z flag is zero
                 var currPlace = this.PC;
                 //Adds the next byte to the program counter
-                this.PC += this.decodeBase(_MemAcc.read(this.PC + 1), 16);
+                this.PC += this.decodeBase(String(_MemAcc.read(this.PC + 1)), 16);
                 // if(this.PC <= 127){
                 //     //Increment 
                 //     //this.PC += parseInt(_MemAcc.read(this.PC+1).toString(16),16);
@@ -226,25 +229,6 @@ var TSOS;
                 this.PC += 2;
             } //else
         } //branch
-        //FULL CANDOR: Fetched these from stack overflow to do 2s comp
-        //Source: https://stackoverflow.com/questions/40353000/javascript-add-two-binary-numbers-returning-binary
-        //Logic Gates
-        xor(a, b) { return (a === b ? 0 : 1); }
-        and(a, b) { return a == 1 && b == 1 ? 1 : 0; }
-        or(a, b) { return (a || b); }
-        fullAdder(a, b, carry) {
-            var halfAdd = this.halfAdder(a, b);
-            const sum = this.xor(carry, halfAdd[0]);
-            carry = this.and(carry, halfAdd[0]);
-            carry = this.or(carry, halfAdd[1]);
-            return [sum, carry];
-        }
-        halfAdder(a, b) {
-            const sum = this.xor(a, b);
-            const carry = this.and(a, b);
-            return [sum, carry];
-        }
-        //######################################################################
         increment() {
             //The value of the byte in front of the Increment OP Code is incremented 
             //      hence why the Program Counter is looking one place ahead
@@ -329,6 +313,8 @@ var TSOS;
             return this.decodeBase(wholeHex, 16);
         } //valueHelper
         //This serves as a means of decoding the hexidecimal and binary to decimal
+        //  baseDecimal MUST BE A STRING!!!!! 
+        //  MAKE SURE EVERYTHING THAT IS CALLED IN IS A STRING OR ELSE IT WONT WORK
         decodeBase(baseDecimals, base) {
             //var baseDecimals = charBase.split('');
             var decimal = 0;
