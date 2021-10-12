@@ -20,9 +20,6 @@ var TSOS;
         } //read
         write(address, value) {
             _Mem.Mem[address] = value;
-            TSOS.Control.update_Mem_GUI();
-            TSOS.Control.update_CPU_GUI();
-            TSOS.Control.update_PCB_GUI();
         } //write
         store() {
         }

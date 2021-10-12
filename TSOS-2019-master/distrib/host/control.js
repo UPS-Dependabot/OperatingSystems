@@ -94,32 +94,73 @@ var TSOS;
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
         }
-        static update_PCB_GUI() {
+        static update_PCB_GUI(pcBlock, createNewPCB) {
             var tableBody = document.getElementById("pcbBody");
-            //tableBody.innerHTML = "";
-            for (var i in _PCBs) {
-                //creates the new row for the  PCB
+            // If this class doesn't exist then create a new class
+            if (createNewPCB) {
+                //Create a new class to contain the PCB
                 var row = document.createElement("tr");
-                //Inserts all of the PCB data into the GUI
-                var td = document.createElement("td");
-                td.innerHTML = _PCBs[i].PID.toString();
-                row.appendChild(td);
-                td = document.createElement("td");
-                td.innerHTML = _PCBs[i].ProgramCounter;
-                row.appendChild(td);
-                td = document.createElement("td");
-                td.innerHTML = _PCBs[i].ProcesState;
-                row.appendChild(td);
-                td = document.createElement("td");
-                td.innerHTML = _PCBs[i].Xreg;
-                row.appendChild(td);
-                td = document.createElement("td");
-                td.innerHTML = _PCBs[i].Yreg;
-                row.appendChild(td);
-            } //for
-            //Inserts the row
-            tableBody.appendChild(row);
+                row.className += String(+pcBlock.PID);
+                //update the PCB
+                this.updatePCB(pcBlock, tableBody, createNewPCB);
+                //Update PIDNumber
+                _PIDNumber++;
+                //Inserts the row
+                // tableBody.appendChild(row); 
+            } //if
+            else { //update existing pcb
+                //var pcbClass = pcBlock.getElementsByClassName(String(pcBlock.PID));
+                this.updatePCB(pcBlock, tableBody, createNewPCB);
+            }
+            // for(var i in _PCBs){
+            //     //creates the new row for the  PCB
+            //     var row = document.createElement("tr");
+            //     //Inserts all of the PCB data into the GUI
+            //     var td = document.createElement("td");
+            //     td.innerHTML = _PCBs[i].PID.toString();
+            //     row.appendChild(td);
+            //     td = document.createElement("td");
+            //     td.innerHTML = _PCBs[i].ProgramCounter;
+            //     row.appendChild(td);
+            //     td = document.createElement("td");
+            //     td.innerHTML = _PCBs[i].ProcesState;
+            //     row.appendChild(td);
+            //     td = document.createElement("td");
+            //     td.innerHTML = _PCBs[i].Xreg;
+            //     row.appendChild(td);
+            //     td = document.createElement("td");
+            //     td.innerHTML = _PCBs[i].Yreg;
+            //     row.appendChild(td);
+            // }//for
+            // //Inserts the row
+            // tableBody.appendChild(row);
         } //update_PCB_GUI
+        static updatePCB(pcb, tb, create) {
+            //creates the new row for the  PCB
+            var row = document.createElement("tr");
+            row.className += " " + String(+pcb.PID);
+            //Inserts all of the PCB data into the GUI
+            var td = document.createElement("td");
+            td.innerHTML = String(pcb.PID);
+            row.appendChild(td);
+            td = document.createElement("td");
+            td.innerHTML = pcb.ProgramCounter;
+            row.appendChild(td);
+            td = document.createElement("td");
+            td.innerHTML = pcb.ProcesState;
+            row.appendChild(td);
+            td = document.createElement("td");
+            td.innerHTML = pcb.Xreg;
+            row.appendChild(td);
+            td = document.createElement("td");
+            td.innerHTML = pcb.Yreg;
+            row.appendChild(td);
+            if (create) {
+                //Inserts the row
+                tb.appendChild(row);
+            }
+        } //updatePCB
+        //Takes in the current PCB and updates the CPU accordingly
         static update_CPU_GUI() {
             document.getElementById("cpuPC").innerHTML = String(_CPU.PC);
             document.getElementById("cpuAcc").innerHTML = String(_CPU.Acc.toString(16));

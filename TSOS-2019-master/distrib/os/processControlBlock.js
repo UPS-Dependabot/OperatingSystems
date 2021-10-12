@@ -12,6 +12,14 @@ var TSOS;
             this.IR = IR;
         } //constructor
         init() {
+            this.PID = 0;
+            this.ProgramCounter = "00",
+                this.ProcesState = "Resident",
+                this.Xreg = "00",
+                this.Yreg = "00",
+                this.Acc = "00",
+                this.Zflag = 0,
+                this.IR = "";
         } //init
         getPID() {
             return this.PID;

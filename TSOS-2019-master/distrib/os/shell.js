@@ -454,18 +454,20 @@ var TSOS;
                     //Send to Memory Accessor to store in Memory
                     _MemAcc.loadIn(validProgram);
                     //creates the process control block
-                    var pcb = new TSOS.ProcessControlBlock;
+                    var pcb = new TSOS.ProcessControlBlock(_PIDNumber, "00", "Resident", "00", "00", "00", 0, "");
                     //Assigns a Process ID to the control block 
-                    pcb.PID = _PIDNumber;
+                    pcb.setPID(_PIDNumber);
                     //stores the new process control block
                     _PCBs[_PIDNumber] = pcb;
-                    //Increments PCB number
-                    _PIDNumber++;
                     _StdOut.advanceLine();
                     _StdOut.putText("Process ID: " + pcb.PID);
+                    //Note to self: The _PIDNumber is incremented in the update_PCB_GUI()
+                    //
                     //Update: Memory GUI
                     //        PCB GUI
-                    TSOS.Control.update_PCB_GUI();
+                    //  
+                    //  Boolean determines wether or not to create a new block in the GUI
+                    TSOS.Control.update_PCB_GUI(pcb, true);
                     TSOS.Control.update_Mem_GUI();
                 } //else
             } //valid
@@ -490,7 +492,7 @@ var TSOS;
                 _StdOut.putText("Process " + userPCB + ": Ready");
                 _PCBs[userPCB].ProcesState = "Ready";
                 _CPU.start(_PCBs[userPCB]);
-                TSOS.Control.update_PCB_GUI();
+                TSOS.Control.update_PCB_GUI(userPCB, false);
                 //begins the program execution
                 _CPU.isExecuting = true;
             } //if
