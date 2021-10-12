@@ -21,11 +21,25 @@ const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (inte
 const KEYBOARD_IRQ: number = 1;
 
 
+
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
+
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
+
+//Memory Constants
+const Segment_Length: number = 256;
+var _Mem: TSOS.Memory;
+//Memory Accessor
+var _MemAcc: TSOS.MemoryAccessor;
+var _MemoryManager: any = null;
+
+//Program Control Block
+var _PCB: TSOS.ProcessControlBlock;
+var _PIDNumber: number = 0;
+var _PCBs = new Array(Segment_Length); //basically my resident Queue
 
 var _OSclock: number = 0;  // Page 23.
 
@@ -52,7 +66,7 @@ var _StdOut: TSOS.Console = null;
 // UI
 var _Console: TSOS.Console;
 var _OsShell: TSOS.Shell;
-var _Counter: Number = 0;//added to play arounf with for scrolling
+var _Counter: Number = 0;//added to play around with for scrolling
 
 
 // At least this OS is not trying to kill you. (Yet.)

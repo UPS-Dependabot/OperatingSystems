@@ -19,6 +19,11 @@
    <script type="text/javascript" src="distrib/host/control.js"></script>
    <script type="text/javascript" src="distrib/host/devices.js"></script>
    <script type="text/javascript" src="distrib/host/cpu.js"></script>
+   <script type="text/javascript" src="distrib/host/memory.js"></script>
+   <script type="text/javascript" src="distrib/host/memoryAccessor.js"></script>
+   <script type="text/javascript" src="distrib/host/memoryManager.js"></script>
+
+   
 
    <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
    <script type="text/javascript" src="distrib/os/interrupt.js"></script>
@@ -31,6 +36,8 @@
    <script type="text/javascript" src="distrib/os/shellCommand.js"></script>
    <script type="text/javascript" src="distrib/os/userCommand.js"></script>
    <script type="text/javascript" src="distrib/os/kernel.js"></script>
+   <script type="text/javascript" src="distrib/os/processControlBlock.js"></script>
+
 
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
@@ -46,7 +53,7 @@
       <p class = "h2"> CharkOS </p>
       <div class = "row">
          <p id = "time" class = "col-2">  </p>  
-         <p class= "col-2">Status: Still Alive </p>
+         <p class= "col-2">Status: <span id= "status">Still Alive </span> </p>
          <script>
             function updateClock() {
                var now = new Date(), // current date
@@ -127,6 +134,66 @@
             ></textarea>
          </label>
       </div>
+
+      <div id="divMemory" style="opacity: 0.9;">
+         <label>Memory</label>
+         <div id="displayMemory" style="height: 150px; overflow-y: scroll;">
+            <table id = "memTable"> 
+               
+            </table>
+            
+         </div>
+     </div>
+   </div>
+
+   <div id = "CPU">
+      <p class = "h3"> CPU </p>
+      <table>
+         <thead>
+            <th id = "PC">PC</th>
+            <th id = "Acc">Acc</th>
+            <th id = "Xreg">Xreg</th>
+            <th id = "Yreg">Yreg</th>
+            <th id = "Zflag">Zreg</th>
+            <th id = "IR"> IR</th>
+         </thead>
+         <tbody id = "cpuBody">
+            <tr>
+               <td id = "cpuPC"> </td>
+               <td id = "cpuAcc"> </td>
+               <td id = "cpuX"> </td>
+               <td id = "cpuY"> </td>
+               <td id = "cpuZ"> </td>
+               <td id = "cpuIR"> </td>
+            </tr>
+         </tbody>
+      </table>
+   <div>
+   <p class = "h3"> Process Control Block </p>
+      <table id = "PCBs">
+         <thead>
+            <th id = "PID">PID</th>
+            <th id = "PC">PC</th>
+            <th id = "State">State</th>
+            <th id = "Xreg">Xreg</th>
+            <th id = "Yreg">Yreg</th>
+         </thead>
+         <tbody id = "pcbBody">
+            <!-- 
+            <tr>
+               <td>  </td>
+               <td>  </td> 
+               <td>  </td>
+               <td>  </td>
+               <td>  </td>
+            </tr>
+            -->
+         </tbody>
+      </table>
+   </div>
+
+ 
+
    </div>
    
    <p class="footerText" style="clear:both;">
