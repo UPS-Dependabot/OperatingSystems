@@ -1,20 +1,24 @@
 var TSOS;
 (function (TSOS) {
     class Memory {
-        constructor(Mem = new Array(Segment_Length)) {
+        constructor(Mem = new Array(Segment_Length * 3)) {
             this.Mem = Mem;
         } //constructor
         init() {
+            //init to false so Memory reconizes that there are no programs currently running
+            _RunningPrograms = [false, false, false];
             //initialize all memory to be 0
-            this.clearMem();
-            //Inserts memory into the GUI
-            //this.memoryInsert();
+            for (var i = 0; i < _RunningPrograms.length; i++) {
+                this.clearMem(i);
+            } //for
         } //init
         getMem() {
             return this.Mem;
         } //getMem
-        clearMem() {
-            for (var i = 0; Segment_Length > i; i++) {
+        clearMem(base) {
+            var start = Segment_Length * base;
+            var end = start + Segment_Length - 1;
+            for (var i = start; end > i; i++) {
                 this.Mem[i] = "00"; // Everything begins at 00 in hex
             } //for
         } //clearMem

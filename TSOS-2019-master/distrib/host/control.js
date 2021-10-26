@@ -109,31 +109,8 @@ var TSOS;
                 // tableBody.appendChild(row); 
             } //if
             else { //update existing pcb
-                //var pcbClass = pcBlock.getElementsByClassName(String(pcBlock.PID));
                 this.updatePCB(pcBlock, tableBody, createNewPCB);
             }
-            // for(var i in _PCBs){
-            //     //creates the new row for the  PCB
-            //     var row = document.createElement("tr");
-            //     //Inserts all of the PCB data into the GUI
-            //     var td = document.createElement("td");
-            //     td.innerHTML = _PCBs[i].PID.toString();
-            //     row.appendChild(td);
-            //     td = document.createElement("td");
-            //     td.innerHTML = _PCBs[i].ProgramCounter;
-            //     row.appendChild(td);
-            //     td = document.createElement("td");
-            //     td.innerHTML = _PCBs[i].ProcesState;
-            //     row.appendChild(td);
-            //     td = document.createElement("td");
-            //     td.innerHTML = _PCBs[i].Xreg;
-            //     row.appendChild(td);
-            //     td = document.createElement("td");
-            //     td.innerHTML = _PCBs[i].Yreg;
-            //     row.appendChild(td);
-            // }//for
-            // //Inserts the row
-            // tableBody.appendChild(row);
         } //update_PCB_GUI
         static updatePCB(pcb, tb, create) {
             //creates the new row for the  PCB
@@ -177,7 +154,8 @@ var TSOS;
             this.removeAllChildNodes(memGUI);
             //Makes the code in the loop look cleaner
             var byteLength = 8;
-            for (var tableRow = 0; tableRow < (Segment_Length / 8); tableRow++) {
+            //multipled by 3 to allocate space for each program
+            for (var tableRow = 0; tableRow < (Segment_Length * 3 / 8); tableRow++) {
                 var row = document.createElement("tr");
                 //Loop 8 times because we know this is for each individual byte
                 for (var rowCell = 0; rowCell < byteLength; rowCell++) {

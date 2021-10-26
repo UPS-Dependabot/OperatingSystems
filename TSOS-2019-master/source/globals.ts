@@ -32,9 +32,14 @@ var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure th
 //Memory Constants
 const Segment_Length: number = 256;
 var _Mem: TSOS.Memory;
+//Detects if there are programs in the MM
+var _RunningPrograms = new  Array(3);
+
 //Memory Accessor
 var _MemAcc: TSOS.MemoryAccessor;
 var _MemoryManager: any = null;
+
+
 
 //Program Control Block
 var _PCB: TSOS.ProcessControlBlock;

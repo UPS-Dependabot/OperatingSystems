@@ -519,16 +519,17 @@ module TSOS {
 
                 if(userProgramInput.value == "")
                     _StdOut.putText("There is no program inputted");
-                //
-                //Right now the isSpace is breaking load I'll deal with this later
-                //
-                // else if(_MemoryManager.isSpace(validProgram.length)){
-                //     _StdOut.putText("The program you entered will not fit into memory");
-                // }
+
+                //Tests to see if there is room in memory
+                var segmentNum = _MemoryManager.segmentAllocation();
+                if(segmentNum >= 3){
+                    _StdOut.putText("There is no room for this program. :(");
+                }//if
                 else{
                     _StdOut.putText("Valid Program :)");
-                    //Send to Memory Accessor to store in Memory
-                    _MemAcc.loadIn(validProgram);
+
+                    //Send to Memory Accessor to store in Memory  
+                    _MemAcc.loadIn(validProgram, segmentNum);
 
                     //creates the process control block
                     var pcb  = new TSOS.ProcessControlBlock(  _PIDNumber,  "00", "Resident", "00",

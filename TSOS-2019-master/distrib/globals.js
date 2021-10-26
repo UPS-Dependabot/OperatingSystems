@@ -24,6 +24,8 @@ var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is 
 //Memory Constants
 const Segment_Length = 256;
 var _Mem;
+//Detects if there are programs in the MM
+var _RunningPrograms = new Array(3);
 //Memory Accessor
 var _MemAcc;
 var _MemoryManager = null;
