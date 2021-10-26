@@ -576,7 +576,7 @@ module TSOS {
             //Find if the id the user entered exists
             if(_PCBs[userPCB] != null){
                 _StdOut.putText("Process "+userPCB+": Ready");
-                _PCBs[userPCB].ProcesState = "Ready"
+                _PCBs[userPCB].ProcesState = "Ready";
                 _CPU.start(_PCBs[userPCB]);
 
                 TSOS.Control.update_PCB_GUI(userPCB, false);

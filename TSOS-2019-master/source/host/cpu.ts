@@ -39,18 +39,22 @@
                 _CPU.Yreg = parseInt(pcb.Yreg, 16)
                 TSOS.Control.update_CPU_GUI();
             }//start
+
+            
     
             public cycle(): void {
                 _Kernel.krnTrace('CPU cycle');
                 // TODO: Accumulate CPU usage and profiling statistics here.
                 // Do the real work here. Be sure to set this.isExecuting appropriately.
+
                 if(this.isExecuting){ 
-                    //Make we don't go past 255 (FF) instead of 256
+                    //Don't go past 255 (FF) instead of 256
                     //  Didn't do this before and I ran into an infinite loop when I branched on FF
-                    while(_Mem.Mem.length -1 > this.PC ){
-                        this.fetchOpCode(_Mem.Mem[this.PC]);
-                    }//for
-    
+                    // while(_Mem.Mem.length -1 > this.PC ){
+                    //     this.fetchOpCode(_Mem.Mem[this.PC]);
+                    // }//for
+
+                    this.fetchOpCode(_Mem.Mem[this.PC]);
                     //updates the PCB
                     //  bool tell us not to create a new PCB in the GUI
                     TSOS.Control.update_PCB_GUI(_PCBs[_PIDNumber],false);
@@ -140,7 +144,7 @@
                 //fetches the next index in Memory and sets it to the accumulator
                 this.Acc =this.decodeBase(String(_MemAcc.read(this.PC+1)),16);
                 this.PC += 2;
-            }//loadConstabnt
+            }//loadConstant
     
             public loadMemory(){//load accumulator from memory
                 //loads from the Specified Addresss in Memory
@@ -157,8 +161,7 @@
             }//store
     
             public addCarry(){//Add with carry
-                //adds the contents of the address into the accumulator
-                
+                //adds the contents of the address into the accumulator 
                 this.Acc += this.decodeBase(String(_MemAcc.read(this.valueHelper())),16);
                 this.PC += 3;
             }//addCarry
@@ -199,7 +202,7 @@
             }//No Operation
     
             public programBreak(){//Ends the program (It is really a system call)
-                this.isExecuting = false;
+                //this.isExecuting = false;
                 this.PC++;
             }//programBreak
     
@@ -222,12 +225,6 @@
     
             public branch(){// Hops to another line in the program if Z Flag = 0
                 if(this.Zflag == 0){//branch when the Z flag is zero
-    
-                     //Adds the next byte to the program counter//
-                    //##############################################################///
-                    //this.PC += this.decodeBase(String(_MemAcc.read(this.PC+1)),16) % 256;
-                    //this.PC = 10;
-                    ///##############################################################///
                     
                     //Everything I did before
                     var currPlace = this.PC;
@@ -235,21 +232,8 @@
                     //increases PC by x amount 
                     //  Adding 1 so we "start" the branch from the byte value rather than the D0
                     this.PC += parseInt(_MemAcc.read(this.PC+1).toString(16),16)+1;
-    
-                    if(this.PC <= 127){
-                        //Increment 
-                        //this.PC += parseInt(_MemAcc.read(this.PC+1).toString(16),16);
-    
-                        //Increment the PC by the byte that is next to it
-                    }
                        
                     if(this.PC > 127){
-                        
-                        //
-                        // this.PC += this.decodeBase(String(_MemAcc.read(this.PC+1)),16);
-                        // this.PC = this.PC % 256;
-    
-    
                         //Invoke 2's complement to find where to branch to in memory
     
                         //Converts the place we are hopping to an array in binary;
@@ -272,10 +256,6 @@
                         var twosComp = this.decodeBase(twoCompResBin,2) + 1;
     
                         var actualLoaction = 255 - twosComp +1;
-                        
-                        //testing------------------------//
-                        console.log(actualLoaction);
-                        //------------------------------//
     
                         //Set the PC to the result in to hop to it in memory                                        
                         this.PC = actualLoaction;
@@ -311,12 +291,6 @@
                 _MemAcc.write(this.valueHelper(), incMemValue);
                 this.PC += 3; 
             }//increment
-    
-            //---------REMINDER-------
-            /*
-            /IMPLEMENT THE INTERPUT QUEUE!!!!!!!!
-            /PLEASSSSEEEEEEE!!!!!!!!!!!!!!!!!!!!!
-            */
     
             
             public sysCall(){
