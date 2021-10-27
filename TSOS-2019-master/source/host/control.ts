@@ -151,21 +151,36 @@ module TSOS {
             var td = document.createElement("td");
             td.innerHTML = String(pcb.PID);
             row.appendChild(td);
-
-            td = document.createElement("td");
-            td.innerHTML = pcb.ProgramCounter;
-            row.appendChild(td);
-
+            
             td = document.createElement("td");
             td.innerHTML = pcb.ProcesState;
             row.appendChild(td);
 
+            //Convert to Hex
+            //  got rid of the PC.toString(16) because it was breaking
+
             td = document.createElement("td");
-            td.innerHTML = pcb.Xreg;
+            td.innerHTML = String(parseInt(pcb.PC));
             row.appendChild(td);
 
             td = document.createElement("td");
-            td.innerHTML = pcb.Yreg;
+            td.innerHTML = String(parseInt(pcb.Acc));
+            row.appendChild(td);
+
+            td = document.createElement("td");
+            td.innerHTML = String(parseInt(pcb.Xreg));
+            row.appendChild(td);
+
+            td = document.createElement("td");
+            td.innerHTML = String(parseInt(pcb.Yreg));
+            row.appendChild(td);
+
+            td = document.createElement("td");
+            td.innerHTML = String(pcb.Zflag);
+            row.appendChild(td);
+
+            td = document.createElement("td");
+            td.innerHTML = pcb.IR;
             row.appendChild(td);
 
             if(create){

@@ -34,10 +34,12 @@
             }
     
             public start(pcb): void{
-                _CPU.PC = parseInt(pcb.ProgramCounter);
-                _CPU.Xreg = parseInt(pcb.Xreg, 16);
-                _CPU.Yreg = parseInt(pcb.Yreg, 16)
-                TSOS.Control.update_CPU_GUI();
+                // _CPU.PC = parseInt(pcb.PC);
+                // _CPU.Acc = parseInt(pcb.PC);
+                // _CPU.Xreg = parseInt(pcb.Xreg, 16);
+                // _CPU.Yreg = parseInt(pcb.Yreg, 16);
+                // _CPU.Zflag = pcb.Zflag;
+                // TSOS.Control.update_CPU_GUI();
             }//start
 
             
@@ -54,13 +56,16 @@
                     //     this.fetchOpCode(_Mem.Mem[this.PC]);
                     // }//for
 
+
                     this.fetchOpCode(_Mem.Mem[this.PC]);
+
+                    //stops for when a user forgets to put in 00 at the end of their program
+                    //_CPU.isExecuting = false;
+
                     //updates the PCB
                     //  bool tell us not to create a new PCB in the GUI
                     TSOS.Control.update_PCB_GUI(_PCBs[_PIDNumber],false);
     
-                    //Ends the program
-                    _CPU.isExecuting = false;
                 }//if
             }//cycle
     
@@ -202,6 +207,9 @@
             }//No Operation
     
             public programBreak(){//Ends the program (It is really a system call)
+                //I think it's turning off the program when it is not supposed to.
+                //Something is up with the branch
+                //
                 //this.isExecuting = false;
                 this.PC++;
             }//programBreak

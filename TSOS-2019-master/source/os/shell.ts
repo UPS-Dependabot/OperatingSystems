@@ -519,39 +519,40 @@ module TSOS {
 
                 if(userProgramInput.value == "")
                     _StdOut.putText("There is no program inputted");
-
-                //Tests to see if there is room in memory
-                var segmentNum = _MemoryManager.segmentAllocation();
-                if(segmentNum >= 3){
-                    _StdOut.putText("There is no room for this program. :(");
-                }//if
                 else{
-                    _StdOut.putText("Valid Program :)");
+                    //Tests to see if there is room in memory
+                    var segmentNum = _MemoryManager.segmentAllocation();
+                    if(segmentNum >= 3){
+                        _StdOut.putText("There is no room for this program. :(");
+                    }//if
+                    else{
+                        _StdOut.putText("Valid Program :)");
 
-                    //Send to Memory Accessor to store in Memory  
-                    _MemAcc.loadIn(validProgram, segmentNum);
+                        //Send to Memory Accessor to store in Memory  
+                        _MemAcc.loadIn(validProgram, segmentNum);
 
-                    //creates the process control block
-                    var pcb  = new TSOS.ProcessControlBlock(  _PIDNumber,  "00", "Resident", "00",
-                                                                             "00", "00", 0, "");
-                    //Assigns a Process ID to the control block 
-                    pcb.setPID(_PIDNumber);
 
-                    //stores the new process control block
-                    _PCBs[_PIDNumber] = pcb;
+                        //creates the process control block           PID         State       PC                       
+                        var pcb  = new TSOS.ProcessControlBlock(  _PIDNumber, "Resident", segmentNum*Segment_Length,0,0,0,0, "");
+                        //Assigns a Process ID to the control block 
+                        pcb.setPID(_PIDNumber);
 
-                    _StdOut.advanceLine();
-                    _StdOut.putText("Process ID: "+pcb.PID);
+                        //stores the new process control block
+                        _PCBs[_PIDNumber] = pcb;
 
-                    //Note to self: The _PIDNumber is incremented in the update_PCB_GUI()
-                    //
-                    //Update: Memory GUI
-                    //        PCB GUI
-                    //  
-                    //  Boolean determines wether or not to create a new block in the GUI
-                    TSOS.Control.update_PCB_GUI(pcb, true);  
-                    TSOS.Control.update_Mem_GUI();     
-                }//else
+                        _StdOut.advanceLine();
+                        _StdOut.putText("Process ID: "+pcb.PID);
+
+                        //Note to self: The _PIDNumber is incremented in the update_PCB_GUI()
+                        //
+                        //Update: Memory GUI
+                        //        PCB GUI
+                        //  
+                        //  Boolean determines wether or not to create a new block in the GUI
+                        TSOS.Control.update_PCB_GUI(pcb, true);  
+                        TSOS.Control.update_Mem_GUI();     
+                    }//else 
+                }//else No program inputted
             }//valid
             else{
                 _StdOut.putText("Invalid Program :( Only usee 0-9, A-F, a-f");
@@ -582,6 +583,7 @@ module TSOS {
                 TSOS.Control.update_PCB_GUI(userPCB, false);
                 //begins the program execution
                 _CPU.isExecuting = true;
+                
             }//if
             else{
                 _StdOut.putText("There is no program associated with this PID");
