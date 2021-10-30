@@ -21,7 +21,9 @@
                         public Yreg: number = 0,
                         public Zflag: number = 0,
                         public IR: String = "",
-                        public isExecuting: boolean = false) {
+                        public isExecuting: boolean = false,
+                        public offset: number = 0
+                        ) {
             }
     
             public init(): void {
@@ -57,7 +59,7 @@
                     // }//for
 
 
-                    this.fetchOpCode(_Mem.Mem[this.PC]);
+                    this.fetchOpCode(_Mem.Mem[this.PC + _CPU.offset]);
 
                     //stops for when a user forgets to put in 00 at the end of their program
                     //_CPU.isExecuting = false;
@@ -207,10 +209,9 @@
             }//No Operation
     
             public programBreak(){//Ends the program (It is really a system call)
-                //I think it's turning off the program when it is not supposed to.
-                //Something is up with the branch
-                //
-                //this.isExecuting = false;
+                //I think it's turning off the program when it is not supposed to. Something is up with the branch
+                //For some this line was being skipped when I used this.isExecuting so I changed it to the CPU
+                _CPU.isExecuting = false;
                 this.PC++;
             }//programBreak
     
@@ -238,8 +239,8 @@
                     var currPlace = this.PC;
     
                     //increases PC by x amount 
-                    //  Adding 1 so we "start" the branch from the byte value rather than the D0
-                    this.PC += parseInt(_MemAcc.read(this.PC+1).toString(16),16)+1;
+                    //  Adding 2 so we "start" the branch from the opdoce after the byte value rather than the D0
+                    this.PC += parseInt(_MemAcc.read(this.PC+1).toString(16),16)+2;
                        
                     if(this.PC > 127){
                         //Invoke 2's complement to find where to branch to in memory

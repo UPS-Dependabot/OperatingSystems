@@ -13,7 +13,7 @@
 var TSOS;
 (function (TSOS) {
     class Cpu {
-        constructor(PC = 0, Acc = 0, Xreg = 0, Yreg = 0, Zflag = 0, IR = "", isExecuting = false) {
+        constructor(PC = 0, Acc = 0, Xreg = 0, Yreg = 0, Zflag = 0, IR = "", isExecuting = false, offset = 0) {
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
@@ -21,6 +21,7 @@ var TSOS;
             this.Zflag = Zflag;
             this.IR = IR;
             this.isExecuting = isExecuting;
+            this.offset = offset;
         }
         init() {
             this.PC = 0;
@@ -48,7 +49,7 @@ var TSOS;
                 // while(_Mem.Mem.length -1 > this.PC ){
                 //     this.fetchOpCode(_Mem.Mem[this.PC]);
                 // }//for
-                this.fetchOpCode(_Mem.Mem[this.PC]);
+                this.fetchOpCode(_Mem.Mem[this.PC + _CPU.offset]);
                 //stops for when a user forgets to put in 00 at the end of their program
                 //_CPU.isExecuting = false;
                 //updates the PCB
@@ -180,7 +181,9 @@ var TSOS;
             this.PC++;
         } //No Operation
         programBreak() {
-            //this.isExecuting = false;
+            //I think it's turning off the program when it is not supposed to. Something is up with the branch
+            //For some this line was being skipped when I used this.isExecuting so I changed it to the CPU
+            _CPU.isExecuting = false;
             this.PC++;
         } //programBreak
         compare() {
@@ -202,8 +205,8 @@ var TSOS;
                 //Everything I did before
                 var currPlace = this.PC;
                 //increases PC by x amount 
-                //  Adding 1 so we "start" the branch from the byte value rather than the D0
-                this.PC += parseInt(_MemAcc.read(this.PC + 1).toString(16), 16) + 1;
+                //  Adding 2 so we "start" the branch from the opdoce after the byte value rather than the D0
+                this.PC += parseInt(_MemAcc.read(this.PC + 1).toString(16), 16) + 2;
                 if (this.PC > 127) {
                     //Invoke 2's complement to find where to branch to in memory
                     //Converts the place we are hopping to an array in binary;

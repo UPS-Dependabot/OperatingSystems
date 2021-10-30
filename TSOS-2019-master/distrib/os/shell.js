@@ -453,8 +453,8 @@ var TSOS;
                         _StdOut.putText("Valid Program :)");
                         //Send to Memory Accessor to store in Memory  
                         _MemAcc.loadIn(validProgram, segmentNum);
-                        //creates the process control block           PID         State       PC                       
-                        var pcb = new TSOS.ProcessControlBlock(_PIDNumber, "Resident", segmentNum * Segment_Length, 0, 0, 0, 0, "");
+                        //creates the process control block           PID         State       PC         isEx     offest                   
+                        var pcb = new TSOS.ProcessControlBlock(_PIDNumber, "Resident", 0, 0, 0, 0, 0, "", false, segmentNum * Segment_Length);
                         //Assigns a Process ID to the control block 
                         pcb.setPID(_PIDNumber);
                         //stores the new process control block
@@ -492,8 +492,12 @@ var TSOS;
             if (_PCBs[userPCB] != null) {
                 _StdOut.putText("Process " + userPCB + ": Ready");
                 _PCBs[userPCB].ProcesState = "Ready";
-                _CPU.start(_PCBs[userPCB]);
-                TSOS.Control.update_PCB_GUI(userPCB, false);
+                var pcbIndex = parseInt(userPCB);
+                _CPU.start(_PCBs[pcbIndex]);
+                //sets the offset in the CPU so the PC is starting in the right segment in memory
+                _CPU.offset = _PCBs[pcbIndex].offset;
+                _CPU.PC = _PCBs[pcbIndex].PC;
+                TSOS.Control.update_PCB_GUI(pcbIndex, false);
                 //begins the program execution
                 _CPU.isExecuting = true;
             } //if
