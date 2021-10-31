@@ -168,8 +168,6 @@ var TSOS;
             this.PC += 2;
         } //YregCon
         YregMem() {
-            //converts the new Value to hex
-            //this.Yreg = _MemAcc.read(this.valueHelper());
             //NEED THIS to be a STRING for when decode parses everything
             var num = this.decodeBase(String(_MemAcc.read(this.valueHelper())), 16);
             this.Yreg = num;
@@ -181,9 +179,10 @@ var TSOS;
             this.PC++;
         } //No Operation
         programBreak() {
-            //I think it's turning off the program when it is not supposed to. Something is up with the branch
-            //For some this line was being skipped when I used this.isExecuting so I changed it to the CPU
             _CPU.isExecuting = false;
+            //Indicates that the segment is now free
+            var seg = _PCBs[_PIDNumber].segment;
+            _RunningPrograms[seg] = false;
             this.PC++;
         } //programBreak
         compare() {
@@ -210,8 +209,6 @@ var TSOS;
                 if (this.PC > 127) {
                     //Invoke 2's complement to find where to branch to in memory
                     //Converts the place we are hopping to an array in binary;
-                    //var locationDec = this.PC + this.decodeBase(_MemAcc.read(currPlace+1),16);
-                    //var locationDec = _MemAcc.read()
                     var locationBinary = (this.PC.toString(2));
                     var twoCompResBin = "";
                     //Flips the digits in the array

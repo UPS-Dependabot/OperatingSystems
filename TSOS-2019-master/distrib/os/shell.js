@@ -61,8 +61,11 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellRun, "run", " - Runs the program that is currently loaded into memory");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellclearMem, "clear", " - Clears all memory");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellKill, "kill", " kill <id> - kills the specified process id");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
-            // kill <id> - kills the specified process id.
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -453,12 +456,18 @@ var TSOS;
                         _StdOut.putText("Valid Program :)");
                         //Send to Memory Accessor to store in Memory  
                         _MemAcc.loadIn(validProgram, segmentNum);
-                        //creates the process control block           PID         State       PC         isEx     offest                   
-                        var pcb = new TSOS.ProcessControlBlock(_PIDNumber, "Resident", 0, 0, 0, 0, 0, "", false, segmentNum * Segment_Length);
+                        //creates the process control block           PID         State   PC               isEx     offest                     Segment
+                        var pcb = new TSOS.ProcessControlBlock(_PIDNumber, "Resident", 0, 0, 0, 0, 0, "", false, segmentNum * Segment_Length, segmentNum);
                         //Assigns a Process ID to the control block 
                         pcb.setPID(_PIDNumber);
                         //stores the new process control block
                         _PCBs[_PIDNumber] = pcb;
+                        // try{
+                        //     _readyQueue.enqueue(pcb);
+                        // }//if
+                        // catch(error){
+                        //     console.error(error);
+                        // }
                         _StdOut.advanceLine();
                         _StdOut.putText("Process ID: " + pcb.PID);
                         //Note to self: The _PIDNumber is incremented in the update_PCB_GUI()
@@ -467,7 +476,7 @@ var TSOS;
                         //        PCB GUI
                         //  
                         //  Boolean determines wether or not to create a new block in the GUI
-                        TSOS.Control.update_PCB_GUI(pcb, true);
+                        TSOS.Control.update_PCB_GUI(_PIDNumber, true);
                         TSOS.Control.update_Mem_GUI();
                     } //else 
                 } //else No program inputted
@@ -491,7 +500,7 @@ var TSOS;
             //Find if the id the user entered exists
             if (_PCBs[userPCB] != null) {
                 _StdOut.putText("Process " + userPCB + ": Ready");
-                _PCBs[userPCB].ProcesState = "Ready";
+                _PCBs[userPCB].ProcesState = "Running";
                 var pcbIndex = parseInt(userPCB);
                 _CPU.start(_PCBs[pcbIndex]);
                 //sets the offset in the CPU so the PC is starting in the right segment in memory
@@ -505,7 +514,29 @@ var TSOS;
                 _StdOut.putText("There is no program associated with this PID");
             }
         } //Run
-    } //Shell
+        //Clears all memory in the OS
+        shellclearMem(args) {
+            //clears all memory
+            for (var i = 0; i < _RunningPrograms.length; i++) {
+                _Mem.clearMem(i);
+                //Indicates that there is now room for a new program
+                _RunningPrograms[i] = false;
+            } //for
+            //Update the GUI
+            TSOS.Control.update_Mem_GUI();
+        } //Clear Mem
+        //Kills a program
+        shellKill(args) {
+            var executePID = parseInt(args[0]);
+            //checks if the PID exists
+            //if(_PCB[executePID] != null){
+            _PCBs[executePID].isExecuting = false;
+            _Mem.clearMem(_PCBs[executePID].segment);
+            //Update the GUI
+            TSOS.Control.update_Mem_GUI();
+            //}//if
+        } //kill
+    }
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));
 //# sourceMappingURL=shell.js.map

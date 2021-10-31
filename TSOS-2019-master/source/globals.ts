@@ -39,7 +39,10 @@ var _RunningPrograms = new  Array(3);
 var _MemAcc: TSOS.MemoryAccessor;
 var _MemoryManager: any = null;
 
-
+//Context Switching
+var _Scheduler: TSOS.Scheduler;
+var _QuantumDefault: number = 6;
+var _readyQueue: TSOS.Queue = null;
 
 //Program Control Block
 var _PCB: TSOS.ProcessControlBlock;
@@ -72,7 +75,6 @@ var _StdOut: TSOS.Console = null;
 var _Console: TSOS.Console;
 var _OsShell: TSOS.Shell;
 var _Counter: Number = 0;//added to play around with for scrolling
-
 
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode: boolean = false;

@@ -10,7 +10,8 @@ module TSOS{
             public Zflag: number = 0,
             public IR: String = "",
             public isExecuting: boolean = false,
-            public offset: number = 0
+            public offset: number = 0,
+            public segment: number = 0
           ) {
         }//constructor
 

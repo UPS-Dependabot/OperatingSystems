@@ -29,6 +29,10 @@ var _RunningPrograms = new Array(3);
 //Memory Accessor
 var _MemAcc;
 var _MemoryManager = null;
+//Context Switching
+var _Scheduler;
+var _QuantumDefault = 6;
+var _readyQueue = null;
 //Program Control Block
 var _PCB;
 var _PIDNumber = 0;

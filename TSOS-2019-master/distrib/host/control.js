@@ -113,40 +113,65 @@ var TSOS;
             }
         } //update_PCB_GUI
         static updatePCB(pcb, tb, create) {
-            //creates the new row for the  PCB
-            var row = document.createElement("tr");
-            row.className += " " + String(+pcb.PID);
-            //Inserts all of the PCB data into the GUI
-            var td = document.createElement("td");
-            td.innerHTML = String(pcb.PID);
-            row.appendChild(td);
-            td = document.createElement("td");
-            td.innerHTML = pcb.ProcesState;
-            row.appendChild(td);
-            //Convert to Hex
-            //  got rid of the PC.toString(16) because it was breaking
-            td = document.createElement("td");
-            td.innerHTML = String(parseInt(pcb.PC));
-            row.appendChild(td);
-            td = document.createElement("td");
-            td.innerHTML = String(parseInt(pcb.Acc));
-            row.appendChild(td);
-            td = document.createElement("td");
-            td.innerHTML = String(parseInt(pcb.Xreg));
-            row.appendChild(td);
-            td = document.createElement("td");
-            td.innerHTML = String(parseInt(pcb.Yreg));
-            row.appendChild(td);
-            td = document.createElement("td");
-            td.innerHTML = String(pcb.Zflag);
-            row.appendChild(td);
-            td = document.createElement("td");
-            td.innerHTML = pcb.IR;
-            row.appendChild(td);
             if (create) {
+                //creates the new row for the  PCB
+                var row = document.createElement("tr");
+                //row.className += " "+String(+_PCBs[pcb].PID);
+                row.id += " " + String(+_PCBs[pcb].PID);
+                //Inserts all of the PCB data into the GUI
+                var td = document.createElement("td");
+                td.innerHTML = String(_PCBs[pcb].PID);
+                row.appendChild(td);
+                td = document.createElement("td");
+                td.innerHTML = _PCBs[pcb].ProcesState;
+                row.appendChild(td);
+                //Convert to Hex
+                //  got rid of the PC.toString(16) because it was breaking
+                td = document.createElement("td");
+                td.className = "PC";
+                td.innerHTML = String(parseInt(_PCBs[pcb].PC));
+                row.appendChild(td);
+                td = document.createElement("td");
+                td.className = "Acc";
+                td.innerHTML = String(parseInt(_PCBs[pcb].Acc));
+                row.appendChild(td);
+                td = document.createElement("td");
+                td.className = "Xreg";
+                td.innerHTML = String(parseInt(_PCBs[pcb].Xreg));
+                row.appendChild(td);
+                td = document.createElement("td");
+                td.className = "Yreg";
+                td.innerHTML = String(parseInt(_PCBs[pcb].Yreg));
+                row.appendChild(td);
+                td = document.createElement("td");
+                td.className = "Zflag";
+                td.innerHTML = String(_PCBs[pcb].Zflag);
+                row.appendChild(td);
+                td = document.createElement("td");
+                td.className = "IR";
+                td.innerHTML = _PCBs[pcb].IR;
+                row.appendChild(td);
                 //Inserts the row
                 tb.appendChild(row);
-            }
+            } //if create
+            else { //update
+                //fetches the row of the PCB in the GUI
+                var pcbRow = document.getElementById(" " + pcb);
+                //List of all headers
+                var headers = new Array(7);
+                headers = ["PC", "Acc", "Xreg", "Yreg", "Zflag", "IR", "ProcessState"];
+                //All feilds in the pcb
+                var feilds = new Array(7);
+                feilds = [_PCBs[pcb].PC, _PCBs[pcb].Acc, _PCBs[pcb].Xreg, _PCBs[pcb].Yreg,
+                    _PCBs[pcb].Zflag, _PCBs[pcb].IR, _PCBs[pcb].ProcesState];
+                //Inserts each header from the PCB into the GUI
+                for (var header = 0; header < headers.length; header++) {
+                    var feild = headers[header];
+                    //  PCB GUI = PCB Object values
+                    //  Ex:   row-ID.PC = pcb.PC;
+                    pcbRow.children[header].innerHTML = String(feilds[header]);
+                } //for
+            } //else
         } //updatePCB
         //Takes in the current PCB and updates the CPU accordingly
         static update_CPU_GUI() {

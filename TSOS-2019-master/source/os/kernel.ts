@@ -77,8 +77,13 @@ module TSOS {
                that it has to look for interrupts and process them if it finds any.                          
             */
 
+            //Call scheduler
+
+
             // Check for an interrupt, if there are any. Page 560
             if (_KernelInterruptQueue.getSize() > 0) {
+
+
                 // Process the first interrupt on the interrupt queue.
                 // TODO (maybe): Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
                 var interrupt = _KernelInterruptQueue.dequeue();

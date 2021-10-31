@@ -44,6 +44,15 @@
                 // TSOS.Control.update_CPU_GUI();
             }//start
 
+            public pcbUpdate():void{
+                _PCBs[_PIDNumber].PC = _CPU.PC;
+                _PCBs[_PIDNumber].Acc = _CPU.Acc;
+                _PCBs[_PIDNumber].Xreg = _CPU.Xreg;
+                _PCBs[_PIDNumber].Yreg = _CPU.Yreg;
+                _PCBs[_PIDNumber].Zflag = _CPU.Zflag;
+                _PCBs[_PIDNumber].IR = _CPU.IR;
+            }//pcbupdate
+
             
     
             public cycle(): void {
@@ -63,11 +72,7 @@
 
                     //stops for when a user forgets to put in 00 at the end of their program
                     //_CPU.isExecuting = false;
-
-                    //updates the PCB
-                    //  bool tell us not to create a new PCB in the GUI
-                    TSOS.Control.update_PCB_GUI(_PCBs[_PIDNumber],false);
-    
+                    
                 }//if
             }//cycle
     
@@ -136,9 +141,12 @@
                         break;
                 }//switch
     
+                //pcb update
+                this.pcbUpdate();
                 //Update everything on the GUI
                 TSOS.Control.update_Mem_GUI();
                 TSOS.Control.update_CPU_GUI();
+                TSOS.Control.update_PCB_GUI(_PIDNumber,false); //  bool tells us not to create a new PCB in the GUI
             }//fetchOPCode
     
             //Always increment the program counter to match the index of the hexcode in the program
@@ -193,9 +201,6 @@
             }//YregCon
     
             public YregMem(){//Load Y register from memory
-                //converts the new Value to hex
-                //this.Yreg = _MemAcc.read(this.valueHelper());
-    
                 //NEED THIS to be a STRING for when decode parses everything
                 var num =  this.decodeBase(String(_MemAcc.read(this.valueHelper())),16);
                 this.Yreg = num;
@@ -209,9 +214,10 @@
             }//No Operation
     
             public programBreak(){//Ends the program (It is really a system call)
-                //I think it's turning off the program when it is not supposed to. Something is up with the branch
-                //For some this line was being skipped when I used this.isExecuting so I changed it to the CPU
                 _CPU.isExecuting = false;
+                //Indicates that the segment is now free
+                var seg = _PCBs[_PIDNumber].segment;
+                _RunningPrograms[seg] = false;
                 this.PC++;
             }//programBreak
     
@@ -247,9 +253,6 @@
     
                         //Converts the place we are hopping to an array in binary;
     
-                        //var locationDec = this.PC + this.decodeBase(_MemAcc.read(currPlace+1),16);
-                        //var locationDec = _MemAcc.read()
-    
                         var locationBinary = (this.PC.toString(2));
                         var twoCompResBin = "";
                         //Flips the digits in the array
@@ -268,8 +271,6 @@
     
                         //Set the PC to the result in to hop to it in memory                                        
                         this.PC = actualLoaction;
-    
-                        
                     }// if 127
                 }//if Z flag
     
