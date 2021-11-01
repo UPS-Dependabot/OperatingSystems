@@ -128,6 +128,11 @@ module TSOS {
                                 "runall",
                                 " - runs all programs in memory");
             this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shellKillAll,
+                                "killall",
+                                " - kill all programs in memory");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
 
             // Display the initial prompt.
@@ -644,8 +649,10 @@ module TSOS {
 
                 _PCBs[executePID].isExecuting = false;
                 _Mem.clearMem(_PCBs[executePID].segment);
+                _PCBs[executePID].ProcesState = "Terminated";
     
                 //Update the GUI
+                TSOS.Control.update_PCB_GUI(executePID, false);
                 TSOS.Control.update_Mem_GUI();
             //}//if
         }//kill
@@ -671,5 +678,19 @@ module TSOS {
             _Scheduler.decide(); //Starts the scheduler
             _CPU.isExecuting = true; //begins program execution
         }//runall
+
+        public shellKillAll(args: string[]){
+            var index = 0;
+            while( _readyQueue.getSize() > index){
+                _PCBs[index].isExecuting = false;
+                _Mem.clearMem(_PCBs[index].segment);
+                _PCBs[index].ProcesState = "Terminated";
+                TSOS.Control.update_PCB_GUI(index, false);
+                index++;
+            }//for
+            //Update the GUI
+            TSOS.Control.update_Mem_GUI();
+
+        }//kill all
     }
 }
