@@ -1,7 +1,7 @@
 var TSOS;
 (function (TSOS) {
     class ProcessControlBlock {
-        constructor(PID = 0, PC = 0, ProcesState = "Resident", Acc = 0, Xreg = 0, Yreg = 0, Zflag = 0, IR = "", isExecuting = false, offset = 0, segment = 0) {
+        constructor(PID = 0, PC = 0, ProcesState = "Resident", Acc = 0, Xreg = 0, Yreg = 0, Zflag = 0, IR = "", segment = 0, isExecuting = false, offset = 0) {
             this.PID = PID;
             this.PC = PC;
             this.ProcesState = ProcesState;
@@ -10,11 +10,22 @@ var TSOS;
             this.Yreg = Yreg;
             this.Zflag = Zflag;
             this.IR = IR;
+            this.segment = segment;
             this.isExecuting = isExecuting;
             this.offset = offset;
-            this.segment = segment;
         } //constructor
         init() {
+            this.PID = 0;
+            this.PC = 0;
+            this.ProcesState = "Resident";
+            this.Acc = 0;
+            this.Xreg = 0;
+            this.Yreg = 0;
+            this.Zflag = 0;
+            this.IR = "";
+            this.segment = -1;
+            this.isExecuting = false;
+            this.offset = 0;
         } //init
         getPID() {
             return this.PID;

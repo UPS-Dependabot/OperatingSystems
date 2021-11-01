@@ -548,11 +548,23 @@ module TSOS {
 
                         //Send to Memory Accessor to store in Memory  
                         _MemAcc.loadIn(validProgram, segmentNum);
+                        
 
-                        //creates the process control block           PID     PC    State               segmentNum   isEx     offest          
-                        var pcb  = new TSOS.ProcessControlBlock(  _PIDNumber, 0,"Resident" ,0,0,0,0, "",segmentNum, false ,segmentNum*Segment_Length, );
+                        //Creates new PCB
+                        var pcb  = new ProcessControlBlock();
+                        pcb.init();
+
+                        pcb.PID = _PIDNumber;
+                        pcb.segment = segmentNum;
+                        pcb.offset = segmentNum*Segment_Length;
+
+                        //#################DUMB WAY OF DOING THINGS######################
+                        //creates the process control block 
+                        //                                 PCB(   PID,     PC, ProcesState,  A, X, Y, Z, IR, segment,   isEx ,  offset )
+                        //var pcb  = new TSOS.ProcessControlBlock(  _PIDNumber, 0,"Resident" , 0, 0, 0, 0, "",segmentNum, false ,segmentNum*Segment_Length, );
+                        //
                         //Assigns a Process ID to the control block 
-                        pcb.setPID(_PIDNumber);
+                        //pcb.setPID(_PIDNumber);
 
                         //stores the new process control block
                         _PCBs[_PIDNumber] = pcb;
@@ -595,6 +607,7 @@ module TSOS {
             if(_PCBs[userPCB] != null){
                 _StdOut.putText("Process "+userPCB+": Ready");
                 _PCBs[userPCB].ProcesState = "Ready";
+                _Scheduler.addPCBQueue(_PCBs[userPCB]);//stores in Ready Queue
 
                 var pcbIndex = parseInt(userPCB);
                 _CPU.start(_PCBs[pcbIndex]);
@@ -656,12 +669,15 @@ module TSOS {
         public shellRunAll(args: string[]){
             for(var i in _PCBs){
                 if(_PCBs[i].ProcesState == "Resident"){
-                    _PCBs[i].ProcesState = "Ready"; //Sets the state
+                    _PCBs[i].ProcesState = "Ready"; //Sets the state to Ready (Basically just for the GUI)
                     //TSOS.Control.update_PCB_GUI(_PCBs[i], false);// updates the GUI
-                    _Scheduler.addPCBQueue(_PCBs[i]); //Puts it inside of the Queue
+                    _PCBs[i].ProcesState = "Running"; //Sets the state Reunning
+                    _Scheduler.addPCBQueue(_PCBs[i]); //Puts each process inside of the Queue
+                    _PCBs[i].isExecuting = true;
                 }//if
             }//for
             _Scheduler.decide(); //Starts the scheduler
+            _CPU.isExecuting = true; //begins program execution
         }//runall
     }
 }

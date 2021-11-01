@@ -14,18 +14,21 @@ var TSOS;
         //Makes decisions as to when the right time is to switch
         decide() {
             var running = false;
+            var index = 0;
             //checks if there is a program that is running
-            for (var i in _PCBs) {
-                if (_PCBs[i].ProcesState == "Running")
-                    running = true;
-            } //for
+            if (!_readyQueue.isEmpty()) { //prevents loop from running when there are no pcbs
+                while (!running && index < _PCBs[index] != null) {
+                    if (_PCBs[index].ProcesState == "Running")
+                        running = true;
+                    index++;
+                } //while
+            } //if
             if (running) {
                 //context switch when the quantm is reached
                 if (this.currQuan > this.quantum) {
                     this.contextSwitch();
                     this.currQuan = 0; //resets for the next process
                 } //if
-                this.currQuan++;
             } //if
         } //decide
         //adds to the ready queue
@@ -37,11 +40,13 @@ var TSOS;
             _readyQueue.dequeue();
         } //remove
         contextSwitch() {
-            var tempPCB = _RunningPCB;
+            var tempPCB = _RunningPCB; //stops and saves the running process
             //The running process will always be on the bottom 
             _RunningPCB = _readyQueue.dequeue();
-            //places the PCB back ontop of the queue
-            this.addPCBQueue(tempPCB);
+            _CPU.PC = _RunningPCB.PC; //Sets the CPU's PC to the next Processes PC
+            //  To prevent from starting from where the previous process's PC left off in the program
+            _CPU.offset = _RunningPCB.offset;
+            this.addPCBQueue(tempPCB); //Places previous running PCB back ontop of the queue
         } //contextSwitch
         //sets the Quantum
         setQuantum(newQuantum) {
