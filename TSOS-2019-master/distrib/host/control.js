@@ -72,6 +72,9 @@ var TSOS;
             _Mem = new TSOS.Memory();
             _Mem.init();
             _MemAcc = new TSOS.MemoryAccessor();
+            _Scheduler = new TSOS.Scheduler();
+            _Scheduler.init();
+            _readyQueue = new TSOS.Queue();
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(TSOS.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
@@ -122,14 +125,14 @@ var TSOS;
                 var td = document.createElement("td");
                 td.innerHTML = String(_PCBs[pcb].PID);
                 row.appendChild(td);
-                td = document.createElement("td");
-                td.innerHTML = _PCBs[pcb].ProcesState;
-                row.appendChild(td);
                 //Convert to Hex
                 //  got rid of the PC.toString(16) because it was breaking
                 td = document.createElement("td");
                 td.className = "PC";
                 td.innerHTML = String(parseInt(_PCBs[pcb].PC));
+                row.appendChild(td);
+                td = document.createElement("td");
+                td.innerHTML = _PCBs[pcb].ProcesState;
                 row.appendChild(td);
                 td = document.createElement("td");
                 td.className = "Acc";
@@ -158,28 +161,33 @@ var TSOS;
                 //fetches the row of the PCB in the GUI
                 var pcbRow = document.getElementById(" " + pcb);
                 //List of all headers
-                var headers = new Array(7);
-                headers = ["PC", "Acc", "Xreg", "Yreg", "Zflag", "IR", "ProcessState"];
+                var headers = new Array(8);
+                headers = ["PID", "PC", "ProcesState", "Acc", "Xreg", "Yreg", "Zflag", "IR"];
                 //All feilds in the pcb
-                var feilds = new Array(7);
-                feilds = [_PCBs[pcb].PC, _PCBs[pcb].Acc, _PCBs[pcb].Xreg, _PCBs[pcb].Yreg,
-                    _PCBs[pcb].Zflag, _PCBs[pcb].IR, _PCBs[pcb].ProcesState];
+                var feilds = new Array(8);
+                feilds = [pcb, _PCBs[pcb].PC, _PCBs[pcb].ProcesState, _PCBs[pcb].Acc, _PCBs[pcb].Xreg, _PCBs[pcb].Yreg,
+                    _PCBs[pcb].Zflag, _PCBs[pcb].IR];
                 //Inserts each header from the PCB into the GUI
                 for (var header = 0; header < headers.length; header++) {
                     var feild = headers[header];
-                    //  PCB GUI = PCB Object values
-                    //  Ex:   row-ID.PC = pcb.PC;
-                    pcbRow.children[header].innerHTML = String(feilds[header]);
-                } //for
+                    if (feild != "ProcesState") { //Inserts all headers as hex except for the State
+                        //  PCB GUI = PCB Object values
+                        //  Ex:   row-ID.PC = pcb.PC;
+                        pcbRow.children[header].innerHTML = String(feilds[header].toString(16));
+                    }
+                    else { //inserts the state in plain text
+                        pcbRow.children[header].innerHTML = String(feilds[header]);
+                    }
+                } //for       
             } //else
         } //updatePCB
         //Takes in the current PCB and updates the CPU accordingly
         static update_CPU_GUI() {
-            document.getElementById("cpuPC").innerHTML = String(_CPU.PC);
+            document.getElementById("cpuPC").innerHTML = String(_CPU.PC.toString(16));
             document.getElementById("cpuAcc").innerHTML = String(_CPU.Acc.toString(16));
             document.getElementById("cpuX").innerHTML = String(_CPU.Xreg.toString(16));
             document.getElementById("cpuY").innerHTML = String(_CPU.Yreg.toString(16));
-            document.getElementById("cpuZ").innerHTML = String(_CPU.Zflag);
+            document.getElementById("cpuZ").innerHTML = String(_CPU.Zflag.toString(16));
             document.getElementById("cpuIR").innerHTML = String(_CPU.IR);
         } //update_CPU_GUI
         //Inserts memory into the GUI

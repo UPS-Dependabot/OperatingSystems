@@ -30,13 +30,14 @@ var _RunningPrograms = new Array(3);
 var _MemAcc;
 var _MemoryManager = null;
 //Context Switching
-var _Scheduler;
+var _Scheduler = null; //Had to init in control.ts. It wasn't reconizing the object when I defined it here.
+var _readyQueue = null; // <-- Same for the Queue
 var _QuantumDefault = 6;
-var _readyQueue = null;
 //Program Control Block
-var _PCB;
+var _RunningPCB;
 var _PIDNumber = 0;
 var _PCBs = new Array(Segment_Length); //basically my resident Queue
+//var _PCBs = new TSOS.Queue;
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().

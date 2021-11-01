@@ -63,7 +63,9 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellclearMem, "clear", " - Clears all memory");
             this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellKill, "kill", " kill <id> - kills the specified process id");
+            sc = new TSOS.ShellCommand(this.shellKill, "kill", "<id> - kills the specified process id");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "<number> - sets the quantum for RR context switch");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // Display the initial prompt.
@@ -456,8 +458,8 @@ var TSOS;
                         _StdOut.putText("Valid Program :)");
                         //Send to Memory Accessor to store in Memory  
                         _MemAcc.loadIn(validProgram, segmentNum);
-                        //creates the process control block           PID         State   PC               isEx     offest                     Segment
-                        var pcb = new TSOS.ProcessControlBlock(_PIDNumber, "Resident", 0, 0, 0, 0, 0, "", false, segmentNum * Segment_Length, segmentNum);
+                        //creates the process control block           PID     PC    State                  isEx     offest                     Segment
+                        var pcb = new TSOS.ProcessControlBlock(_PIDNumber, 0, "Resident", 0, 0, 0, 0, "", false, segmentNum * Segment_Length, segmentNum);
                         //Assigns a Process ID to the control block 
                         pcb.setPID(_PIDNumber);
                         //stores the new process control block
@@ -500,13 +502,16 @@ var TSOS;
             //Find if the id the user entered exists
             if (_PCBs[userPCB] != null) {
                 _StdOut.putText("Process " + userPCB + ": Ready");
-                _PCBs[userPCB].ProcesState = "Running";
+                _PCBs[userPCB].ProcesState = "Ready";
                 var pcbIndex = parseInt(userPCB);
                 _CPU.start(_PCBs[pcbIndex]);
                 //sets the offset in the CPU so the PC is starting in the right segment in memory
                 _CPU.offset = _PCBs[pcbIndex].offset;
                 _CPU.PC = _PCBs[pcbIndex].PC;
+                //saves the running PCB for later when we context switch in the scheduler
+                _RunningPCB = _PCBs[pcbIndex];
                 TSOS.Control.update_PCB_GUI(pcbIndex, false);
+                _PCBs[userPCB].ProcesState = "Running";
                 //begins the program execution
                 _CPU.isExecuting = true;
             } //if
@@ -536,6 +541,14 @@ var TSOS;
             TSOS.Control.update_Mem_GUI();
             //}//if
         } //kill
+        //User Sets Quantum
+        shellQuantum(args) {
+            var q = parseInt(args[0]);
+            //sets the quantum in the scheduler
+            _Scheduler.setQuantum(q);
+        } //quantum
+        shellRunAll(args) {
+        }
     }
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));

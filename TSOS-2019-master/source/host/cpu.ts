@@ -45,12 +45,12 @@
             }//start
 
             public pcbUpdate():void{
-                _PCBs[_PIDNumber].PC = _CPU.PC;
-                _PCBs[_PIDNumber].Acc = _CPU.Acc;
-                _PCBs[_PIDNumber].Xreg = _CPU.Xreg;
-                _PCBs[_PIDNumber].Yreg = _CPU.Yreg;
-                _PCBs[_PIDNumber].Zflag = _CPU.Zflag;
-                _PCBs[_PIDNumber].IR = _CPU.IR;
+                _RunningPCB.PC = _CPU.PC;
+                _RunningPCB.Acc = _CPU.Acc;
+                _RunningPCB.Xreg = _CPU.Xreg;
+                _RunningPCB.Yreg = _CPU.Yreg;
+                _RunningPCB.Zflag = _CPU.Zflag;
+                _RunningPCB.IR = _CPU.IR;
             }//pcbupdate
 
             
@@ -69,9 +69,6 @@
 
 
                     this.fetchOpCode(_Mem.Mem[this.PC + _CPU.offset]);
-
-                    //stops for when a user forgets to put in 00 at the end of their program
-                    //_CPU.isExecuting = false;
                     
                 }//if
             }//cycle
@@ -146,7 +143,7 @@
                 //Update everything on the GUI
                 TSOS.Control.update_Mem_GUI();
                 TSOS.Control.update_CPU_GUI();
-                TSOS.Control.update_PCB_GUI(_PIDNumber,false); //  bool tells us not to create a new PCB in the GUI
+                TSOS.Control.update_PCB_GUI(_RunningPCB.PID,false); //  bool tells us not to create a new PCB in the GUI
             }//fetchOPCode
     
             //Always increment the program counter to match the index of the hexcode in the program
@@ -216,8 +213,14 @@
             public programBreak(){//Ends the program (It is really a system call)
                 _CPU.isExecuting = false;
                 //Indicates that the segment is now free
-                var seg = _PCBs[_PIDNumber].segment;
+                var seg = _RunningPCB.segment;
                 _RunningPrograms[seg] = false;
+                //removes from the ready queue and scheduler
+                _Scheduler.removePCBQueue(_RunningPCB);
+                //updates the GUI before execution
+                _RunningPCB.ProcesState = "Terminated";
+                TSOS.Control.update_PCB_GUI(_RunningPCB.PID,false); 
+
                 this.PC++;
             }//programBreak
     

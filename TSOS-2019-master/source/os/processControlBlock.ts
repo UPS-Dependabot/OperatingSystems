@@ -2,8 +2,8 @@ module TSOS{
     export class ProcessControlBlock{
         constructor(
             public PID: number = 0,
-            public ProcesState = "Resident",
             public PC: number = 0,
+            public ProcesState = "Resident",
             public Acc: number = 0,
             public Xreg: number = 0,
             public Yreg: number = 0,

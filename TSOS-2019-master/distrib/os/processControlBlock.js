@@ -1,10 +1,10 @@
 var TSOS;
 (function (TSOS) {
     class ProcessControlBlock {
-        constructor(PID = 0, ProcesState = "Resident", PC = 0, Acc = 0, Xreg = 0, Yreg = 0, Zflag = 0, IR = "", isExecuting = false, offset = 0, segment = 0) {
+        constructor(PID = 0, PC = 0, ProcesState = "Resident", Acc = 0, Xreg = 0, Yreg = 0, Zflag = 0, IR = "", isExecuting = false, offset = 0, segment = 0) {
             this.PID = PID;
-            this.ProcesState = ProcesState;
             this.PC = PC;
+            this.ProcesState = ProcesState;
             this.Acc = Acc;
             this.Xreg = Xreg;
             this.Yreg = Yreg;

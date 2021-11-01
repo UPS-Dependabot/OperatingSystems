@@ -40,15 +40,18 @@ var _MemAcc: TSOS.MemoryAccessor;
 var _MemoryManager: any = null;
 
 //Context Switching
-var _Scheduler: TSOS.Scheduler;
+var _Scheduler: any = null;   //Had to init in control.ts. It wasn't reconizing the object when I defined it here.
+var _readyQueue: any = null;  // <-- Same for the Queue
 var _QuantumDefault: number = 6;
-var _readyQueue: TSOS.Queue = null;
+
 
 //Program Control Block
-var _PCB: TSOS.ProcessControlBlock;
+var _RunningPCB: TSOS.ProcessControlBlock;
 var _PIDNumber: number = 0;
 var _PCBs = new Array(Segment_Length); //basically my resident Queue
+var _PStates = ["Resident", "Ready", "Running", "Terminated"];
 
+//var _PCBs = new TSOS.Queue;
 var _OSclock: number = 0;  // Page 23.
 
 var _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.

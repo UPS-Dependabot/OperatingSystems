@@ -95,6 +95,11 @@ module TSOS {
             _Mem.init();
             _MemAcc	= new MemoryAccessor();
 
+            _Scheduler = new Scheduler();
+            _Scheduler.init();
+
+            _readyQueue = new Queue();            
+
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
@@ -153,10 +158,6 @@ module TSOS {
                 var td = document.createElement("td");
                 td.innerHTML = String(_PCBs[pcb].PID);
                 row.appendChild(td);
-                
-                td = document.createElement("td");
-                td.innerHTML = _PCBs[pcb].ProcesState;
-                row.appendChild(td);
 
                 //Convert to Hex
                 //  got rid of the PC.toString(16) because it was breaking
@@ -164,6 +165,10 @@ module TSOS {
                 td = document.createElement("td");
                 td.className = "PC";
                 td.innerHTML = String(parseInt(_PCBs[pcb].PC));
+                row.appendChild(td);
+
+                td = document.createElement("td");
+                td.innerHTML = _PCBs[pcb].ProcesState;
                 row.appendChild(td);
 
                 td = document.createElement("td");
@@ -199,35 +204,38 @@ module TSOS {
                 //fetches the row of the PCB in the GUI
                 var pcbRow  = document.getElementById(" "+pcb);
                 //List of all headers
-                var headers = new Array(7);
-                headers = ["PC" , "ProcessState", "Acc", "Xreg", "Yreg", "Zflag", "IR"];
+                var headers = new Array(8);
+                headers = ["PID", "PC" , "ProcesState", "Acc", "Xreg", "Yreg", "Zflag", "IR"];
 
                 //All feilds in the pcb
-                var feilds = new Array(7); 
-                feilds = [_PCBs[pcb].PC , _PCBs[pcb].ProcessState], _PCBs[pcb].Acc, _PCBs[pcb].Xreg, _PCBs[pcb].Yreg,
-                             _PCBs[pcb].Zflag, _PCBs[pcb].IR;
+                var feilds = new Array(8); 
+                feilds = [pcb ,_PCBs[pcb].PC , _PCBs[pcb].ProcesState, _PCBs[pcb].Acc, _PCBs[pcb].Xreg, _PCBs[pcb].Yreg,
+                             _PCBs[pcb].Zflag, _PCBs[pcb].IR];
 
                 //Inserts each header from the PCB into the GUI
                 for(var header: number = 0; header < headers.length; header++){
                     var feild = headers[header];
+                    if(feild != "ProcesState"){//Inserts all headers as hex except for the State
                     //  PCB GUI = PCB Object values
                     //  Ex:   row-ID.PC = pcb.PC;
-                    pcbRow.children[header].innerHTML = String(feilds[header]);
-                }//for
-                   
+                    pcbRow.children[header].innerHTML = String(feilds[header].toString(16));
+                    }
+                    else{//inserts the state in plain text
+                        pcbRow.children[header].innerHTML = String(feilds[header]);
+                    }
+                }//for       
             }//else
 
        }//updatePCB
         
         //Takes in the current PCB and updates the CPU accordingly
         public static update_CPU_GUI(){
-            document.getElementById("cpuPC").innerHTML = String(_CPU.PC);
+            document.getElementById("cpuPC").innerHTML = String(_CPU.PC.toString(16));
             document.getElementById("cpuAcc").innerHTML = String(_CPU.Acc.toString(16));
             document.getElementById("cpuX").innerHTML = String(_CPU.Xreg.toString(16));
             document.getElementById("cpuY").innerHTML = String(_CPU.Yreg.toString(16));
-            document.getElementById("cpuZ").innerHTML = String(_CPU.Zflag);
+            document.getElementById("cpuZ").innerHTML = String(_CPU.Zflag.toString(16));
             document.getElementById("cpuIR").innerHTML = String(_CPU.IR);
-
         }//update_CPU_GUI
 
         
@@ -240,7 +248,6 @@ module TSOS {
             
             //Clear the old memory so we don't see every iteration when someone loads.
             this.removeAllChildNodes(memGUI);
-
 
             //Makes the code in the loop look cleaner
             var byteLength = 8;

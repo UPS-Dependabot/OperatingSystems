@@ -39,6 +39,14 @@ var TSOS;
             // _CPU.Zflag = pcb.Zflag;
             // TSOS.Control.update_CPU_GUI();
         } //start
+        pcbUpdate() {
+            _RunningPCB.PC = _CPU.PC;
+            _RunningPCB.Acc = _CPU.Acc;
+            _RunningPCB.Xreg = _CPU.Xreg;
+            _RunningPCB.Yreg = _CPU.Yreg;
+            _RunningPCB.Zflag = _CPU.Zflag;
+            _RunningPCB.IR = _CPU.IR;
+        } //pcbupdate
         cycle() {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
@@ -50,11 +58,6 @@ var TSOS;
                 //     this.fetchOpCode(_Mem.Mem[this.PC]);
                 // }//for
                 this.fetchOpCode(_Mem.Mem[this.PC + _CPU.offset]);
-                //stops for when a user forgets to put in 00 at the end of their program
-                //_CPU.isExecuting = false;
-                //updates the PCB
-                //  bool tell us not to create a new PCB in the GUI
-                TSOS.Control.update_PCB_GUI(_PCBs[_PIDNumber], false);
             } //if
         } //cycle
         //finds the Op Code associated with the hex nnumbers
@@ -121,9 +124,12 @@ var TSOS;
                     this.PC++;
                     break;
             } //switch
+            //pcb update
+            this.pcbUpdate();
             //Update everything on the GUI
             TSOS.Control.update_Mem_GUI();
             TSOS.Control.update_CPU_GUI();
+            TSOS.Control.update_PCB_GUI(_RunningPCB.PID, false); //  bool tells us not to create a new PCB in the GUI
         } //fetchOPCode
         //Always increment the program counter to match the index of the hexcode in the program
         //
@@ -181,8 +187,13 @@ var TSOS;
         programBreak() {
             _CPU.isExecuting = false;
             //Indicates that the segment is now free
-            var seg = _PCBs[_PIDNumber].segment;
+            var seg = _RunningPCB.segment;
             _RunningPrograms[seg] = false;
+            //removes from the ready queue and scheduler
+            _Scheduler.removePCBQueue(_RunningPCB);
+            //updates the GUI before execution
+            _RunningPCB.ProcesState = "Terminated";
+            TSOS.Control.update_PCB_GUI(_RunningPCB.PID, false);
             this.PC++;
         } //programBreak
         compare() {

@@ -78,7 +78,7 @@ module TSOS {
             */
 
             //Call scheduler
-
+            _Scheduler.decide();
 
             // Check for an interrupt, if there are any. Page 560
             if (_KernelInterruptQueue.getSize() > 0) {
