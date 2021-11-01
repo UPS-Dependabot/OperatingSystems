@@ -33,8 +33,9 @@ var _MemoryManager = null;
 var _Scheduler = null; //Had to init in control.ts. It wasn't reconizing the object when I defined it here.
 var _readyQueue = null; // <-- Same for the Queue
 var _QuantumDefault = 6;
+var _switched = false; //Tells log when there was a context switch
 //Program Control Block
-var _RunningPCB;
+var _RunningPCB = null; //TSOS.ProcessControlBlock;
 var _PIDNumber = 0;
 var _PCBs = new Array(Segment_Length); //basically my resident Queue
 var _PStates = ["Resident", "Ready", "Running", "Terminated"];

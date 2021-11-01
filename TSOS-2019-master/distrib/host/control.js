@@ -50,9 +50,15 @@ var TSOS;
             var now = new Date().getTime();
             // Build the log string.
             var str = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now + " })" + "\n";
-            // Update the log console.
+            //update the Log for Scheduling events
+            var switched = "NO";
+            if (_switched) {
+                switched = "CONTEXT SWITCH!!!!";
+                _switched = false;
+            }
+            var scheduleStr = "({Segment:" + _RunningPCB.segment + " context switch: " + switched + "})" + "\n";
             var taLog = document.getElementById("taHostLog");
-            taLog.value = str + taLog.value;
+            taLog.value = str + scheduleStr + taLog.value;
             // TODO in the future: Optionally update a log database or some streaming service.
         }
         //
@@ -69,12 +75,16 @@ var TSOS;
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
             _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
+            //NOTE TO SELF: Had create some of my own inits here
             _Mem = new TSOS.Memory();
             _Mem.init();
             _MemAcc = new TSOS.MemoryAccessor();
             _Scheduler = new TSOS.Scheduler();
             _Scheduler.init();
             _readyQueue = new TSOS.Queue();
+            _RunningPCB = new TSOS.ProcessControlBlock();
+            _RunningPCB.init();
+            //----------END OF MY INTIS-----------//
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(TSOS.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.

@@ -65,9 +65,16 @@ module TSOS {
             // Build the log string.
             var str: string = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now  + " })"  + "\n";
 
-            // Update the log console.
+            //update the Log for Scheduling events
+            var switched: string  = "NO"
+            if(_switched){
+                switched = "CONTEXT SWITCH!!!!";
+                _switched = false;
+            }
+            var scheduleStr: string  = "({Segment:"+ _RunningPCB.segment +" context switch: "+switched+"})" + "\n";
+            
             var taLog = <HTMLInputElement> document.getElementById("taHostLog");
-            taLog.value = str + taLog.value;
+            taLog.value = str + scheduleStr + taLog.value;
 
             // TODO in the future: Optionally update a log database or some streaming service.
         }
@@ -91,6 +98,7 @@ module TSOS {
             _CPU = new Cpu();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init();       //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
 
+            //NOTE TO SELF: Had create some of my own inits here
             _Mem = new Memory();
             _Mem.init();
             _MemAcc	= new MemoryAccessor();
@@ -98,7 +106,11 @@ module TSOS {
             _Scheduler = new Scheduler();
             _Scheduler.init();
 
-            _readyQueue = new Queue();            
+            _readyQueue = new Queue();         
+            
+            _RunningPCB = new ProcessControlBlock();
+            _RunningPCB.init();
+            //----------END OF MY INTIS-----------//
 
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);

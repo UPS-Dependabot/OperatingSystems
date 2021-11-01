@@ -46,6 +46,8 @@ var TSOS;
             _RunningPCB.Yreg = _CPU.Yreg;
             _RunningPCB.Zflag = _CPU.Zflag;
             _RunningPCB.IR = _CPU.IR;
+            //ensures that the ready Queue is updated
+            _readyQueue[_RunningPCB.PID] = _RunningPCB;
         } //pcbupdate
         cycle() {
             _Kernel.krnTrace('CPU cycle');
@@ -190,11 +192,12 @@ var TSOS;
             var seg = _RunningPCB.segment;
             _RunningPrograms[seg] = false;
             //removes from the ready queue and scheduler
-            _Scheduler.removePCBQueue(_RunningPCB);
+            _readyQueue.dequeue();
             //updates the GUI before execution
             _RunningPCB.ProcesState = "Terminated";
             TSOS.Control.update_PCB_GUI(_RunningPCB.PID, false);
             this.PC++;
+            _Scheduler.decide();
         } //programBreak
         compare() {
             //sets the Zero Flag to the appropriate state
