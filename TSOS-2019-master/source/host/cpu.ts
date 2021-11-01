@@ -222,10 +222,10 @@
                 //updates the GUI before execution
                 _RunningPCB.ProcesState = "Terminated";
                 TSOS.Control.update_PCB_GUI(_RunningPCB.PID,false); 
-
+                
                 this.PC++;
 
-                _Scheduler.contextSwitch();
+                _Dispatcher.contextSwitch();
             }//programBreak
     
             public compare(){//Compare a byte in memory to X reg & sets the zero flag if equal

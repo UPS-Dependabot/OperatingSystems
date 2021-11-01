@@ -52,11 +52,13 @@ var TSOS;
             var str = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now + " })" + "\n";
             //update the Log for Scheduling events
             var switched = "NO";
+            var segNum = "...";
             if (_switched) {
                 switched = "CONTEXT SWITCH!!!!";
                 _switched = false;
-            }
-            var scheduleStr = "({Segment:" + _RunningPCB.segment + " context switch: " + switched + "})" + "\n";
+                segNum = _RunningPCB.segment;
+            } //if
+            var scheduleStr = "({Context switch: " + switched + "})" + "\n";
             var taLog = document.getElementById("taHostLog");
             taLog.value = str + scheduleStr + taLog.value;
             // TODO in the future: Optionally update a log database or some streaming service.
@@ -81,6 +83,8 @@ var TSOS;
             _MemAcc = new TSOS.MemoryAccessor();
             _Scheduler = new TSOS.Scheduler();
             _Scheduler.init();
+            _Dispatcher = new TSOS.Dispatcher();
+            _Dispatcher.init();
             _readyQueue = new TSOS.Queue();
             _RunningPCB = new TSOS.ProcessControlBlock();
             _RunningPCB.init();

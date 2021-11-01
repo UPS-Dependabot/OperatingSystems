@@ -67,11 +67,13 @@ module TSOS {
 
             //update the Log for Scheduling events
             var switched: string  = "NO"
+            var segNum: string = "...";
             if(_switched){
                 switched = "CONTEXT SWITCH!!!!";
                 _switched = false;
-            }
-            var scheduleStr: string  = "({Segment:"+ _RunningPCB.segment +" context switch: "+switched+"})" + "\n";
+                segNum = _RunningPCB.segment;
+            }//if
+            var scheduleStr: string  = "({Context switch: "+switched+"})" + "\n";
             
             var taLog = <HTMLInputElement> document.getElementById("taHostLog");
             taLog.value = str + scheduleStr + taLog.value;
@@ -106,6 +108,9 @@ module TSOS {
             _Scheduler = new Scheduler();
             _Scheduler.init();
 
+            _Dispatcher = new Dispatcher();
+            _Dispatcher.init();
+            
             _readyQueue = new Queue();         
             
             _RunningPCB = new ProcessControlBlock();

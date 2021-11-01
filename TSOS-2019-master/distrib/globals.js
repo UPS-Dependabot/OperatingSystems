@@ -30,8 +30,9 @@ var _RunningPrograms = new Array(3);
 var _MemAcc;
 var _MemoryManager = null;
 //Context Switching
-var _Scheduler = null; //Had to init in control.ts. It wasn't reconizing the object when I defined it here.
+var _Scheduler = null; //Had to init in control.ts. It wasn't reconizing the object when I defined it here
 var _readyQueue = null; // <-- Same for the Queue
+var _Dispatcher = null;
 var _QuantumDefault = 6;
 var _switched = false; //Tells log when there was a context switch
 //Program Control Block

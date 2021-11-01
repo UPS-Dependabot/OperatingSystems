@@ -35,7 +35,8 @@ module TSOS {
                 //Context switch when the quantm is reached 
                 //OR when the current Process is Terminated
                 if(this.currQuan > this.quantum || _RunningPCB.ProcesState == "Terminated"){
-                    this.contextSwitch();
+                    //this.contextSwitch();
+                    _Dispatcher.contextSwitch();
                     this.currQuan = 0; //resets for the next process
                     _switched = true;
                 }//if

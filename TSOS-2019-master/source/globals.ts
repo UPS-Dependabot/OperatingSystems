@@ -40,8 +40,9 @@ var _MemAcc: TSOS.MemoryAccessor;
 var _MemoryManager: any = null;
 
 //Context Switching
-var _Scheduler: any = null;   //Had to init in control.ts. It wasn't reconizing the object when I defined it here.
+var _Scheduler: any = null;   //Had to init in control.ts. It wasn't reconizing the object when I defined it here
 var _readyQueue: any = null;  // <-- Same for the Queue
+var _Dispatcher: any = null;
 var _QuantumDefault: number = 6;
 var _switched: boolean = false;  //Tells log when there was a context switch
 
