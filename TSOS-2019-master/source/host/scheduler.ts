@@ -22,17 +22,20 @@ module TSOS {
             //checks if there is a program that is running
             for(var i in _PCBs)
             {
-                if(_PCBs[i].ProcessState == "Running")
+                if(_PCBs[i].ProcesState == "Running")
                     running = true;
             }//for
 
             if(running){
                 //context switch when the quantm is reached
                 if(this.currQuan > this.quantum){
-                    this.contextSwitch(_RunningPCB);
+                    this.contextSwitch();
+                    this.currQuan = 0; //resets for the next process
                 }//if
                 this.currQuan++;
             }//if
+
+
         }//decide
 
         //adds to the ready queue
@@ -42,18 +45,17 @@ module TSOS {
 
         //When program terminates
         public removePCBQueue(pcb){
-
             _readyQueue.dequeue();
-
         }//remove
 
 
-        public contextSwitch(switchingPCB){
+        public contextSwitch(){
+            var tempPCB = _RunningPCB;
             //The running process will always be on the bottom 
-            _readyQueue.dequeue();
+            _RunningPCB =  _readyQueue.dequeue();
 
             //places the PCB back ontop of the queue
-            this.addPCBQueue(switchingPCB);            
+            this.addPCBQueue(tempPCB);            
         }//contextSwitch
 
         //sets the Quantum

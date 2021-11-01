@@ -209,18 +209,18 @@ module TSOS {
 
                 //All feilds in the pcb
                 var feilds = new Array(8); 
-                feilds = [pcb ,_PCBs[pcb].PC , _PCBs[pcb].ProcesState, _PCBs[pcb].Acc, _PCBs[pcb].Xreg, _PCBs[pcb].Yreg,
+                feilds = [pcb, _PCBs[pcb].PC, _PCBs[pcb].ProcesState, _PCBs[pcb].Acc, _PCBs[pcb].Xreg, _PCBs[pcb].Yreg,
                              _PCBs[pcb].Zflag, _PCBs[pcb].IR];
 
                 //Inserts each header from the PCB into the GUI
                 for(var header: number = 0; header < headers.length; header++){
                     var feild = headers[header];
-                    if(feild != "ProcesState"){//Inserts all headers as hex except for the State
+                    if(feild != "ProcesState"){//Inserts all headers as hex except for the State & Segment
                     //  PCB GUI = PCB Object values
                     //  Ex:   row-ID.PC = pcb.PC;
                     pcbRow.children[header].innerHTML = String(feilds[header].toString(16));
                     }
-                    else{//inserts the state in plain text
+                    else{//inserts the state/seg in plain text
                         pcbRow.children[header].innerHTML = String(feilds[header]);
                     }
                 }//for       

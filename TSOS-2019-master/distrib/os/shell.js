@@ -67,6 +67,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "<number> - sets the quantum for RR context switch");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellRunAll, "runall", " - runs all programs in memory");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // Display the initial prompt.
             this.putPrompt();
@@ -458,18 +460,12 @@ var TSOS;
                         _StdOut.putText("Valid Program :)");
                         //Send to Memory Accessor to store in Memory  
                         _MemAcc.loadIn(validProgram, segmentNum);
-                        //creates the process control block           PID     PC    State                  isEx     offest                     Segment
-                        var pcb = new TSOS.ProcessControlBlock(_PIDNumber, 0, "Resident", 0, 0, 0, 0, "", false, segmentNum * Segment_Length, segmentNum);
+                        //creates the process control block           PID     PC    State               segmentNum   isEx     offest          
+                        var pcb = new TSOS.ProcessControlBlock(_PIDNumber, 0, "Resident", 0, 0, 0, 0, "", segmentNum, false, segmentNum * Segment_Length);
                         //Assigns a Process ID to the control block 
                         pcb.setPID(_PIDNumber);
                         //stores the new process control block
                         _PCBs[_PIDNumber] = pcb;
-                        // try{
-                        //     _readyQueue.enqueue(pcb);
-                        // }//if
-                        // catch(error){
-                        //     console.error(error);
-                        // }
                         _StdOut.advanceLine();
                         _StdOut.putText("Process ID: " + pcb.PID);
                         //Note to self: The _PIDNumber is incremented in the update_PCB_GUI()
@@ -548,7 +544,15 @@ var TSOS;
             _Scheduler.setQuantum(q);
         } //quantum
         shellRunAll(args) {
-        }
+            for (var i in _PCBs) {
+                if (_PCBs[i].ProcesState == "Resident") {
+                    _PCBs[i].ProcesState = "Ready"; //Sets the state
+                    //TSOS.Control.update_PCB_GUI(_PCBs[i], false);// updates the GUI
+                    _Scheduler.addPCBQueue(_PCBs[i]); //Puts it inside of the Queue
+                } //if
+            } //for
+            _Scheduler.decide(); //Starts the scheduler
+        } //runall
     }
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));

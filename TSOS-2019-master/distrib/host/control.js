@@ -170,12 +170,12 @@ var TSOS;
                 //Inserts each header from the PCB into the GUI
                 for (var header = 0; header < headers.length; header++) {
                     var feild = headers[header];
-                    if (feild != "ProcesState") { //Inserts all headers as hex except for the State
+                    if (feild != "ProcesState") { //Inserts all headers as hex except for the State & Segment
                         //  PCB GUI = PCB Object values
                         //  Ex:   row-ID.PC = pcb.PC;
                         pcbRow.children[header].innerHTML = String(feilds[header].toString(16));
                     }
-                    else { //inserts the state in plain text
+                    else { //inserts the state/seg in plain text
                         pcbRow.children[header].innerHTML = String(feilds[header]);
                     }
                 } //for       
