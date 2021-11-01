@@ -197,7 +197,7 @@ var TSOS;
             _RunningPCB.ProcesState = "Terminated";
             TSOS.Control.update_PCB_GUI(_RunningPCB.PID, false);
             this.PC++;
-            _Scheduler.decide();
+            _Scheduler.contextSwitch();
         } //programBreak
         compare() {
             //sets the Zero Flag to the appropriate state

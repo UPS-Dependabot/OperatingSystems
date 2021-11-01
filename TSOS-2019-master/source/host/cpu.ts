@@ -225,7 +225,7 @@
 
                 this.PC++;
 
-                _Scheduler.decide();
+                _Scheduler.contextSwitch();
             }//programBreak
     
             public compare(){//Compare a byte in memory to X reg & sets the zero flag if equal

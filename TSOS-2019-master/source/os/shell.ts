@@ -558,14 +558,6 @@ module TSOS {
                         pcb.segment = segmentNum;
                         pcb.offset = segmentNum*Segment_Length;
 
-                        //#################DUMB WAY OF DOING THINGS######################
-                        //creates the process control block 
-                        //                                 PCB(   PID,     PC, ProcesState,  A, X, Y, Z, IR, segment,   isEx ,  offset )
-                        //var pcb  = new TSOS.ProcessControlBlock(  _PIDNumber, 0,"Resident" , 0, 0, 0, 0, "",segmentNum, false ,segmentNum*Segment_Length, );
-                        //
-                        //Assigns a Process ID to the control block 
-                        //pcb.setPID(_PIDNumber);
-
                         //stores the new process control block
                         _PCBs[_PIDNumber] = pcb;
 
