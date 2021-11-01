@@ -599,7 +599,7 @@ module TSOS {
             if(_PCBs[userPCB] != null){
                 _StdOut.putText("Process "+userPCB+": Ready");
                 _PCBs[userPCB].ProcesState = "Ready";
-                _Scheduler.addPCBQueue(_PCBs[userPCB]);//stores in Ready Queue
+                _readyQueue.enqueue(_PCBs[userPCB]);//stores in Ready Queue
 
                 var pcbIndex = parseInt(userPCB);
                 _CPU.start(_PCBs[pcbIndex]);
@@ -664,7 +664,7 @@ module TSOS {
                     _PCBs[i].ProcesState = "Ready"; //Sets the state to Ready (Basically just for the GUI)
                     //TSOS.Control.update_PCB_GUI(_PCBs[i], false);// updates the GUI
                     _PCBs[i].ProcesState = "Running"; //Sets the state Reunning
-                    _Scheduler.addPCBQueue(_PCBs[i]); //Puts each process inside of the Queue
+                    _readyQueue.enqueue(_PCBs[i]); //Puts each process inside of the Queue
                     _PCBs[i].isExecuting = true;
                 }//if
             }//for

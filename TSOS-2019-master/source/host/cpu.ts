@@ -55,6 +55,16 @@
                 _readyQueue[_RunningPCB.PID] = _RunningPCB;
             }//pcbupdate
 
+            public cpuUpdate():void{
+                    _CPU.PC = _RunningPCB.PC;
+                    _CPU.Acc = _RunningPCB.Acc;
+                    _CPU.Xreg =  _RunningPCB.Xreg;
+                    _CPU.Yreg = _RunningPCB.Yreg;
+                    _CPU.Zflag = _RunningPCB.Zflag;
+                    _CPU.IR = _RunningPCB.IR;
+                    _CPU.isExecuting = _RunningPCB.isExecuting;
+            }//pcbupdate
+            
             
     
             public cycle(): void {
@@ -217,8 +227,10 @@
                 //Indicates that the segment is now free
                 var seg = _RunningPCB.segment;
                 _RunningPrograms[seg] = false;
+
                 //removes from the ready queue and scheduler
-                _readyQueue.dequeue();
+                //_readyQueue.dequeue();
+                
                 //updates the GUI before execution
                 _RunningPCB.ProcesState = "Terminated";
                 TSOS.Control.update_PCB_GUI(_RunningPCB.PID,false); 
