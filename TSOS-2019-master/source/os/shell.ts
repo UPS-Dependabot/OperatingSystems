@@ -133,7 +133,11 @@ module TSOS {
                                 "killall",
                                 " - kill all programs in memory");
             this.commandList[this.commandList.length] = sc;
-            // ps  - list the running processes and their IDs
+
+            sc = new ShellCommand(this.shellPS,
+                                "ps",
+                                " - display the PID and the state of all processes");
+            this.commandList[this.commandList.length] = sc;
 
             // Display the initial prompt.
             this.putPrompt();
@@ -690,7 +694,15 @@ module TSOS {
             }//for
             //Update the GUI
             TSOS.Control.update_Mem_GUI();
-
         }//kill all
+        
+        public shellPS(args: string[]){
+            var index = 0;
+            while(index < _PIDNumber){
+                _StdOut.putText("PID: " + String(_PCBs[index].PID) + " State: " + _PCBs[index].ProcesState);
+                _StdOut.advanceLine();
+                index++;
+            }//while
+        }//shellPS
     }
 }
