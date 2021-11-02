@@ -569,6 +569,7 @@ module TSOS {
 
                         //stores the new process control block
                         _PCBs[_PIDNumber] = pcb;
+                        _readyQueue.enqueue(pcb);
 
                         _StdOut.advanceLine();
                         _StdOut.putText("Process ID: "+pcb.PID);
@@ -608,8 +609,8 @@ module TSOS {
             if(_PCBs[userPCB] != null){
                 _StdOut.putText("Process "+userPCB+": Ready");
                 _PCBs[userPCB].ProcesState = "Ready";
-                _readyQueue.enqueue(_PCBs[userPCB]);//stores in Ready Queue
-
+                _readyQueue.dequeue();//takes off the ready Ready Queue
+                
                 var pcbIndex = parseInt(userPCB);
                 _CPU.start(_PCBs[pcbIndex]);
                 //sets the offset in the CPU so the PC is starting in the right segment in memory
@@ -618,12 +619,11 @@ module TSOS {
 
                 //saves the running PCB for later when we context switch in the scheduler
                 _RunningPCB = _PCBs[pcbIndex];
-
-                TSOS.Control.update_PCB_GUI(pcbIndex, false);
-
+                //TSOS.Control.update_PCB_GUI(pcbIndex, false);
+                
                 _PCBs[userPCB].ProcesState = "Running";
-                //begins the program execution
-                _CPU.isExecuting = true;
+                _PCBs[userPCB].isExecuting = true;
+                _CPU.isExecuting = true; //begins the program execution
                 
             }//if
             else{
@@ -642,7 +642,7 @@ module TSOS {
             
             //Update the GUI
             TSOS.Control.update_Mem_GUI();       
-         }//Clear Mem
+        }//Clear Mem
 
         //Kills a program
         public shellKill (args: string[]){
@@ -654,10 +654,13 @@ module TSOS {
                 _PCBs[executePID].isExecuting = false;
                 _Mem.clearMem(_PCBs[executePID].segment);
                 _PCBs[executePID].ProcesState = "Terminated";
-    
+                _PCBs[executePID].isExecuting = false;
+
                 //Update the GUI
                 TSOS.Control.update_PCB_GUI(executePID, false);
                 TSOS.Control.update_Mem_GUI();
+
+                
             //}//if
         }//kill
         
@@ -673,12 +676,13 @@ module TSOS {
             for(var i in _PCBs){
                 if(_PCBs[i].ProcesState == "Resident"){
                     _PCBs[i].ProcesState = "Ready"; //Sets the state to Ready (Basically just for the GUI)
-                    //TSOS.Control.update_PCB_GUI(_PCBs[i], false);// updates the GUI
-                    _PCBs[i].ProcesState = "Running"; //Sets the state Reunning
-                    _readyQueue.enqueue(_PCBs[i]); //Puts each process inside of the Queue
-                    _PCBs[i].isExecuting = true;
+                    //TSOS.Control.update_PCB_GUI(_PCBs[i], false);// updates the GUI                    
+                    _PCBs[i].isExecuting = true;    
                 }//if
             }//for
+            _RunningPCB = _readyQueue.dequeue(); //Takes the first process of the queue. 
+            _RunningPCB.ProcesState = "Running"; //Sets the state Running
+
             _Scheduler.decide(); //Starts the scheduler
             _CPU.isExecuting = true; //begins program execution
         }//runall
@@ -690,6 +694,8 @@ module TSOS {
                 _Mem.clearMem(_PCBs[index].segment);
                 _PCBs[index].ProcesState = "Terminated";
                 TSOS.Control.update_PCB_GUI(index, false);
+                _PCBs[index].isExecuting = false;
+
                 index++;
             }//for
             //Update the GUI

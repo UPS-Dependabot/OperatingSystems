@@ -63,6 +63,7 @@
                     _CPU.Zflag = _RunningPCB.Zflag;
                     _CPU.IR = _RunningPCB.IR;
                     _CPU.isExecuting = _RunningPCB.isExecuting;
+                    _CPU.offset = _RunningPCB.offset;
             }//pcbupdate
             
             
@@ -166,7 +167,7 @@
     
             public loadConstant (){//load accumulator with constant
                 //fetches the next index in Memory and sets it to the accumulator
-                this.Acc =this.decodeBase(String(_MemAcc.read(this.PC+1)),16);
+                this.Acc =this.decodeBase(String(_MemAcc.read(this.PC+1+_CPU.offset)),16);
                 this.PC += 2;
             }//loadConstant
     
@@ -191,13 +192,12 @@
             }//addCarry
     
             public XregCon(){//Load X register with constant
-                this.Xreg = this.decodeBase(String(_MemAcc.read(this.PC+1)),16);
+                this.Xreg = this.decodeBase(String(_MemAcc.read(this.PC+1+_CPU.offset)),16);
                 this.PC += 2;
             }//XregCon
     
             public XregMem(){//Load X register from memory
                 //converts the new Value to hex
-                //this.Xreg =  _MemAcc.read(this.valueHelper());
                 this.Xreg = this.decodeBase(String(_MemAcc.read(this.valueHelper())),16);
     
                 //Program Counter
@@ -205,7 +205,7 @@
             }//XregMem
     
             public YregCon(){// Load Y register with constant
-                this.Yreg = this.decodeBase(String(_MemAcc.read(this.PC+1)),16);
+                this.Yreg = this.decodeBase(String(_MemAcc.read(this.PC+1+_CPU.offset)),16);
                 this.PC += 2;
             }//YregCon
     
@@ -230,7 +230,7 @@
 
                 //removes from the ready queue and scheduler
                 //_readyQueue.dequeue();
-                
+
                 //updates the GUI before execution
                 _RunningPCB.ProcesState = "Terminated";
                 TSOS.Control.update_PCB_GUI(_RunningPCB.PID,false); 
@@ -260,14 +260,15 @@
             public branch(){// Hops to another line in the program if Z Flag = 0
                 if(this.Zflag == 0){//branch when the Z flag is zero
                     
-                    //Everything I did before
-                    var currPlace = this.PC;
+                    var currPlace = this.PC+_CPU.offset;
     
                     //increases PC by x amount 
                     //  Adding 2 so we "start" the branch from the opdoce after the byte value rather than the D0
-                    this.PC += parseInt(_MemAcc.read(this.PC+1).toString(16),16)+2;
-                       
-                    if(this.PC > 127){
+                    //this.PC += parseInt(_MemAcc.read(this.PC+1+_CPU.offset).toString(16),16)+2;
+                    //  _MemAcc: returns a string od the address as hex
+                    //  
+                    this.PC += this.decodeBase(String(_MemAcc.read(this.PC+1+_CPU.offset).toString(16)),16)+2;
+                    if(this.PC > 127){//took away the +_CPU.offset
                         //Invoke 2's complement to find where to branch to in memory
     
                         //Converts the place we are hopping to an array in binary;
@@ -342,16 +343,16 @@
                         //Outputs to text
     
                         //Remebers where the PC left off before jumping somewhere else in memory
-                        var currentPlace = this.PC;
+                        var currentPlace = this.PC+_CPU.offset;
     
                         //Hop to the index in mmemory that the Y reg is pointing to
-                        this.PC = this.Yreg;
+                        this.PC = this.Yreg + _CPU.offset;
                         //Stops when you begin counting past memory or when you specify the printing to end 
-                        while(_MemAcc.read(this.PC) != "00" && this.PC < 255){
+                        while(_MemAcc.read(this.PC + _CPU.offset) != "00" && this.PC < 255){
                             //Must be converted back into Hex for the IR to read the instruction correctly
                             //
                             //----Read in the PC as an decimal
-                            this.IR = _MemAcc.read(this.PC);
+                            this.IR = _MemAcc.read(this.PC + _CPU.offset);
     
                             //I know this is kind of a mess but here is the explaination:
                             //  For whatever resaon in parse int it cannot convert from string to String (idk why)
@@ -388,7 +389,7 @@
             //     63 (index 63 in mem is index 64)
             //
             //Grabs the next 2 hex numbers in Memory
-                var wholeHex = _MemAcc.read(this.PC+2)+_MemAcc.read(this.PC+1);
+                var wholeHex = _MemAcc.read(this.PC+2+_CPU.offset)+_MemAcc.read(this.PC+1+_CPU.offset);
                 return this.decodeBase(wholeHex, 16);
             }//valueHelper
     
