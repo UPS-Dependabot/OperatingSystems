@@ -343,10 +343,10 @@
                         //Outputs to text
     
                         //Remebers where the PC left off before jumping somewhere else in memory
-                        var currentPlace = this.PC+_CPU.offset;
+                        var currentPlace = this.PC 
     
                         //Hop to the index in mmemory that the Y reg is pointing to
-                        this.PC = this.Yreg + _CPU.offset;
+                        this.PC = this.Yreg 
                         //Stops when you begin counting past memory or when you specify the printing to end 
                         while(_MemAcc.read(this.PC + _CPU.offset) != "00" && this.PC < 255){
                             //Must be converted back into Hex for the IR to read the instruction correctly
