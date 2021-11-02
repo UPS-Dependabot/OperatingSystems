@@ -27,12 +27,11 @@ module TSOS {
             //Prevents an undefined _RunningPCB from entering a context
             //  Occurs when you start OS
             if(running){
-                //Context switch when 
                 //  (the quantm is reached 
                 //  OR when the current Process is Terminated)
                 //  (AND when the readyQueue has more 1 or more pcbs to switch to)
 
-                if((this.currQuan > this.quantum || _RunningPCB.ProcesState == "Terminated") && _readyQueue.getSize() >= 1 && _RunningPCB.isExecuting) {
+                if((this.currQuan > this.quantum || _RunningPCB.ProcesState == "Terminated") && _readyQueue.getSize() >= 1 && _CPU.isExecuting) {
                     //this.contextSwitch();
                     _Dispatcher.contextSwitch();
                     this.currQuan = 0; //resets for the next process
