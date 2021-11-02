@@ -21,6 +21,8 @@ module TSOS {
             _KernelBuffers = new Array();         // Buffers... for the kernel.
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
 
+            _MemoryManager	=	new	MemoryManager();
+
             // Initialize the console.
             _Console = new Console();             // The command line interface / console I/O device.
             _Console.init();
@@ -68,15 +70,22 @@ module TSOS {
         }
 
 
-        public krnOnCPUClockPulse() {
+    public krnOnCPUClockPulse() {
             /* This gets called from the host hardware simulation every time there is a hardware clock pulse.
                This is NOT the same as a TIMER, which causes an interrupt and is handled like other interrupts.
                This, on the other hand, is the clock pulse from the hardware / VM / host that tells the kernel
                that it has to look for interrupts and process them if it finds any.                          
             */
 
+            _Scheduler.currQuan++;// increments the quantum on each cycle
+            //_Scheduler.time();    //Increments WT and TT for each process
+            _Scheduler.decide();  //Call scheduler
+
+
             // Check for an interrupt, if there are any. Page 560
             if (_KernelInterruptQueue.getSize() > 0) {
+
+
                 // Process the first interrupt on the interrupt queue.
                 // TODO (maybe): Implement a priority queue based on the IRQ number/id to enforce interrupt priority.
                 var interrupt = _KernelInterruptQueue.dequeue();

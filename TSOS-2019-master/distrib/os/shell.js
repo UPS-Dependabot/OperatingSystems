@@ -61,8 +61,18 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellRun, "run", " - Runs the program that is currently loaded into memory");
             this.commandList[this.commandList.length] = sc;
-            // ps  - list the running processes and their IDs
-            // kill <id> - kills the specified process id.
+            sc = new TSOS.ShellCommand(this.shellclearMem, "clear", " - Clears all memory");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellKill, "kill", "<id> - kills the specified process id");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "<number> - sets the quantum for RR context switch");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellRunAll, "runall", " - runs all programs in memory");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellKillAll, "killall", " - kill all programs in memory");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellPS, "ps", " - display the PID and the state of all processes");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -443,33 +453,37 @@ var TSOS;
                 validProgram = userProgramInput.value.split(" ");
                 if (userProgramInput.value == "")
                     _StdOut.putText("There is no program inputted");
-                //
-                //Right now the isSpace is breaking load I'll deal with this later
-                //
-                // else if(_MemoryManager.isSpace(validProgram.length)){
-                //     _StdOut.putText("The program you entered will not fit into memory");
-                // }
                 else {
-                    _StdOut.putText("Valid Program :)");
-                    //Send to Memory Accessor to store in Memory
-                    _MemAcc.loadIn(validProgram);
-                    //creates the process control block
-                    var pcb = new TSOS.ProcessControlBlock(_PIDNumber, "00", "Resident", "00", "00", "00", 0, "");
-                    //Assigns a Process ID to the control block 
-                    pcb.setPID(_PIDNumber);
-                    //stores the new process control block
-                    _PCBs[_PIDNumber] = pcb;
-                    _StdOut.advanceLine();
-                    _StdOut.putText("Process ID: " + pcb.PID);
-                    //Note to self: The _PIDNumber is incremented in the update_PCB_GUI()
-                    //
-                    //Update: Memory GUI
-                    //        PCB GUI
-                    //  
-                    //  Boolean determines wether or not to create a new block in the GUI
-                    TSOS.Control.update_PCB_GUI(pcb, true);
-                    TSOS.Control.update_Mem_GUI();
-                } //else
+                    //Tests to see if there is room in memory
+                    var segmentNum = _MemoryManager.segmentAllocation();
+                    if (segmentNum >= 3) {
+                        _StdOut.putText("There is no room for this program. :(");
+                    } //if
+                    else {
+                        _StdOut.putText("Valid Program :)");
+                        //Send to Memory Accessor to store in Memory  
+                        _MemAcc.loadIn(validProgram, segmentNum);
+                        //Creates new PCB
+                        var pcb = new TSOS.ProcessControlBlock();
+                        pcb.init();
+                        pcb.PID = _PIDNumber;
+                        pcb.segment = segmentNum;
+                        pcb.offset = segmentNum * Segment_Length;
+                        //stores the new process control block
+                        _PCBs[_PIDNumber] = pcb;
+                        _readyQueue.enqueue(pcb);
+                        _StdOut.advanceLine();
+                        _StdOut.putText("Process ID: " + pcb.PID);
+                        //Note to self: The _PIDNumber is incremented in the update_PCB_GUI()
+                        //
+                        //Update: Memory GUI
+                        //        PCB GUI
+                        //  
+                        //  Boolean determines wether or not to create a new block in the GUI
+                        TSOS.Control.update_PCB_GUI(_PIDNumber, true);
+                        TSOS.Control.update_Mem_GUI();
+                    } //else 
+                } //else No program inputted
             } //valid
             else {
                 _StdOut.putText("Invalid Program :( Only usee 0-9, A-F, a-f");
@@ -491,15 +505,99 @@ var TSOS;
             if (_PCBs[userPCB] != null) {
                 _StdOut.putText("Process " + userPCB + ": Ready");
                 _PCBs[userPCB].ProcesState = "Ready";
-                _CPU.start(_PCBs[userPCB]);
-                TSOS.Control.update_PCB_GUI(userPCB, false);
-                //begins the program execution
-                _CPU.isExecuting = true;
+                _readyQueue.dequeue(); //takes off the ready Ready Queue
+                var pcbIndex = parseInt(userPCB);
+                _CPU.start(_PCBs[pcbIndex]);
+                //sets the offset in the CPU so the PC is starting in the right segment in memory
+                _CPU.offset = _PCBs[pcbIndex].offset;
+                _CPU.PC = _PCBs[pcbIndex].PC;
+                //saves the running PCB for later when we context switch in the scheduler
+                _RunningPCB = _PCBs[pcbIndex];
+                //TSOS.Control.update_PCB_GUI(pcbIndex, false);
+                _PCBs[userPCB].ProcesState = "Running";
+                _PCBs[userPCB].isExecuting = true;
+                _CPU.isExecuting = true; //begins the program execution
             } //if
             else {
                 _StdOut.putText("There is no program associated with this PID");
             }
         } //Run
+        //Clears all memory in the OS
+        shellclearMem(args) {
+            //clears all memory
+            for (var i = 0; i < _RunningPrograms.length; i++) {
+                _Mem.clearMem(i);
+                //Indicates that there is now room for a new program
+                _RunningPrograms[i] = false;
+            } //for
+            //Update the GUI
+            TSOS.Control.update_Mem_GUI();
+        } //Clear Mem
+        //Kills a program
+        shellKill(args) {
+            var executePID = parseInt(args[0]);
+            //checks if the PID exists
+            //if(_PCB[executePID] != null){
+            _Mem.clearMem(_PCBs[executePID].segment);
+            _RunningPrograms[_PCBs[executePID].segment] = false; //Opens a space in memory
+            _PCBs[executePID].ProcesState = "Terminated";
+            _PCBs[executePID].isExecuting = false;
+            //Update the GUI
+            TSOS.Control.update_PCB_GUI(executePID, false);
+            TSOS.Control.update_Mem_GUI();
+            //}//if
+        } //kill
+        //User Sets Quantum
+        shellQuantum(args) {
+            var q = parseInt(args[0]);
+            //sets the quantum in the scheduler
+            _Scheduler.setQuantum(q);
+        } //quantum
+        shellRunAll(args) {
+            for (var i in _PCBs) {
+                if (_PCBs[i].ProcesState == "Resident") {
+                    _PCBs[i].ProcesState = "Ready"; //Sets the state to Ready (Basically just for the GUI)
+                    //TSOS.Control.update_PCB_GUI(_PCBs[i], false);// updates the GUI                    
+                    _PCBs[i].isExecuting = true;
+                } //if
+            } //for
+            _RunningPCB = _readyQueue.dequeue(); //Takes the first process of the queue. 
+            _RunningPCB.ProcesState = "Running"; //Sets the state Running
+            _Scheduler.decide(); //Starts the scheduler
+            _CPU.isExecuting = true; //begins program execution
+        } //runall
+        shellKillAll(args) {
+            var index = 0;
+            while (_readyQueue.getSize() >= index) {
+                _PCBs[index].isExecuting = false;
+                _Mem.clearMem(_PCBs[index].segment);
+                _RunningPrograms[index] = false;
+                _PCBs[index].ProcesState = "Terminated";
+                TSOS.Control.update_PCB_GUI(index, false);
+                _PCBs[index].isExecuting = false;
+                index++;
+            } //for
+            //Update the GUI
+            TSOS.Control.update_Mem_GUI();
+        } //kill all
+        shellPS(args) {
+            var index = 0;
+            while (index < _PIDNumber) {
+                _StdOut.putText("PID: " + String(_PCBs[index].PID) + " State: " + _PCBs[index].ProcesState);
+                _StdOut.advanceLine();
+                index++;
+            } //while
+        } //shellPS
+        //Outputs waittime and turnaround time when a process completes
+        helperWaitTurnTime(pcb) {
+            _StdOut.putText("PID " + pcb.PID + " Complete!");
+            _StdOut.advanceLine();
+            _StdOut.putText("TurnAroundTime: " + pcb.turnTime);
+            _StdOut.advanceLine();
+            _StdOut.putText("WaitTime: " + pcb.waitTime);
+            _StdOut.advanceLine();
+            _StdOut.putText(this.promptStr);
+        } //helperWaitTurnTime
     } //Shell
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));

@@ -24,13 +24,23 @@ var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is 
 //Memory Constants
 const Segment_Length = 256;
 var _Mem;
+//Detects if there are programs in the MM
+var _RunningPrograms = new Array(3);
 //Memory Accessor
 var _MemAcc;
 var _MemoryManager = null;
+//Context Switching
+var _Scheduler = null; //Had to init in control.ts. It wasn't reconizing the object when I defined it here
+var _readyQueue = null; // <-- Same for the Queue
+var _Dispatcher = null;
+var _QuantumDefault = 6;
+var _switched = false; //Tells log when there was a context switch
 //Program Control Block
-var _PCB;
+var _RunningPCB = null; //TSOS.ProcessControlBlock;
 var _PIDNumber = 0;
 var _PCBs = new Array(Segment_Length); //basically my resident Queue
+var _PStates = ["Resident", "Ready", "Running", "Terminated"];
+//var _PCBs = new TSOS.Queue;
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().

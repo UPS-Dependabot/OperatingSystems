@@ -6,11 +6,13 @@ var TSOS;
         init() {
         } //init
         //loads the user's program into memory
-        loadIn(newCode) {
+        loadIn(newCode, base) {
+            //Determines where the program will start so it will begin in the right place in the segment
+            var offset = base * 256;
             //clears memory every time you load so none of the last program lingers in memory
-            _Mem.clearMem();
-            for (var i in newCode) {
-                _Mem.Mem[i] = newCode[i];
+            _Mem.clearMem(base);
+            for (var i = 0; i < newCode.length; i++) {
+                _Mem.Mem[i + offset] = newCode[i];
             } //for
         } //load in
         //Returns the hex at the specified address
@@ -21,8 +23,6 @@ var TSOS;
         write(address, value) {
             _Mem.Mem[address] = value;
         } //write
-        store() {
-        }
     } //MemoryAccessor
     TSOS.MemoryAccessor = MemoryAccessor;
 })(TSOS || (TSOS = {})); //TSOS

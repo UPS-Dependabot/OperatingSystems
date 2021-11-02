@@ -21,7 +21,7 @@
    <script type="text/javascript" src="distrib/host/cpu.js"></script>
    <script type="text/javascript" src="distrib/host/memory.js"></script>
    <script type="text/javascript" src="distrib/host/memoryAccessor.js"></script>
-   <script type="text/javascript" src="distrib/host/memoryManager.js"></script>
+
 
    
 
@@ -37,12 +37,18 @@
    <script type="text/javascript" src="distrib/os/userCommand.js"></script>
    <script type="text/javascript" src="distrib/os/kernel.js"></script>
    <script type="text/javascript" src="distrib/os/processControlBlock.js"></script>
+   <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
+   <script type="text/javascript" src="distrib/os/scheduler.js"></script>
+   <script type="text/javascript" src="distrib/os/dispatcher.js"></script>
+
+
+
 
 
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
-   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip0.js"></script>
+   <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip3.js"></script> -->
    
 </head>
 
@@ -175,9 +181,14 @@
             <th id = "PID">PID</th>
             <th id = "PC">PC</th>
             <th id = "State">State</th>
+            <th id = "Acc"> Acc</th>
             <th id = "Xreg">Xreg</th>
             <th id = "Yreg">Yreg</th>
+            <th id = "ZFlag"> ZFlag </th>
+            <th id = "IR"> IR </th>
+            <!-- <th id = "Segment"> Segment </th> -->
          </thead>
+
          <tbody id = "pcbBody">
             <!-- 
             <tr>

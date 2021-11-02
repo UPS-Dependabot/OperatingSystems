@@ -32,15 +32,28 @@ var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure th
 //Memory Constants
 const Segment_Length: number = 256;
 var _Mem: TSOS.Memory;
+//Detects if there are programs in the MM
+var _RunningPrograms = new  Array(3);
+
 //Memory Accessor
 var _MemAcc: TSOS.MemoryAccessor;
 var _MemoryManager: any = null;
 
+//Context Switching
+var _Scheduler: any = null;   //Had to init in control.ts. It wasn't reconizing the object when I defined it here
+var _readyQueue: any = null;  // <-- Same for the Queue
+var _Dispatcher: any = null;
+var _QuantumDefault: number = 6;
+var _switched: boolean = false;  //Tells log when there was a context switch
+
+
 //Program Control Block
-var _PCB: TSOS.ProcessControlBlock;
+var _RunningPCB: any = null; //TSOS.ProcessControlBlock;
 var _PIDNumber: number = 0;
 var _PCBs = new Array(Segment_Length); //basically my resident Queue
+var _PStates = ["Resident", "Ready", "Running", "Terminated"];
 
+//var _PCBs = new TSOS.Queue;
 var _OSclock: number = 0;  // Page 23.
 
 var _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
@@ -67,7 +80,6 @@ var _StdOut: TSOS.Console = null;
 var _Console: TSOS.Console;
 var _OsShell: TSOS.Shell;
 var _Counter: Number = 0;//added to play around with for scrolling
-
 
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode: boolean = false;

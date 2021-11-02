@@ -65,9 +65,18 @@ module TSOS {
             // Build the log string.
             var str: string = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now  + " })"  + "\n";
 
-            // Update the log console.
+            //update the Log for Scheduling events
+            var switched: string  = "NO"
+            var segNum: string = "...";
+            if(_switched){
+                switched = "CONTEXT SWITCH!!!!";
+                _switched = false;
+                segNum = _RunningPCB.segment;
+            }//if
+            var scheduleStr: string  = "({Context switch: "+switched+"})" + "\n";
+            
             var taLog = <HTMLInputElement> document.getElementById("taHostLog");
-            taLog.value = str + taLog.value;
+            taLog.value = str + scheduleStr + taLog.value;
 
             // TODO in the future: Optionally update a log database or some streaming service.
         }
@@ -91,9 +100,22 @@ module TSOS {
             _CPU = new Cpu();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init();       //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
 
+            //NOTE TO SELF: Had create some of my own inits here
             _Mem = new Memory();
             _Mem.init();
             _MemAcc	= new MemoryAccessor();
+
+            _Scheduler = new Scheduler();
+            _Scheduler.init();
+
+            _Dispatcher = new Dispatcher();
+            _Dispatcher.init();
+            
+            _readyQueue = new Queue();         
+            
+            _RunningPCB = new ProcessControlBlock();
+            _RunningPCB.init();
+            //----------END OF MY INTIS-----------//
 
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
@@ -136,85 +158,101 @@ module TSOS {
                 // tableBody.appendChild(row); 
             }//if
             else{//update existing pcb
-
-                 //var pcbClass = pcBlock.getElementsByClassName(String(pcBlock.PID));
                  this.updatePCB(pcBlock, tableBody, createNewPCB);
             }
-
-            // for(var i in _PCBs){
-            //     //creates the new row for the  PCB
-            //     var row = document.createElement("tr");
-
-            //     //Inserts all of the PCB data into the GUI
-            //     var td = document.createElement("td");
-            //     td.innerHTML = _PCBs[i].PID.toString();
-            //     row.appendChild(td);
-
-            //     td = document.createElement("td");
-            //     td.innerHTML = _PCBs[i].ProgramCounter;
-            //     row.appendChild(td);
-
-            //     td = document.createElement("td");
-            //     td.innerHTML = _PCBs[i].ProcesState;
-            //     row.appendChild(td);
-
-            //     td = document.createElement("td");
-            //     td.innerHTML = _PCBs[i].Xreg;
-            //     row.appendChild(td);
-
-            //     td = document.createElement("td");
-            //     td.innerHTML = _PCBs[i].Yreg;
-            //     row.appendChild(td);
-
-            // }//for
-            // //Inserts the row
-            // tableBody.appendChild(row);
             
         }//update_PCB_GUI
 
         public static updatePCB(pcb, tb, create) : void{
-            //creates the new row for the  PCB
-            var row = document.createElement("tr");
-
-            row.className += " "+String(+pcb.PID);
-            
-            //Inserts all of the PCB data into the GUI
-            var td = document.createElement("td");
-            td.innerHTML = String(pcb.PID);
-            row.appendChild(td);
-
-            td = document.createElement("td");
-            td.innerHTML = pcb.ProgramCounter;
-            row.appendChild(td);
-
-            td = document.createElement("td");
-            td.innerHTML = pcb.ProcesState;
-            row.appendChild(td);
-
-            td = document.createElement("td");
-            td.innerHTML = pcb.Xreg;
-            row.appendChild(td);
-
-            td = document.createElement("td");
-            td.innerHTML = pcb.Yreg;
-            row.appendChild(td);
-
             if(create){
-             //Inserts the row
-             tb.appendChild(row);
-            }
+                //creates the new row for the  PCB
+                var row = document.createElement("tr");
+
+                //row.className += " "+String(+_PCBs[pcb].PID);
+                row.id += " "+String(+ _PCBs[pcb].PID);
+                
+                //Inserts all of the PCB data into the GUI
+                var td = document.createElement("td");
+                td.innerHTML = String(_PCBs[pcb].PID);
+                row.appendChild(td);
+
+                //Convert to Hex
+                //  got rid of the PC.toString(16) because it was breaking
+
+                td = document.createElement("td");
+                td.className = "PC";
+                td.innerHTML = String(parseInt(_PCBs[pcb].PC));
+                row.appendChild(td);
+
+                td = document.createElement("td");
+                td.innerHTML = _PCBs[pcb].ProcesState;
+                row.appendChild(td);
+
+                td = document.createElement("td");
+                td.className = "Acc";
+                td.innerHTML = String(parseInt(_PCBs[pcb].Acc));
+                row.appendChild(td);
+
+                td = document.createElement("td");
+                td.className = "Xreg";
+                td.innerHTML = String(parseInt(_PCBs[pcb].Xreg));
+                row.appendChild(td);
+
+                td = document.createElement("td");
+                td.className = "Yreg";
+                td.innerHTML = String(parseInt(_PCBs[pcb].Yreg));
+                row.appendChild(td);
+
+                td = document.createElement("td");
+                td.className = "Zflag";
+                td.innerHTML = String(_PCBs[pcb].Zflag);
+                row.appendChild(td);
+
+                td = document.createElement("td");
+                td.className = "IR";
+                td.innerHTML = _PCBs[pcb].IR;
+                row.appendChild(td);
+
+                
+                //Inserts the row
+                tb.appendChild(row);
+            }//if create
+            else{//update
+                //fetches the row of the PCB in the GUI
+                var pcbRow  = document.getElementById(" "+pcb);
+                //List of all headers
+                var headers = new Array(8);
+                headers = ["PID", "PC" , "ProcesState", "Acc", "Xreg", "Yreg", "Zflag", "IR"];
+
+                //All feilds in the pcb
+                var feilds = new Array(8); 
+                feilds = [pcb, _PCBs[pcb].PC, _PCBs[pcb].ProcesState, _PCBs[pcb].Acc, _PCBs[pcb].Xreg, _PCBs[pcb].Yreg,
+                             _PCBs[pcb].Zflag, _PCBs[pcb].IR];
+
+                //Inserts each header from the PCB into the GUI
+                for(var header: number = 0; header < headers.length; header++){
+                    var feild = headers[header];
+                    if(feild != "ProcesState"){//Inserts all headers as hex except for the State & Segment
+                    //  PCB GUI = PCB Object values
+                    //  Ex:   row-ID.PC = pcb.PC;
+                    pcbRow.children[header].innerHTML = String(feilds[header].toString(16));
+                    }
+                    else{//inserts the state/seg in plain text
+                        pcbRow.children[header].innerHTML = String(feilds[header]);
+                    }
+                }//for       
+            }//else
 
        }//updatePCB
         
         //Takes in the current PCB and updates the CPU accordingly
         public static update_CPU_GUI(){
-            document.getElementById("cpuPC").innerHTML = String(_CPU.PC);
+            document.getElementById("cpuPC").innerHTML = String(_CPU.PC.toString(16));
             document.getElementById("cpuAcc").innerHTML = String(_CPU.Acc.toString(16));
             document.getElementById("cpuX").innerHTML = String(_CPU.Xreg.toString(16));
             document.getElementById("cpuY").innerHTML = String(_CPU.Yreg.toString(16));
-            document.getElementById("cpuZ").innerHTML = String(_CPU.Zflag);
+            document.getElementById("cpuZ").innerHTML = String(_CPU.Zflag.toString(16));
             document.getElementById("cpuIR").innerHTML = String(_CPU.IR);
-
         }//update_CPU_GUI
 
         
@@ -228,11 +266,11 @@ module TSOS {
             //Clear the old memory so we don't see every iteration when someone loads.
             this.removeAllChildNodes(memGUI);
 
-
             //Makes the code in the loop look cleaner
             var byteLength = 8;
             
-            for(var tableRow = 0; tableRow < (Segment_Length/8) ; tableRow++){
+            //multipled by 3 to allocate space for each program
+            for(var tableRow = 0; tableRow < (Segment_Length*3/8) ; tableRow++){
                 var row = document.createElement("tr");
                 //Loop 8 times because we know this is for each individual byte
                 for(var rowCell = 0; rowCell < byteLength; rowCell++){

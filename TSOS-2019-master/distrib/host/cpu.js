@@ -13,7 +13,7 @@
 var TSOS;
 (function (TSOS) {
     class Cpu {
-        constructor(PC = 0, Acc = 0, Xreg = 0, Yreg = 0, Zflag = 0, IR = "", isExecuting = false) {
+        constructor(PC = 0, Acc = 0, Xreg = 0, Yreg = 0, Zflag = 0, IR = "", isExecuting = false, offset = 0) {
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
@@ -21,6 +21,7 @@ var TSOS;
             this.Zflag = Zflag;
             this.IR = IR;
             this.isExecuting = isExecuting;
+            this.offset = offset;
         }
         init() {
             this.PC = 0;
@@ -31,26 +32,44 @@ var TSOS;
             this.isExecuting = false;
         }
         start(pcb) {
-            _CPU.PC = parseInt(pcb.ProgramCounter);
-            _CPU.Xreg = parseInt(pcb.Xreg, 16);
-            _CPU.Yreg = parseInt(pcb.Yreg, 16);
-            TSOS.Control.update_CPU_GUI();
+            // _CPU.PC = parseInt(pcb.PC);
+            // _CPU.Acc = parseInt(pcb.PC);
+            // _CPU.Xreg = parseInt(pcb.Xreg, 16);
+            // _CPU.Yreg = parseInt(pcb.Yreg, 16);
+            // _CPU.Zflag = pcb.Zflag;
+            // TSOS.Control.update_CPU_GUI();
         } //start
+        pcbUpdate() {
+            _RunningPCB.PC = _CPU.PC;
+            _RunningPCB.Acc = _CPU.Acc;
+            _RunningPCB.Xreg = _CPU.Xreg;
+            _RunningPCB.Yreg = _CPU.Yreg;
+            _RunningPCB.Zflag = _CPU.Zflag;
+            _RunningPCB.IR = _CPU.IR;
+            //ensures that the ready Queue is updated
+            _readyQueue[_RunningPCB.PID] = _RunningPCB;
+        } //pcbupdate
+        cpuUpdate() {
+            _CPU.PC = _RunningPCB.PC;
+            _CPU.Acc = _RunningPCB.Acc;
+            _CPU.Xreg = _RunningPCB.Xreg;
+            _CPU.Yreg = _RunningPCB.Yreg;
+            _CPU.Zflag = _RunningPCB.Zflag;
+            _CPU.IR = _RunningPCB.IR;
+            _CPU.isExecuting = _RunningPCB.isExecuting;
+            _CPU.offset = _RunningPCB.offset;
+        } //pcbupdate
         cycle() {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             if (this.isExecuting) {
-                //Make we don't go past 255 (FF) instead of 256
+                //Don't go past 255 (FF) instead of 256
                 //  Didn't do this before and I ran into an infinite loop when I branched on FF
-                while (_Mem.Mem.length - 1 > this.PC) {
-                    this.fetchOpCode(_Mem.Mem[this.PC]);
-                } //for
-                //updates the PCB
-                //  bool tell us not to create a new PCB in the GUI
-                TSOS.Control.update_PCB_GUI(_PCBs[_PIDNumber], false);
-                //Ends the program
-                _CPU.isExecuting = false;
+                // while(_Mem.Mem.length -1 > this.PC ){
+                //     this.fetchOpCode(_Mem.Mem[this.PC]);
+                // }//for
+                this.fetchOpCode(_Mem.Mem[this.PC + _CPU.offset]);
             } //if
         } //cycle
         //finds the Op Code associated with the hex nnumbers
@@ -117,9 +136,12 @@ var TSOS;
                     this.PC++;
                     break;
             } //switch
+            //pcb update
+            this.pcbUpdate();
             //Update everything on the GUI
             TSOS.Control.update_Mem_GUI();
             TSOS.Control.update_CPU_GUI();
+            TSOS.Control.update_PCB_GUI(_RunningPCB.PID, false); //  bool tells us not to create a new PCB in the GUI
         } //fetchOPCode
         //Always increment the program counter to match the index of the hexcode in the program
         //
@@ -128,9 +150,9 @@ var TSOS;
         //                      to a base of 10
         loadConstant() {
             //fetches the next index in Memory and sets it to the accumulator
-            this.Acc = this.decodeBase(String(_MemAcc.read(this.PC + 1)), 16);
+            this.Acc = this.decodeBase(String(_MemAcc.read(this.PC + 1 + _CPU.offset)), 16);
             this.PC += 2;
-        } //loadConstabnt
+        } //loadConstant
         loadMemory() {
             //loads from the Specified Addresss in Memory
             //              Stores in the accumulator as a decimal because I think this is how Alan wants it 
@@ -144,28 +166,25 @@ var TSOS;
             this.PC += 3;
         } //store
         addCarry() {
-            //adds the contents of the address into the accumulator
-            this.Acc += parseInt(this.valueHelper().toString(16), 16);
+            //adds the contents of the address into the accumulator 
+            this.Acc += this.decodeBase(String(_MemAcc.read(this.valueHelper())), 16);
             this.PC += 3;
         } //addCarry
         XregCon() {
-            this.Xreg = this.decodeBase(String(_MemAcc.read(this.PC + 1)), 16);
+            this.Xreg = this.decodeBase(String(_MemAcc.read(this.PC + 1 + _CPU.offset)), 16);
             this.PC += 2;
         } //XregCon
         XregMem() {
             //converts the new Value to hex
-            //this.Xreg =  _MemAcc.read(this.valueHelper());
             this.Xreg = this.decodeBase(String(_MemAcc.read(this.valueHelper())), 16);
             //Program Counter
             this.PC += 3;
         } //XregMem
         YregCon() {
-            this.Yreg = this.decodeBase(String(_MemAcc.read(this.PC + 1)), 16);
+            this.Yreg = this.decodeBase(String(_MemAcc.read(this.PC + 1 + _CPU.offset)), 16);
             this.PC += 2;
         } //YregCon
         YregMem() {
-            //converts the new Value to hex
-            //this.Yreg = _MemAcc.read(this.valueHelper());
             //NEED THIS to be a STRING for when decode parses everything
             var num = this.decodeBase(String(_MemAcc.read(this.valueHelper())), 16);
             this.Yreg = num;
@@ -177,11 +196,22 @@ var TSOS;
             this.PC++;
         } //No Operation
         programBreak() {
-            this.isExecuting = false;
+            _CPU.isExecuting = false;
+            //Indicates that the segment is now free
+            var seg = _RunningPCB.segment;
+            _RunningPrograms[seg] = false;
+            //removes from the ready queue and scheduler
+            //_readyQueue.dequeue();
+            //updates the GUI before execution
+            _RunningPCB.ProcesState = "Terminated";
+            TSOS.Control.update_PCB_GUI(_RunningPCB.PID, false);
+            //_OsShell.helperWaitTurnTime(_RunningPCB); // Outputs the Wait and Turnaround time in the shell
             this.PC++;
+            _Dispatcher.contextSwitch();
         } //programBreak
         compare() {
             //sets the Zero Flag to the appropriate state
+            //Easier to Debug when everything is not in the if 
             var data = _MemAcc.read(this.valueHelper());
             if (this.Xreg == this.decodeBase(String(data), 16)) {
                 this.Zflag = 1;
@@ -195,19 +225,16 @@ var TSOS;
         } //compare
         branch() {
             if (this.Zflag == 0) { //branch when the Z flag is zero
-                var currPlace = this.PC;
-                //Adds the next byte to the program counter
-                this.PC += this.decodeBase(String(_MemAcc.read(this.PC + 1)), 16);
-                // if(this.PC <= 127){
-                //     //Increment 
-                //     //this.PC += parseInt(_MemAcc.read(this.PC+1).toString(16),16);
-                //     //Increment the PC by the byte that is next to it
-                // }
-                if (this.PC > 127) {
+                var currPlace = this.PC + _CPU.offset;
+                //increases PC by x amount 
+                //  Adding 2 so we "start" the branch from the opdoce after the byte value rather than the D0
+                //this.PC += parseInt(_MemAcc.read(this.PC+1+_CPU.offset).toString(16),16)+2;
+                //  _MemAcc: returns a string od the address as hex
+                //  
+                this.PC += this.decodeBase(String(_MemAcc.read(this.PC + 1 + _CPU.offset).toString(16)), 16) + 2;
+                if (this.PC > 127) { //took away the +_CPU.offset
                     //Invoke 2's complement to find where to branch to in memory
                     //Converts the place we are hopping to an array in binary;
-                    //var locationDec = this.PC + this.decodeBase(_MemAcc.read(currPlace+1),16);
-                    //var locationDec = _MemAcc.read()
                     var locationBinary = (this.PC.toString(2));
                     var twoCompResBin = "";
                     //Flips the digits in the array
@@ -217,13 +244,13 @@ var TSOS;
                         if (locationBinary[i] == "1")
                             twoCompResBin += '0';
                     } //for
-                    //DONT Add one to the result
+                    //Add one to the result
                     var twosComp = this.decodeBase(twoCompResBin, 2) + 1;
-                    var actualLoaction = 255 - twosComp;
+                    var actualLoaction = 255 - twosComp + 1;
                     //Set the PC to the result in to hop to it in memory                                        
                     this.PC = actualLoaction;
-                }
-            } //if
+                } // if 127
+            } //if Z flag
             else { //No Branch 
                 //Just increment as normal to go past the rest of Op Code and the address
                 this.PC += 2;
@@ -247,11 +274,6 @@ var TSOS;
             _MemAcc.write(this.valueHelper(), incMemValue);
             this.PC += 3;
         } //increment
-        //---------REMINDER-------
-        /*
-        /IMPLEMENT THE INTERPUT QUEUE!!!!!!!!
-        /PLEASSSSEEEEEEE!!!!!!!!!!!!!!!!!!!!!
-        */
         sysCall() {
             switch (this.Xreg) {
                 //Call 1
@@ -268,27 +290,26 @@ var TSOS;
                 //Convert the ASCII to text and output on the Console
                 case 2:
                     //Outputs to text
-                    _StdOut.advanceLine();
                     //Remebers where the PC left off before jumping somewhere else in memory
                     var currentPlace = this.PC;
                     //Hop to the index in mmemory that the Y reg is pointing to
                     this.PC = this.Yreg;
                     //Stops when you begin counting past memory or when you specify the printing to end 
-                    while (this.IR != "00" && this.PC < 255) {
+                    while (_MemAcc.read(this.PC + _CPU.offset) != "00" && this.PC < 255) {
                         //Must be converted back into Hex for the IR to read the instruction correctly
-                        this.IR = _MemAcc.read(this.PC.toString(16));
+                        //
+                        //----Read in the PC as an decimal
+                        this.IR = _MemAcc.read(this.PC + _CPU.offset);
                         //I know this is kind of a mess but here is the explaination:
                         //  For whatever resaon in parse int it cannot convert from string to String (idk why)
                         //  Therefore I wrapped the IR in the String method and from there I wrapped around parseInt
                         //  Finally I convert the actual Char Code once it is a number and turn it into the actual
                         //  ASCII text
                         var IRString = String(this.IR);
-                        var IRnumber = parseInt(IRString);
-                        _StdOut.putText(String.fromCharCode(IRnumber));
+                        //var IRnumber = parseInt(IRString);
+                        _StdOut.putText(String.fromCharCode(parseInt(IRString, 16)));
                         this.PC++;
                     } //while   
-                    _StdOut.advanceLine();
-                    _OsShell.putPrompt();
                     //hops to the next op code in memory
                     this.PC = currentPlace + 1;
                     break;
@@ -309,7 +330,7 @@ var TSOS;
             //     63 (index 63 in mem is index 64)
             //
             //Grabs the next 2 hex numbers in Memory
-            var wholeHex = _MemAcc.read(this.PC + 2) + _MemAcc.read(this.PC + 1);
+            var wholeHex = _MemAcc.read(this.PC + 2 + _CPU.offset) + _MemAcc.read(this.PC + 1 + _CPU.offset);
             return this.decodeBase(wholeHex, 16);
         } //valueHelper
         //This serves as a means of decoding the hexidecimal and binary to decimal
