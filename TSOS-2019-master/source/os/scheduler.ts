@@ -22,13 +22,6 @@ module TSOS {
             //checks if there is a program that is running
             if(!_readyQueue.isEmpty()){//prevents loop from running when there are no pcbs
                 running = true;
-                //while(_PCBs[index].isExecuting)
-                // do{
-                //     if(_PCBs[index].isExecuting)
-                //         running = true;
-                //     index++;
-                // }//while
-                //while(!running && index < _PCBs[index] != null);
             }//if
             
             //Prevents an undefined _RunningPCB from entering a context
@@ -39,7 +32,7 @@ module TSOS {
                 //  OR when the current Process is Terminated)
                 //  (AND when the readyQueue has more 1 or more pcbs to switch to)
 
-                if((this.currQuan > this.quantum || _RunningPCB.ProcesState == "Terminated") && _readyQueue.getSize() >= 1) {
+                if((this.currQuan > this.quantum || _RunningPCB.ProcesState == "Terminated") && _readyQueue.getSize() >= 1 && _RunningPCB.isExecuting) {
                     //this.contextSwitch();
                     _Dispatcher.contextSwitch();
                     this.currQuan = 0; //resets for the next process
@@ -49,6 +42,21 @@ module TSOS {
 
 
         }//decide
+
+        public time(){
+            //if(running){// Can only run when there is a running program
+            if(_CPU.isExecuting){ //Begins running when there is a program running 
+                for(var i = 0; _readyQueue.getSize() > i; i++){
+                    if(_PIDNumber == _RunningPCB.PID)//turntime increases when running
+                        _RunningPCB.turnTime++;
+                    else { //Determines that the process has began running                    if(_readyQueue[i].isExecuting)       
+                        var pcb = new ProcessControlBlock();        
+                        pcb =  _readyQueue[i]; //waitime increase when a process 
+                        pcb.waitTime++;  // is in the ready Queue
+                    }//else
+                }//for
+            }//if
+        }//time
 
         //adds to the ready queue
         public addPCBQueue(pcb){

@@ -12,6 +12,9 @@ module TSOS{
             public segment: number = 0,
             public isExecuting: boolean = false,
             public offset: number = 0,
+            public waitTime: number = 0,
+            public turnTime: number = 0,
+
           ) {
         }//constructor
 
@@ -27,6 +30,9 @@ module TSOS{
             this.segment = -1;
             this.isExecuting = false;
             this.offset = 0;
+            this.waitTime = 0;
+            this.turnTime = 0;
+
         }//init
 
         public getPID(){

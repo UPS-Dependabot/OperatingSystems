@@ -205,6 +205,7 @@ var TSOS;
             //updates the GUI before execution
             _RunningPCB.ProcesState = "Terminated";
             TSOS.Control.update_PCB_GUI(_RunningPCB.PID, false);
+            //_OsShell.helperWaitTurnTime(_RunningPCB); // Outputs the Wait and Turnaround time in the shell
             this.PC++;
             _Dispatcher.contextSwitch();
         } //programBreak

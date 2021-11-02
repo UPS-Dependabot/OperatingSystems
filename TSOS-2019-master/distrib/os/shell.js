@@ -538,8 +538,8 @@ var TSOS;
             var executePID = parseInt(args[0]);
             //checks if the PID exists
             //if(_PCB[executePID] != null){
-            _PCBs[executePID].isExecuting = false;
             _Mem.clearMem(_PCBs[executePID].segment);
+            _RunningPrograms[_PCBs[executePID].segment] = false; //Opens a space in memory
             _PCBs[executePID].ProcesState = "Terminated";
             _PCBs[executePID].isExecuting = false;
             //Update the GUI
@@ -568,9 +568,10 @@ var TSOS;
         } //runall
         shellKillAll(args) {
             var index = 0;
-            while (_readyQueue.getSize() > index) {
+            while (_readyQueue.getSize() >= index) {
                 _PCBs[index].isExecuting = false;
                 _Mem.clearMem(_PCBs[index].segment);
+                _RunningPrograms[index] = false;
                 _PCBs[index].ProcesState = "Terminated";
                 TSOS.Control.update_PCB_GUI(index, false);
                 _PCBs[index].isExecuting = false;
@@ -587,7 +588,17 @@ var TSOS;
                 index++;
             } //while
         } //shellPS
-    }
+        //Outputs waittime and turnaround time when a process completes
+        helperWaitTurnTime(pcb) {
+            _StdOut.putText("PID " + pcb.PID + " Complete!");
+            _StdOut.advanceLine();
+            _StdOut.putText("TurnAroundTime: " + pcb.turnTime);
+            _StdOut.advanceLine();
+            _StdOut.putText("WaitTime: " + pcb.waitTime);
+            _StdOut.advanceLine();
+            _StdOut.putText(this.promptStr);
+        } //helperWaitTurnTime
+    } //Shell
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));
 //# sourceMappingURL=shell.js.map
