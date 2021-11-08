@@ -88,6 +88,7 @@ var TSOS;
             _readyQueue = new TSOS.Queue();
             _RunningPCB = new TSOS.ProcessControlBlock();
             _RunningPCB.init();
+            _Files = new TSOS.Queue();
             //----------END OF MY INTIS-----------//
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(TSOS.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);

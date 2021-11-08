@@ -73,6 +73,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellPS, "ps", " - display the PID and the state of all processes");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellCreate, "create", " - creates a new file in the system");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -598,6 +600,23 @@ var TSOS;
             _StdOut.advanceLine();
             _StdOut.putText(this.promptStr);
         } //helperWaitTurnTime
+        shellCreate(args) {
+            var newFile = new TSOS.File();
+            _FileID++; //Increments the file id to ensure that each file is unique
+            var input = "";
+            var usrStatus = _StdOut.buffer.split(" ");
+            if (args.length > 0) {
+                for (var i in args) {
+                    input += args[i] + " "; //user input from the shell
+                } //for 
+                newFile.fileName = input;
+                _Files.enqueue(newFile);
+                _StdOut.putText(newFile.fileName + "has been created!");
+            } //if
+            else {
+                _StdOut.putText("No file has been created. Please specifiy a filename.");
+            } //else
+        } //create
     } //Shell
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));

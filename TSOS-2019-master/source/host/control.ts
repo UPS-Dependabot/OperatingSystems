@@ -115,6 +115,8 @@ module TSOS {
             
             _RunningPCB = new ProcessControlBlock();
             _RunningPCB.init();
+
+            _Files = new Queue();
             //----------END OF MY INTIS-----------//
 
             // ... then set the host clock pulse ...

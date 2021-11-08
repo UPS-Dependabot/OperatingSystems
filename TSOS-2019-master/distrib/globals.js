@@ -57,6 +57,9 @@ var _KernelBuffers = null;
 // Standard input and output
 var _StdIn = null;
 var _StdOut = null;
+//Files
+var _FileID = 0;
+var _Files = null; // File Queue inited in console.ts
 // UI
 var _Console;
 var _OsShell;

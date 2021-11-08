@@ -76,6 +76,10 @@ var _KernelBuffers = null;
 var _StdIn:  TSOS.Console = null; 
 var _StdOut: TSOS.Console = null;
 
+//Files
+var _FileID: number = 0; 
+var _Files : any = null; // File Queue inited in console.ts
+
 // UI
 var _Console: TSOS.Console;
 var _OsShell: TSOS.Shell;
