@@ -217,10 +217,16 @@ var TSOS;
             //multipled by 3 to allocate space for each program
             for (var tableRow = 0; tableRow < (Segment_Length * 3 / 8); tableRow++) {
                 var row = document.createElement("tr");
-                //Loop 8 times because we know this is for each individual byte
+                //Loops 8 times because we know this is for each individual byte and the label
                 for (var rowCell = 0; rowCell < byteLength; rowCell++) {
-                    //This is definately a weird way of fetching the data from the Memory array but it works
                     var cell = document.createElement("td");
+                    if (rowCell == 0) { //Adds the label
+                        var labelCell = document.createElement("td");
+                        labelCell.setAttribute("style", "color:black; background: white");
+                        labelCell.innerHTML = (tableRow * 8).toString(16); //converts the row number to hex for the label
+                        row.appendChild(labelCell);
+                    }
+                    //This is definately a weird way of fetching the data from the Memory array but it works
                     cell.innerHTML = _MemAcc.read(tableRow * byteLength + rowCell);
                     //Inserts each byte into the row
                     row.appendChild(cell);

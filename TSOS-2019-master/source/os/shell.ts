@@ -110,7 +110,7 @@ module TSOS {
             this.commandList[this.commandList.length] = sc;
 
             sc = new ShellCommand(this.shellclearMem,
-                                "clear",
+                                "clearmem",
                                 " - Clears all memory");
             this.commandList[this.commandList.length] = sc;
             
@@ -144,6 +144,9 @@ module TSOS {
                                     " - creates a new file in the system");
             this.commandList[this.commandList.length] = sc;
 
+            sc = new ShellCommand(this.shellWrite,
+                                    "write",
+                                    " - writes new data to a file");
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -556,6 +559,9 @@ module TSOS {
                     var segmentNum = _MemoryManager.segmentAllocation();
                     if(segmentNum >= 3){
                         _StdOut.putText("There is no room for this program. :(");
+
+                        //LOAD PROGRAM INTO DISK DRIVE
+
                     }//if
                     else{
                         _StdOut.putText("Valid Program :)");
@@ -571,6 +577,7 @@ module TSOS {
                         pcb.PID = _PIDNumber;
                         pcb.segment = segmentNum;
                         pcb.offset = segmentNum*Segment_Length;
+                        pcb.limit = pcb.offset + Segment_Length-1;
 
                         //stores the new process control block
                         _PCBs[_PIDNumber] = pcb;
@@ -617,7 +624,6 @@ module TSOS {
                 _readyQueue.dequeue();//takes off the ready Ready Queue
                 
                 var pcbIndex = parseInt(userPCB);
-                _CPU.start(_PCBs[pcbIndex]);
                 //sets the offset in the CPU so the PC is starting in the right segment in memory
                 _CPU.offset =  _PCBs[pcbIndex].offset;
                 _CPU.PC = _PCBs[pcbIndex].PC;
@@ -730,6 +736,14 @@ module TSOS {
             _StdOut.putText(this.promptStr);
         }//helperWaitTurnTime
 
+        //Returns all of the user input in the shell
+        public helperfetchArgs(args: string[]){
+            var input = "";
+            for(var i in args){
+                input += args[i]+" "; //user input from the shell
+            }//for 
+            return input;
+        }//helperfetchArgs
 
         public shellCreate(args: string[]){
             var newFile = new File();
@@ -740,19 +754,46 @@ module TSOS {
 
             var usrStatus = _StdOut.buffer.split(" ");
             if (args.length > 0) {
-               for(var i in args){
-                   input += args[i]+" "; //user input from the shell
-               }//for 
-               
-               newFile.fileName = input;
-               _Files.enqueue(newFile);
+                
+                var input = "";
+                for(var i in args){
+                    input += args[i]+" "; //user input from the shell
+                }//for 
 
-               _StdOut.putText( newFile.fileName+"has been created!");
+                newFile.fileName = input;
+                _Files.enqueue(newFile);
+
+               //_StdOut.putText( newFile.fileName+"New file has been created!");
+               _StdOut.putText("File-Name: "+newFile.fileName);
+               _StdOut.putText("File-ID: "+newFile.fileID);
+
             }//if
             else{
                 _StdOut.putText("No file has been created. Please specifiy a filename.");
             }//else
             
         }//create
+
+        public shellWrite(args: string[]){
+            //collect input
+            if (args.length > 0) {
+                
+                var input = "";
+                for(var i in args){
+                    input += args[i]+" "; //user input from the shell
+                }//for 
+            }//if
+
+            var found: boolean = false;
+            for(var j = 0; !found && j < _Files.getSize(); j++ ){
+                if(_Files[j].fileName == input){
+                    found = true;
+                }//if
+            }//for
+
+            if(found){
+
+            }
+        }//write
     }//Shell
 }

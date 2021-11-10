@@ -26,8 +26,11 @@ var TSOS;
                 //  OR when the current Process is Terminated)
                 //  (AND when the readyQueue has more 1 or more pcbs to switch to)
                 if ((this.currQuan > this.quantum || _RunningPCB.ProcesState == "Terminated") && _readyQueue.getSize() >= 1 && _CPU.isExecuting) {
-                    //this.contextSwitch();
-                    _Dispatcher.contextSwitch();
+                    //implements the context switch via the software interupt
+                    var param;
+                    //Create a software inturupt on the queue
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(SOFTWARE_IRQ, param));
+                    //_Dispatcher.contextSwitch();
                     this.currQuan = 0; //resets for the next process
                     _switched = true;
                 } //if

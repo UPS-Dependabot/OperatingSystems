@@ -126,6 +126,9 @@ module TSOS {
                 case TIMER_IRQ:
                     this.krnTimerISR();               // Kernel built-in routine for timers (not the clock).
                     break;
+                case SOFTWARE_IRQ:                    // Software Interupts
+                    _Dispatcher.contextSwitch();
+                    break;
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();

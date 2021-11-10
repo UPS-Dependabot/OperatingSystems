@@ -61,7 +61,7 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellRun, "run", " - Runs the program that is currently loaded into memory");
             this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellclearMem, "clear", " - Clears all memory");
+            sc = new TSOS.ShellCommand(this.shellclearMem, "clearmem", " - Clears all memory");
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellKill, "kill", "<id> - kills the specified process id");
             this.commandList[this.commandList.length] = sc;
@@ -75,6 +75,7 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellCreate, "create", " - creates a new file in the system");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellWrite, "write", " - writes new data to a file");
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -460,6 +461,7 @@ var TSOS;
                     var segmentNum = _MemoryManager.segmentAllocation();
                     if (segmentNum >= 3) {
                         _StdOut.putText("There is no room for this program. :(");
+                        //LOAD PROGRAM INTO DISK DRIVE
                     } //if
                     else {
                         _StdOut.putText("Valid Program :)");
@@ -471,6 +473,7 @@ var TSOS;
                         pcb.PID = _PIDNumber;
                         pcb.segment = segmentNum;
                         pcb.offset = segmentNum * Segment_Length;
+                        pcb.limit = pcb.offset + Segment_Length - 1;
                         //stores the new process control block
                         _PCBs[_PIDNumber] = pcb;
                         _readyQueue.enqueue(pcb);
@@ -509,7 +512,6 @@ var TSOS;
                 _PCBs[userPCB].ProcesState = "Ready";
                 _readyQueue.dequeue(); //takes off the ready Ready Queue
                 var pcbIndex = parseInt(userPCB);
-                _CPU.start(_PCBs[pcbIndex]);
                 //sets the offset in the CPU so the PC is starting in the right segment in memory
                 _CPU.offset = _PCBs[pcbIndex].offset;
                 _CPU.PC = _PCBs[pcbIndex].PC;
@@ -600,23 +602,51 @@ var TSOS;
             _StdOut.advanceLine();
             _StdOut.putText(this.promptStr);
         } //helperWaitTurnTime
+        //Returns all of the user input in the shell
+        helperfetchArgs(args) {
+            var input = "";
+            for (var i in args) {
+                input += args[i] + " "; //user input from the shell
+            } //for 
+            return input;
+        } //helperfetchArgs
         shellCreate(args) {
             var newFile = new TSOS.File();
             _FileID++; //Increments the file id to ensure that each file is unique
             var input = "";
             var usrStatus = _StdOut.buffer.split(" ");
             if (args.length > 0) {
+                var input = "";
                 for (var i in args) {
                     input += args[i] + " "; //user input from the shell
                 } //for 
                 newFile.fileName = input;
                 _Files.enqueue(newFile);
-                _StdOut.putText(newFile.fileName + "has been created!");
+                //_StdOut.putText( newFile.fileName+"New file has been created!");
+                _StdOut.putText("File-Name: " + newFile.fileName);
+                _StdOut.putText("File-ID: " + newFile.fileID);
             } //if
             else {
                 _StdOut.putText("No file has been created. Please specifiy a filename.");
             } //else
         } //create
+        shellWrite(args) {
+            //collect input
+            if (args.length > 0) {
+                var input = "";
+                for (var i in args) {
+                    input += args[i] + " "; //user input from the shell
+                } //for 
+            } //if
+            var found = false;
+            for (var j = 0; !found && j < _Files.getSize(); j++) {
+                if (_Files[j].fileName == input) {
+                    found = true;
+                } //if
+            } //for
+            if (found) {
+            }
+        } //write
     } //Shell
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));
