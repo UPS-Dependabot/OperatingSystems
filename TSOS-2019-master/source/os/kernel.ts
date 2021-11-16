@@ -35,6 +35,10 @@ module TSOS {
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new DeviceDriverKeyboard();     // Construct it.
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
+
+            _krnDiskDriver = new DeviceDriverDisk();
+            _krnDiskDriver.driverEntry();                        //Comes from Device Driver 
+
             this.krnTrace(_krnKeyboardDriver.status);
 
             //
@@ -129,6 +133,9 @@ module TSOS {
                 case SOFTWARE_IRQ:                    // Software Interupts
                     _Dispatcher.contextSwitch();
                     break;
+                //___________________________________________________________________
+                //|TODO: Add Disk Driver Interupt here for when you swap out Programs|
+                //|__________________________________________________________________|
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();

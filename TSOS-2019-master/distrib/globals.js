@@ -67,8 +67,11 @@ var _OsShell;
 var _Counter = 0; //added to play around with for scrolling
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode = false;
+//Disk
+var _Disk = null;
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver = null;
+var _krnDiskDriver = null; //init on krn bootstrap
 var _hardwareClockID = null;
 // For testing (and enrichment)...
 var Glados = null; // This is the function Glados() in glados-ip*.js http://alanclasses.github.io/TSOS/test/ .

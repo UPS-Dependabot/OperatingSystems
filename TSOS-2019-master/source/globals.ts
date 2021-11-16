@@ -90,8 +90,12 @@ var _Counter: Number = 0;//added to play around with for scrolling
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode: boolean = false;
 
+//Disk
+var _Disk: TSOS.Disk = null;
+
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver: TSOS.DeviceDriverKeyboard  = null;
+var _krnDiskDriver: TSOS.DeviceDriver = null;    //init on krn bootstrap
 
 var _hardwareClockID: number = null;
 

@@ -38,7 +38,6 @@ module TSOS {
                     //Create a software inturupt on the queue
                     _KernelInterruptQueue.enqueue(new TSOS.Interrupt(SOFTWARE_IRQ,  param));
 
-                    //_Dispatcher.contextSwitch();
                     this.currQuan = 0; //resets for the next process
                     _switched = true;
                 }//if

@@ -78,6 +78,8 @@ var TSOS;
             _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
             //NOTE TO SELF: Had create some of my own inits here
+            _Disk = new TSOS.Disk();
+            _Disk.init();
             _Mem = new TSOS.Memory();
             _Mem.init();
             _MemAcc = new TSOS.MemoryAccessor();
