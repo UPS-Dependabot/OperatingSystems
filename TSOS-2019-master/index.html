@@ -147,9 +147,33 @@
          </label>
       </div>
 
+      <div id = "CPU">
+         <p class = "h3"> CPU </p>
+         <table>
+            <thead>
+               <th id = "PC">PC</th>
+               <th id = "Acc">Acc</th>
+               <th id = "Xreg">Xreg</th>
+               <th id = "Yreg">Yreg</th>
+               <th id = "Zflag">Zreg</th>
+               <th id = "IR"> IR</th>
+            </thead>
+            <tbody id = "cpuBody">
+               <tr>
+                  <td id = "cpuPC"> </td>
+                  <td id = "cpuAcc"> </td>
+                  <td id = "cpuX"> </td>
+                  <td id = "cpuY"> </td>
+                  <td id = "cpuZ"> </td>
+                  <td id = "cpuIR"> </td>
+               </tr>
+            </tbody>
+         </table>
+      <div>
+
       <div id="divMemory" style="opacity: 0.9;">
          <label>Memory</label>
-         <div id="displayMemory" style="height: 150px; overflow-y: scroll;">
+         <div id="displayMemory" style="height: 150px;  width: 300px; overflow-y: scroll;">
             <table id = "memTable"> 
                
             </table>
@@ -158,52 +182,26 @@
      </div>
    </div>
 
-   <div id = "CPU">
-      <p class = "h3"> CPU </p>
-      <table>
-         <thead>
-            <th id = "PC">PC</th>
-            <th id = "Acc">Acc</th>
-            <th id = "Xreg">Xreg</th>
-            <th id = "Yreg">Yreg</th>
-            <th id = "Zflag">Zreg</th>
-            <th id = "IR"> IR</th>
-         </thead>
-         <tbody id = "cpuBody">
-            <tr>
-               <td id = "cpuPC"> </td>
-               <td id = "cpuAcc"> </td>
-               <td id = "cpuX"> </td>
-               <td id = "cpuY"> </td>
-               <td id = "cpuZ"> </td>
-               <td id = "cpuIR"> </td>
-            </tr>
-         </tbody>
-      </table>
-   <div>
 
    <div id = "Disk">
-      <p class = "h3"> Disk Drive</p>
-      <table>
-         <thead>
-            <th id = "Track">Track</th>
-            <th id = "Sector">Sector</th>
-            <th id = "Block">Block</th>
-            <th id = "Value"> Value </th>
-         </thead>
+      <p class = "h3" > Disk Drive</p>
+      <div id = "Disk-Display"  style="height: 150px; overflow-y: scroll;">
+         <table>
+            <thead>
+               <th id = "TSB">TSB</th>
+               <th id = "Value"> Value </th>
+            </thead>
 
-         <tbody id = "diskBody">
+            <tbody id = "diskBody">
+               
+               <!-- <tr>
+                  <td>  0</td>
+                  <td>  324423423</td>
+               </tr> -->
             
-            <!-- <tr>
-               <td> 0 </td>
-               <td>  0</td> 
-               <td>  0</td>
-               <td>  324423423</td>
-            </tr> -->
-         
-         </tbody>
-      </table>
-
+            </tbody>
+         </table>
+      </div>
    </div>
    <p class = "h3"> Process Control Block </p>
       <table id = "PCBs">

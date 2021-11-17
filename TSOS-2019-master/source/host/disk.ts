@@ -5,7 +5,7 @@ module TSOS {
             public trackNum: number = 4,
             public sectorNum: number = 8,
             public blockNum: number = 8,
-            public dataSize: number = 60
+            public dataSize: number = 61 //Data Size is 61 because the first byte is the inUse
             ) 
             {
         }//constructor
@@ -15,17 +15,20 @@ module TSOS {
             for(var t = 0; this.trackNum > t; t++){
                 for(var s = 0; this.sectorNum > s; s++){
                     for(var b = 0; this.blockNum > b; b++){
+                        var inUse = "00";                    
                         var id = t + ":" + s + ":" + b; 
                         var diskData = new Array();
+                        diskData.push(inUse); 
                         for(var i = 0; i < this.dataSize; i++){
                             diskData.push("00");
                         }//for
                         var block = {
-                            isAvailable: "0",
-                            pointer: "0:0:0",
+                            isAvailable: inUse,
+                            pointer: id,
                             data: diskData
                         };
                         sessionStorage.setItem(id, JSON.stringify(block));
+                        TSOS.Control.updateDiskDriver(id, diskData);
                     }//for
                 }//for
             }//for tracks

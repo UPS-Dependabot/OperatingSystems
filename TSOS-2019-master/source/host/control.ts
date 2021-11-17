@@ -104,7 +104,7 @@ module TSOS {
             
             _Disk = new Disk();
             _Disk.init();
-            
+
             _Mem = new Memory();
             _Mem.init();
             _MemAcc	= new MemoryAccessor();
@@ -307,6 +307,34 @@ module TSOS {
                 parent.removeChild(parent.firstChild);
             }
         }
+
+        public static updateDiskDriver(key, data){
+            //Initialize the GUI so the user can see the Disk storage 
+            var diskGUI = document.getElementById("Disk-Display");
+            
+            //Clear the old memory so we don't see every iteration when someone loads.
+            //this.removeAllChildNodes(diskGUI);
+
+            
+            //session storage is where everything in the disk is stored
+            // for(var tableRow = 0; tableRow < sessionStorage.length ; tableRow++){
+                var row = document.createElement("tr");
+                var keyCell  = document.createElement("td");
+                var dataCell = document.createElement("td");
+
+                keyCell.setAttribute("style", "color:black; background: white");
+                
+                keyCell.innerHTML = key;
+                dataCell.innerHTML = data;
+                    
+                //Inserts each byte into the row
+                row.appendChild(keyCell);
+                row.appendChild(dataCell);
+
+                //Inserts the row into the memory GUI
+                diskGUI.appendChild(row);
+            // }//for
+        }//updateDiskDriver
         
 
     }

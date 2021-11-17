@@ -42,8 +42,6 @@ module TSOS {
                     _switched = true;
                 }//if
             }//if
-
-
         }//decide
 
         public time(){
