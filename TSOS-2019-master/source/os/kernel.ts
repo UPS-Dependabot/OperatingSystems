@@ -40,6 +40,7 @@ module TSOS {
             _krnDiskDriver.driverEntry();                        //Comes from Device Driver 
 
             this.krnTrace(_krnKeyboardDriver.status);
+            this.krnTrace(_krnDiskDriver.status);  
 
             //
             // ... more?
@@ -133,9 +134,10 @@ module TSOS {
                 case SOFTWARE_IRQ:                    // Software Interupts
                     _Dispatcher.contextSwitch();
                     break;
-                //___________________________________________________________________
+                //___________________________________________________________________ 
                 //|TODO: Add Disk Driver Interupt here for when you swap out Programs|
                 //|__________________________________________________________________|
+
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();

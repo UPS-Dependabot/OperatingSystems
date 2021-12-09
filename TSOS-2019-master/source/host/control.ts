@@ -103,7 +103,6 @@ module TSOS {
             //NOTE TO SELF: Had create some of my own inits here
             
             _Disk = new Disk();
-            _Disk.init();
 
             _Mem = new Memory();
             _Mem.init();
@@ -317,7 +316,7 @@ module TSOS {
 
             
             //session storage is where everything in the disk is stored
-            // for(var tableRow = 0; tableRow < sessionStorage.length ; tableRow++){
+            //for(var tableRow = 0; tableRow < sessionStorage.length ; tableRow++){
                 var row = document.createElement("tr");
                 var keyCell  = document.createElement("td");
                 var dataCell = document.createElement("td");
@@ -325,7 +324,8 @@ module TSOS {
                 keyCell.setAttribute("style", "color:black; background: white");
                 
                 keyCell.innerHTML = key;
-                dataCell.innerHTML = data;
+                var tempdata = data.toString();
+                dataCell.innerHTML = tempdata.split(',').join(""); //strips the commas from the array 
                     
                 //Inserts each byte into the row
                 row.appendChild(keyCell);
@@ -333,7 +333,7 @@ module TSOS {
 
                 //Inserts the row into the memory GUI
                 diskGUI.appendChild(row);
-            // }//for
+             //}//for
         }//updateDiskDriver
         
 

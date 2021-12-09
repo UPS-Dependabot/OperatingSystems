@@ -73,6 +73,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellPS, "ps", " - display the PID and the state of all processes");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellFormat, "format", " - formats the Disk Drive");
+            this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellCreate, "create", " - creates a new file in the system");
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellWrite, "write", " - writes new data to a file");
@@ -610,25 +612,35 @@ var TSOS;
             } //for 
             return input;
         } //helperfetchArgs
+        shellFormat(args) {
+            _krnDiskDriver.format();
+        }
+        //Attempts to create file and informs the user of the result
         shellCreate(args) {
-            var newFile = new TSOS.File();
-            _FileID++; //Increments the file id to ensure that each file is unique
-            var input = "";
-            var usrStatus = _StdOut.buffer.split(" ");
-            if (args.length > 0) {
-                var input = "";
-                for (var i in args) {
-                    input += args[i] + " "; //user input from the shell
-                } //for 
-                newFile.fileName = input;
-                _Files.enqueue(newFile);
-                //_StdOut.putText( newFile.fileName+"New file has been created!");
-                _StdOut.putText("File-Name: " + newFile.fileName);
-                _StdOut.putText("File-ID: " + newFile.fileID);
-            } //if
+            if (_krnDiskDriver.create(args)) {
+                _StdOut.putText("File " + args + " Created :)");
+            }
             else {
-                _StdOut.putText("No file has been created. Please specifiy a filename.");
-            } //else
+                _StdOut.putText("File " + args + " not created :(");
+            }
+            // var newFile = new File();
+            // _FileID++; //Increments the file id to ensure that each file is unique
+            // var input = ""; 
+            // var usrStatus = _StdOut.buffer.split(" ");
+            // if (args.length > 0) {
+            //     var input = "";
+            //     for(var i in args){
+            //         input += args[i]+" "; //user input from the shell
+            //     }//for 
+            //     newFile.fileName = input;
+            //     _Files.enqueue(newFile);
+            //    //_StdOut.putText( newFile.fileName+"New file has been created!");
+            //    _StdOut.putText("File-Name: "+newFile.fileName);
+            //    _StdOut.putText("File-ID: "+newFile.fileID);
+            // }//if
+            // else{
+            //     _StdOut.putText("No file has been created. Please specifiy a filename.");
+            // }//else
         } //create
         shellWrite(args) {
             //collect input

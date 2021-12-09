@@ -95,7 +95,7 @@ var _Disk: TSOS.Disk = null;
 
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver: TSOS.DeviceDriverKeyboard  = null;
-var _krnDiskDriver: TSOS.DeviceDriver = null;    //init on krn bootstrap
+var _krnDiskDriver: TSOS.DeviceDriverDisk = null;    //init on krn bootstrap
 
 var _hardwareClockID: number = null;
 

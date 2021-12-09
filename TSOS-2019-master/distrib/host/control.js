@@ -79,7 +79,6 @@ var TSOS;
             _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
             //NOTE TO SELF: Had create some of my own inits here
             _Disk = new TSOS.Disk();
-            _Disk.init();
             _Mem = new TSOS.Memory();
             _Mem.init();
             _MemAcc = new TSOS.MemoryAccessor();
@@ -249,19 +248,20 @@ var TSOS;
             //Clear the old memory so we don't see every iteration when someone loads.
             //this.removeAllChildNodes(diskGUI);
             //session storage is where everything in the disk is stored
-            // for(var tableRow = 0; tableRow < sessionStorage.length ; tableRow++){
+            //for(var tableRow = 0; tableRow < sessionStorage.length ; tableRow++){
             var row = document.createElement("tr");
             var keyCell = document.createElement("td");
             var dataCell = document.createElement("td");
             keyCell.setAttribute("style", "color:black; background: white");
             keyCell.innerHTML = key;
-            dataCell.innerHTML = data;
+            var tempdata = data.toString();
+            dataCell.innerHTML = tempdata.split(',').join(""); //strips the commas from the array 
             //Inserts each byte into the row
             row.appendChild(keyCell);
             row.appendChild(dataCell);
             //Inserts the row into the memory GUI
             diskGUI.appendChild(row);
-            // }//for
+            //}//for
         } //updateDiskDriver
     }
     TSOS.Control = Control;

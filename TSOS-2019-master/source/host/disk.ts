@@ -15,7 +15,7 @@ module TSOS {
             for(var t = 0; this.trackNum > t; t++){
                 for(var s = 0; this.sectorNum > s; s++){
                     for(var b = 0; this.blockNum > b; b++){
-                        var inUse = "00";                    
+                        var inUse = "0";                    
                         var id = t + ":" + s + ":" + b; 
                         var diskData = new Array();
                         diskData.push(inUse); 
