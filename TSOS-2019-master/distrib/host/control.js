@@ -242,26 +242,51 @@ var TSOS;
                 parent.removeChild(parent.firstChild);
             }
         }
-        static updateDiskDriver(key, data) {
+        static createDiskDriver(key, data) {
             //Initialize the GUI so the user can see the Disk storage 
             var diskGUI = document.getElementById("Disk-Display");
-            //Clear the old memory so we don't see every iteration when someone loads.
-            //this.removeAllChildNodes(diskGUI);
             //session storage is where everything in the disk is stored
-            //for(var tableRow = 0; tableRow < sessionStorage.length ; tableRow++){
             var row = document.createElement("tr");
             var keyCell = document.createElement("td");
             var dataCell = document.createElement("td");
             keyCell.setAttribute("style", "color:black; background: white");
             keyCell.innerHTML = key;
             var tempdata = data.toString();
-            dataCell.innerHTML = tempdata.split(',').join(""); //strips the commas from the array 
+            dataCell.innerHTML = tempdata;
             //Inserts each byte into the row
             row.appendChild(keyCell);
             row.appendChild(dataCell);
             //Inserts the row into the memory GUI
             diskGUI.appendChild(row);
-            //}//for
+        } //createDiskDriver
+        //updates an individual row in the disk driver
+        static updateDiskDriver(key, data) {
+            //Initialize the GUI so the user can see the Disk storage 
+            var diskGUI = document.getElementById("Disk-Display");
+            //diskCells has all the cells inside of the disk GUI
+            //  The pattern goes from the td -- id to td -- data
+            //  Therefore the td with the id is always going to be one index ahead from the td data
+            var diskCells = diskGUI.getElementsByTagName('td');
+            var track = "";
+            var sector = "";
+            var block = "";
+            var id = "";
+            for (var i = 0; diskCells.length > i; i++) {
+                for (var t = 0; _Disk.trackNum > t; t++) {
+                    track = t.toString();
+                    for (var s = 0; _Disk.sectorNum > s; s++) {
+                        sector = s.toString();
+                        for (var b = 0; _Disk.blockNum > b; b++) {
+                            block = b.toString();
+                            id = track + ":" + sector + ":" + block;
+                            if (diskCells[i].innerHTML == key) { //Find the tr index
+                                diskCells[i + 1].innerHTML = data; //update the td data
+                                return; //exit this terrifiying loop
+                            } //if
+                        } //for block
+                    } //for sectors
+                } //for tracks
+            } //for diskCells
         } //updateDiskDriver
     }
     TSOS.Control = Control;

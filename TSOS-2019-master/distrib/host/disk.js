@@ -1,7 +1,7 @@
 var TSOS;
 (function (TSOS) {
     class Disk {
-        constructor(trackNum = 4, sectorNum = 8, blockNum = 8, dataSize = 61 //Data Size is 61 because the first byte is the inUse
+        constructor(trackNum = 4, sectorNum = 8, blockNum = 8, dataSize = 60 //Data Size in file
         ) {
             this.trackNum = trackNum;
             this.sectorNum = sectorNum;
@@ -15,18 +15,13 @@ var TSOS;
                     for (var b = 0; this.blockNum > b; b++) {
                         var inUse = "0";
                         var id = t + ":" + s + ":" + b;
-                        var diskData = new Array();
-                        diskData.push(inUse);
+                        var diskData = "";
+                        diskData.concat(inUse);
                         for (var i = 0; i < this.dataSize; i++) {
-                            diskData.push("00");
+                            diskData = diskData + "00";
                         } //for
-                        var block = {
-                            isAvailable: inUse,
-                            pointer: id,
-                            data: diskData
-                        };
-                        sessionStorage.setItem(id, JSON.stringify(block));
-                        TSOS.Control.updateDiskDriver(id, diskData);
+                        sessionStorage.setItem(id, diskData);
+                        TSOS.Control.createDiskDriver(id, diskData);
                     } //for
                 } //for
             } //for tracks
