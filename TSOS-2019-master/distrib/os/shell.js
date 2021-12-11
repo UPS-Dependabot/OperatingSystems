@@ -78,6 +78,7 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellCreate, "create", " - creates a new file in the system");
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellWrite, "write", " - writes new data to a file");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -623,41 +624,19 @@ var TSOS;
             else {
                 _StdOut.putText("File " + args + " not created :(");
             }
-            // var newFile = new File();
-            // _FileID++; //Increments the file id to ensure that each file is unique
-            // var input = ""; 
-            // var usrStatus = _StdOut.buffer.split(" ");
-            // if (args.length > 0) {
-            //     var input = "";
-            //     for(var i in args){
-            //         input += args[i]+" "; //user input from the shell
-            //     }//for 
-            //     newFile.fileName = input;
-            //     _Files.enqueue(newFile);
-            //    //_StdOut.putText( newFile.fileName+"New file has been created!");
-            //    _StdOut.putText("File-Name: "+newFile.fileName);
-            //    _StdOut.putText("File-ID: "+newFile.fileID);
-            // }//if
-            // else{
-            //     _StdOut.putText("No file has been created. Please specifiy a filename.");
-            // }//else
         } //create
         shellWrite(args) {
-            //collect input
-            if (args.length > 0) {
-                var input = "";
-                for (var i in args) {
-                    input += args[i] + " "; //user input from the shell
-                } //for 
-            } //if
-            var found = false;
-            for (var j = 0; !found && j < _Files.getSize(); j++) {
-                if (_Files[j].fileName == input) {
-                    found = true;
+            if (args.length == 2) { // Make sure that there are only two parameters in the shell
+                if (_krnDiskDriver.write(args[0], args[1], false)) {
+                    _StdOut.putText("Successfully wrote to file");
                 } //if
-            } //for
-            if (found) {
-            }
+                else {
+                    _StdOut.putText("There is not enough space to store the program on the disk");
+                } //else
+            } //if
+            else {
+                _StdOut.putText("format incorrect: write <filename> <\"data\"> ");
+            } //else
         } //write
     } //Shell
     TSOS.Shell = Shell;

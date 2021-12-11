@@ -32,7 +32,9 @@ var TSOS;
         //Creates the file
         create(filename) {
             var isCreated = false;
-            if (this.formatted && !this.duplicateFile(filename)) {
+            var newNameData = this.asciiHex(filename); //converts the file name to ascii
+            // newData must fit into memory block
+            if (this.formatted && !this.duplicateFile(filename) && newNameData.length <= 120) {
                 var t = 0;
                 var s = 0;
                 var b = 0;
@@ -45,7 +47,6 @@ var TSOS;
                         }
                         else {
                             var id = 0 + ":" + s + ":" + b;
-                            var newNameData = "";
                             //the first character is the isavailable bit
                             var block = sessionStorage.getItem(id);
                             //the first character is the Availble bit
@@ -55,7 +56,7 @@ var TSOS;
                                 for (var i = 0; pointerChars.length > i; i++) {
                                     block = this.stringModifier(block, i + 1, pointerChars[i]); //adds the pointer into the block. Replaces bits 1, 2, 3 
                                 } //for
-                                newNameData = this.asciiHex(filename); //converts the file name to ascii
+                                // newNameData =  this.asciiHex(filename); //converts the file name to ascii
                                 //This discusting line is:
                                 //   1 - combination of the unavailble bit and pointer (in this case we will always grab the first four bits)
                                 //   2 -  name of new file
@@ -71,9 +72,6 @@ var TSOS;
                     s++;
                 } //while sector
             } //if
-            else {
-                //Inform user that they need to the format the file in the CLI
-            } //else
             return isCreated;
         } //create
         asciiHex(input) {
@@ -123,16 +121,11 @@ var TSOS;
                             var filehex = this.asciiHex(filename);
                             var splicedWord = tempData.substring(4); //skip the availble bit and pointer
                             var parsedData = splicedWord.split("00")[0]; //get rid of the zeros (the first array holds your stuff)
-                            //  var parseSub = parsedData.substring(4);
-                            //  var dataStuff = parseSub.split(",");
-                            //  var dataHex= String (parsedData).substring(2).split(",")[1]; //The string gets stored into the second place in the array
                             var counter = 0; //keeps track of the amount of times there is a match between the dataHex and the parsedDate
                             //compare each hex code
                             for (var i = 0; filehex.length > i; i++) {
                                 //parseData 
-                                if (filehex[i] == parsedData[i])
-                                    ;
-                                { //finds if each character is equal to the other
+                                if (filehex[i] == parsedData[i]) { //finds if each character is equal to the other
                                     counter++;
                                 } //if
                             } //for
@@ -145,7 +138,184 @@ var TSOS;
             } //for
             return false;
         } //duplicateFile
-    }
+        // Writes new data to the disk
+        //
+        // isRole represents when a file is either being written from the write command (via the shell) or coming in via memory when is gets swapped in
+        //  True - from memory, False - form the shell
+        //
+        write(filename, data, isRole) {
+            //Convert data and filename to hex (ascii returns as an array)
+            //Then convert the arrays to strings 
+            // Only strip the quotes when the user enters the data from the shell
+            if (!isRole) {
+                //strip off \" \" encapuslating the data
+                //example: data = \"asdf\"
+                //      starting index " = 1 
+                //      ending index \ = data.length -1
+                //          subtring's end param ends on the \ but does not include it
+                data = data.substring(1, data.length - 1);
+            } //if
+            var filehex = this.asciiHex(filename);
+            var hexdata = this.asciiHex(data);
+            //calcualtes the number of tsbs that the file data will occupy
+            var tsbToOccupy = 1;
+            var dataPieces = new Array(tsbToOccupy);
+            //We want to round up so we can collect all of the data in the tsb
+            //  if we round down we would cut off data
+            tsbToOccupy = Math.ceil(hexdata.length / 120);
+            if (tsbToOccupy == 0) {
+                tsbToOccupy = 1;
+            } //if
+            var start = 0;
+            var end = 121;
+            //parse data into multiple sections 
+            for (var i = 0; i < tsbToOccupy; i++) {
+                dataPieces[i] = hexdata.substring(start, end);
+                start += _Disk.dataSize * 2; //double the size of the disk data because one byte is 2 zeros (00)
+                end += _Disk.dataSize * 2;
+            } //for
+            //Check if we have many TSBs avaible for the array
+            //Find the free pointers that we need            
+            if (this.isAvaibleSpace(tsbToOccupy) != null) {
+                //  Searach for file with the filename 
+                //  Filenames are all located in the track 0
+                for (var s = 0; _Disk.sectorNum > s; s++) {
+                    for (var b = 0; _Disk.blockNum > b; b++) {
+                        var id = 0 + ":" + s + ":" + b; //fetches the id
+                        var tempData = sessionStorage.getItem(id);
+                        if (tempData[0] == "1") { //find if the file is being used
+                            var splicedWord = tempData.substring(4); //skip the availble bit and pointer
+                            var parsedData = splicedWord.split("00")[0]; //get rid of the zeros (the first array holds your stuff)
+                            //Split may take off a zero that is apart of the hex at the end of the string
+                            //  This conditional adds the zero back into the string if the character is lost
+                            if (parsedData.length % 2 != 0) {
+                                parsedData += "0";
+                            } //if
+                            var counter = 0; //keeps track of the amount of times there is a match between the dataHex and the parsedDate
+                            //compare each hex code
+                            for (var i = 0; filehex.length > i; i++) {
+                                //parseData 
+                                if (filehex[i] == parsedData[i]) { //finds if each character is equal to the other
+                                    counter++;
+                                } //if
+                            } //for
+                            if (counter == filehex.length) {
+                                //Get pointer from the value
+                                var pointerInData = tempData.substring(1, 4);
+                                //Modify string to add :s in between each number so the key will be reconized 
+                                //  in the session storage
+                                var trueKey = this.stringToKey(pointerInData); //first place we store to for the file contents
+                                var datablock;
+                                var availblebit = "1";
+                                var availbleIds = this.isAvaibleSpace(tsbToOccupy);
+                                if (tsbToOccupy > 1) {
+                                    //get next pointer from pointer array
+                                    for (var i = 0; availbleIds.length > i; i++) {
+                                        if (availbleIds.length - 1 != i) {
+                                            //set the current TSB's pointer to that array
+                                            //write into the next block
+                                            //repeat until done, fill last one with 0s as needed  
+                                            if (i == 0) {
+                                                //The first available id represents the first location that will be saved to 
+                                                datablock = availblebit + this.keyToString(availbleIds[i]) + dataPieces[i];
+                                                //The true key is the first loaction we are going to save to on the disk
+                                                sessionStorage.setItem(trueKey, datablock);
+                                                TSOS.Control.updateDiskDriver(trueKey, datablock);
+                                            } //if
+                                            else { //updates the key with the last key
+                                                //avaibleid[i] points to the next id
+                                                datablock = availblebit + this.keyToString(String(availbleIds[i])) + dataPieces[i];
+                                                //We want to set it to available[i -1] because that represents the next tsb we will set to
+                                                sessionStorage.setItem(availbleIds[i - 1], datablock);
+                                                TSOS.Control.updateDiskDriver(availbleIds[i - 1], datablock);
+                                            } //else      
+                                        } //if
+                                        else {
+                                            //There is no pointer for the last datablock
+                                            datablock = availblebit + "000" + this.appendZeros(dataPieces[i]);
+                                            //Write into block
+                                            sessionStorage.setItem(availbleIds[i - 1], datablock);
+                                            TSOS.Control.updateDiskDriver(availbleIds[i - 1], datablock);
+                                        } //else
+                                    } //for
+                                } //if
+                                else { //entire file is only written into a single block
+                                    datablock = availblebit + "000" + this.appendZeros(dataPieces[0]);
+                                    //Write into first block  
+                                    //  points to the filename location
+                                    sessionStorage.setItem(trueKey, datablock);
+                                    TSOS.Control.updateDiskDriver(trueKey, datablock);
+                                } //else
+                                return true; //Writes data to the filename
+                            } //if
+                        } //if
+                    } //for
+                } //for
+            } //if  
+            else {
+                return false;
+            } //else
+        } //write
+        //Appends zeros to after the data on the block
+        //  Only used for the last block in the chain
+        //  param dataPartition is a string
+        appendZeros(dataPartition) {
+            //total zeros are 120 and the dataParition in hex
+            //  subtracts the 3 to compensate for the pointer 
+            var zerosToAppend = _Disk.dataSize * 2 - dataPartition.length - 3;
+            var lastDataPiece = dataPartition;
+            for (var i = 0; zerosToAppend > i; i++) {
+                lastDataPiece = lastDataPiece + "0";
+            } //for
+            return lastDataPiece;
+        } //appendZeros
+        //converts string to a key for session storage
+        //ex: 100 --> 1:0:0
+        stringToKey(blandString) {
+            var keyArr = blandString.split('');
+            var key = "";
+            for (var i = 0; keyArr.length > i; i++) {
+                key += keyArr[i];
+                if (keyArr.length - 1 > i) { //doesn't append the colon on the last iteration
+                    key += ":";
+                } //if
+            } //for
+            return key;
+        } //stringToKey
+        //converts formatted key to string
+        keyToString(formattedKey) {
+            var blandArr = formattedKey.split(':');
+            var blandString = "";
+            for (var i = 0; blandArr.length > i; i++) {
+                blandString = blandString + blandArr[i];
+            } //for
+            return blandString;
+        } //keyToString
+        //finds the pointer we need to assign 
+        isAvaibleSpace(tsbsNeeded) {
+            var id = "";
+            var pointerString = "";
+            var tempData = "";
+            var ids = new Array();
+            var avaibleTSB = 0; //tracks the number of availbe tsbs
+            for (var t = 1; t < _Disk.trackNum; t++) {
+                for (var s = 0; s < _Disk.sectorNum; s++) {
+                    for (var b = 0; b < _Disk.blockNum; b++) {
+                        id = t + ":" + s + ":" + b; //fetches the id
+                        tempData = sessionStorage.getItem(id);
+                        if (tempData[0] == "0") { //find if the file is free
+                            ids.push(id); //adds the id
+                            avaibleTSB++;
+                            if (avaibleTSB >= tsbsNeeded) {
+                                return ids; //returns the array of ids
+                            } //if
+                        } //if
+                    } //for
+                } //for
+            } //for
+            return null;
+        } //isAvaibleSpace
+    } //DeviceDriverDisk
     TSOS.DeviceDriverDisk = DeviceDriverDisk;
 })(TSOS || (TSOS = {}));
 //# sourceMappingURL=deviceDriverDisk.js.map
