@@ -316,6 +316,58 @@ var TSOS;
             } //for
             return null;
         } //read
+        //Deletes a file from disk based on the filename
+        delete(filename) {
+            //loop through
+            for (var t = 0; t < _Disk.trackNum; t++) {
+                for (var s = 0; s < _Disk.sectorNum; s++) {
+                    for (var b = 0; b < _Disk.blockNum; b++) {
+                        var id = t + ":" + s + ":" + b; //fetches the id
+                        var tempData = sessionStorage.getItem(id);
+                        if (tempData[0] == "1") { //find if the file is free
+                            //parse file
+                            var filehex = this.asciiHex(filename);
+                            var splicedWord = tempData.substring(4); //skip the availble bit and pointer
+                            var parsedData = splicedWord.split("00")[0]; //get rid of the zeros (the first array holds your stuff)
+                            var parsedPointer = tempData.substring(1, 4);
+                            var counter = 0; //keeps track of the amount of times there is a match between the dataHex and the parsedDate
+                            //compare each hex code
+                            for (var i = 0; filehex.length > i; i++) {
+                                //parseData 
+                                if (filehex[i] == parsedData[i]) { //finds if each character is equal to the other
+                                    counter++;
+                                } //if
+                            } //for
+                            if (counter == filehex.length) {
+                                var currDataBlock = "";
+                                //clear out filename block
+                                sessionStorage.setItem(id, this.getClearBlock());
+                                TSOS.Control.updateDiskDriver(id, this.getClearBlock());
+                                var tempPointer = "";
+                                //deletes the entire file on the chain
+                                while (parsedPointer != "000") {
+                                    //ensures the pointer is not lost when the next block of data is cleared
+                                    tempPointer = sessionStorage.getItem(this.stringToKey(parsedPointer)).substring(1, 4);
+                                    //zeros out the current block
+                                    sessionStorage.setItem(this.stringToKey(parsedPointer), this.getClearBlock());
+                                    TSOS.Control.updateDiskDriver(this.stringToKey(parsedPointer), this.getClearBlock());
+                                    //fetches the next pointer in the chain
+                                    parsedPointer = tempPointer;
+                                } //while
+                                //inform user that the file has been deleted
+                                return true;
+                            } //if
+                        } //if
+                    } //for
+                } //for
+            } //for
+            return false;
+        } //delete
+        //creates a zeroed out datablock
+        getClearBlock() {
+            var clearBlock = "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+            return clearBlock;
+        } //getClearBlock
         //Appends zeros to after the data on the block
         //  Only used for the last block in the chain
         //  param dataPartition is a string

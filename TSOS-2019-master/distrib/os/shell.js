@@ -81,6 +81,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellRead, "read", " - reads from file");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellDelete, "delete", " - deletes a file from disk");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -654,6 +656,14 @@ var TSOS;
                 _StdOut.putText(" Disk not formatted ");
             }
         } //read
+        shellDelete(args) {
+            if (args.length == 1) {
+                _krnDiskDriver.delete(args[0]);
+            } //if
+            else {
+                _StdOut.putText("delete incorrect: delete <filename> ");
+            } //else
+        } //shellDelete
     } //Shell
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));

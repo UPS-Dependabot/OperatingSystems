@@ -158,6 +158,11 @@ module TSOS {
                                     "read",
                                     " - reads from file");
             this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shellDelete,
+                                    "delete",
+                                    " - deletes a file from disk");
+            this.commandList[this.commandList.length] = sc;
                                 
             // Display the initial prompt.
             this.putPrompt();
@@ -801,5 +806,14 @@ module TSOS {
                 _StdOut.putText(" Disk not formatted ");
             }
         }//read
+
+        public shellDelete(args:string[]){
+            if(args.length == 1){
+                _krnDiskDriver.delete(args[0]);
+            }//if
+            else{
+                _StdOut.putText("delete incorrect: delete <filename> ");
+            }//else
+        }//shellDelete
     }//Shell
 }
