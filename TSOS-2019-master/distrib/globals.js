@@ -69,6 +69,7 @@ var _Counter = 0; //added to play around with for scrolling
 var _SarcasticMode = false;
 //Disk
 var _Disk = null;
+var _Swapper = null;
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver = null;
 var _krnDiskDriver = null; //init on krn bootstrap

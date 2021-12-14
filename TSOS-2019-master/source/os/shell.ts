@@ -572,21 +572,65 @@ module TSOS {
                 if(userProgramInput.value == "")
                     _StdOut.putText("There is no program inputted");
                 else{
+                    _StdOut.putText("Valid Program :)");
+                    
                     //Tests to see if there is room in memory
                     var segmentNum = _MemoryManager.segmentAllocation();
                     if(segmentNum >= 3){
-                        _StdOut.putText("There is no room for this program. :(");
+                        if(_krnDiskDriver.formatted){
+                            //Creates new PCB
+                            var pcb  = new ProcessControlBlock();
+                            pcb.init();
 
-                        //LOAD PROGRAM INTO DISK DRIVE
+                            pcb.PID = _PIDNumber;
+                            pcb.segment = segmentNum;
+                            pcb.offset = segmentNum*Segment_Length;
+                            pcb.limit = pcb.offset + Segment_Length-1;
+                            pcb.location = "Disk";
 
+                            //stores the new process control block
+                            _PCBs[_PIDNumber] = pcb;
+                            _readyQueue.enqueue(pcb);
+
+                            _StdOut.advanceLine();
+                            _StdOut.putText("Process ID: "+pcb.PID);
+
+                            //stores the new process control block
+                            _PCBs[_PIDNumber] = pcb;
+                            _readyQueue.enqueue(pcb);
+
+                            //LOAD PROGRAM INTO DISK DRIVE
+                            _StdOut.advanceLine();
+                            var fileName = "*file_"+pcb.PID;
+                            _krnDiskDriver.create(fileName);
+                            //write takes in a string so I need to convert valid program 
+                            //from an array to string
+                            var programString = "";
+                            for(var data = 0 ; validProgram.length > data; data++){
+                                programString += validProgram[data];
+                            }//for
+                            //wrap the quote "" around the program string so write doesn't strip the first 
+                            //  and last character off of the prgram
+                            programString = "\""+programString+"\"";
+                            _krnDiskDriver.write(fileName, programString, false);
+
+                            _StdOut.putText("FileName: "+fileName);
+                            _StdOut.advanceLine();
+                            _StdOut.putText("Location: Disk Drive");
+
+                            TSOS.Control.update_PCB_GUI(_PIDNumber, true);  
+                        }//if
+                        else{
+                            _StdOut.advanceLine();
+                            _StdOut.putText("To load more than 3 programs at a time please format the Disk Drive.");
+                        }//else
+
+                        //Todo: add condition checking for when disk is completly full
                     }//if
                     else{
-                        _StdOut.putText("Valid Program :)");
-
                         //Send to Memory Accessor to store in Memory  
                         _MemAcc.loadIn(validProgram, segmentNum);
                         
-
                         //Creates new PCB
                         var pcb  = new ProcessControlBlock();
                         pcb.init();
@@ -595,14 +639,12 @@ module TSOS {
                         pcb.segment = segmentNum;
                         pcb.offset = segmentNum*Segment_Length;
                         pcb.limit = pcb.offset + Segment_Length-1;
+                        pcb.location = "Memory";
 
                         //stores the new process control block
                         _PCBs[_PIDNumber] = pcb;
                         _readyQueue.enqueue(pcb);
-
-                        _StdOut.advanceLine();
-                        _StdOut.putText("Process ID: "+pcb.PID);
-
+                        
                         //Note to self: The _PIDNumber is incremented in the update_PCB_GUI()
                         //
                         //Update: Memory GUI
@@ -815,5 +857,14 @@ module TSOS {
                 _StdOut.putText("delete incorrect: delete <filename> ");
             }//else
         }//shellDelete
+
+        //converts Array to String
+        helperArrString(arr){
+            var str = "";
+            for(var i in arr){
+                str += i;
+            }//for
+            return str;
+        }//helperArrString
     }//Shell
 }

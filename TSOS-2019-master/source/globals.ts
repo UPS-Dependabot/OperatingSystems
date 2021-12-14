@@ -92,6 +92,7 @@ var _SarcasticMode: boolean = false;
 
 //Disk
 var _Disk: TSOS.Disk = null;
+var _Swapper: TSOS.Swapper = null;
 
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver: TSOS.DeviceDriverKeyboard  = null;

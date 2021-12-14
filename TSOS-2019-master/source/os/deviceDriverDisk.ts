@@ -46,9 +46,6 @@ module TSOS {
                 var s = 0;
                 var b = 0;
                 //Find location to put the file
-                
-
-                
                 while(_Disk.sectorNum > s && !isCreated){
                     while( _Disk.blockNum > b && !isCreated){
                         if(s == 0 && b == 0){
@@ -56,10 +53,7 @@ module TSOS {
                             //We do not want to overwrite the block into the master boot leg
                         }
                         else{
-                            var id = 0 + ":" + s + ":" + b; 
-                            
-                            
-                            //the first character is the isavailable bit
+                            var id = 0 + ":" + s + ":" + b;              
                             var block = sessionStorage.getItem(id);
                             //the first character is the Availble bit
                             if(block[0] == "0"){

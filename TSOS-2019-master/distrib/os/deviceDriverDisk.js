@@ -47,7 +47,6 @@ var TSOS;
                         }
                         else {
                             var id = 0 + ":" + s + ":" + b;
-                            //the first character is the isavailable bit
                             var block = sessionStorage.getItem(id);
                             //the first character is the Availble bit
                             if (block[0] == "0") {
