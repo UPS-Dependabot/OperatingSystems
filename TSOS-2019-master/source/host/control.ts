@@ -103,6 +103,7 @@ module TSOS {
             //NOTE TO SELF: Had create some of my own inits here
             
             _Disk = new Disk();
+            _Swapper = new Swapper();
 
             _Mem = new Memory();
             _Mem.init();

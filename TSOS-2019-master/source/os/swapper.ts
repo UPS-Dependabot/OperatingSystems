@@ -2,9 +2,6 @@ module TSOS {
     export class Swapper{
 
         constructor(
-            public fileID: number =  _FileID,
-            public fileName = "unNamed",
-            public data = ""
             ) 
             {
         }//constructor
@@ -13,15 +10,34 @@ module TSOS {
 
         }//init
 
-        //Reads data
-        public getData(){
-            return this.data;
-        }//getData
 
-        //Writes data
-        public setData(newData){
-            this.data = newData;
-        }//data
+        //Rolls a file out of memory and into the disk
+        //  invoked in the dispatcher when you context switch
+        public rollOut(data, pcb){
+            // Put the PCB onto the disk
+            var fileName = "*file_"+pcb.PID;
+            _krnDiskDriver.create(fileName);
+            _krnDiskDriver.write(fileName, data, true);
+            pcb.location = "Disk";
+
+            // clear mem segment so that a new file from the disk can rollIn to Memory
+            _Mem.clearMem(pcb.segment);
+        }//rollout
+
+        //Rolls a process from Disk into Memory
+        public rollIn(pcb){
+            // read data from disk
+            var fileName = "*file_"+pcb.PID;
+            var data = _krnDiskDriver.read(fileName);
+
+            // load it into mem
+            for(var i = 0; i <data.length; i++){
+                _MemAcc.write(pcb.offset+i,data[i]);
+            }//for
+
+            // delete the file that held the data on the disk
+            _krnDiskDriver.delete(fileName); 
+        }//rollin
         
-    }//File
+    }//Swapper
 }//TSOS

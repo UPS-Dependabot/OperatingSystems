@@ -697,6 +697,9 @@ var TSOS;
         shellDelete(args) {
             if (args.length == 1) {
                 _krnDiskDriver.delete(args[0]);
+                if (args[0][0] == "*") {
+                    _StdOut.putText("Important file don't delete it");
+                } //if
             } //if
             else {
                 _StdOut.putText("delete incorrect: delete <filename> ");
