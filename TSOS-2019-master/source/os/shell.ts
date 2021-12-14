@@ -153,6 +153,12 @@ module TSOS {
                                     "write",
                                     " - writes new data to a file");
             this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shellRead,
+                                    "read",
+                                    " - reads from file");
+            this.commandList[this.commandList.length] = sc;
+                                
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -753,7 +759,6 @@ module TSOS {
 
         public shellFormat(args: string[]){
           _krnDiskDriver.format();
-
                
         }
         //Attempts to create file and informs the user of the result
@@ -780,5 +785,21 @@ module TSOS {
                 _StdOut.putText("format incorrect: write <filename> <\"data\"> ");
             }//else
         }//write
+
+
+        public shellRead(args: string[]){
+            if(_krnDiskDriver.format){
+                if(args.length == 1){
+                    var fileData = _krnDiskDriver.read(args[0]);
+                    _StdOut.putText(fileData);
+                }//if
+                else{
+                    _StdOut.putText("read incorrect: read <filename> ");
+                }//else
+            }//if
+            else{
+                _StdOut.putText(" Disk not formatted ");
+            }
+        }//read
     }//Shell
 }

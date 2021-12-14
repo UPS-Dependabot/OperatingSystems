@@ -92,6 +92,7 @@ module TSOS {
 
         }//create
 
+        //Converts From  ASCII to Hex
         public asciiHex(input){
             var hexString = "";
             for(var i = 0; i < String(input).length; i++){//reconizes the input as a single input rather than a character so  I manually converted to a string
@@ -100,6 +101,15 @@ module TSOS {
             }//for
             return hexString;
         }//asciiHex
+
+        
+        public hexAscii(hexx) {
+            var hex = hexx.toString();//force conversion
+            var str = '';
+            for (var i = 0; i < hex.length; i += 2)
+                str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+            return str;
+        }
 
         //finds the pointer we need to assign 
         public findPointer(){
@@ -199,7 +209,7 @@ module TSOS {
             }//if
 
             var start = 0;
-            var end = 121;
+            var end = 120;
             //parse data into multiple sections 
             for(var i = 0; i < tsbToOccupy; i++){
                 dataPieces[i] = hexdata.substring(start, end);
@@ -294,6 +304,68 @@ module TSOS {
                 return false;
             }//else
         }//write
+
+        public read(filename){
+            //find filename
+            //loop through
+            var readData = "";
+
+            for(var t = 0; t < _Disk.trackNum; t++){
+                for(var s = 0; s < _Disk.sectorNum; s++){
+                    for(var b = 0; b < _Disk.blockNum; b++){
+                        var id = t+":"+s+":"+b; //fetches the id
+                        var tempData = sessionStorage.getItem(id);
+                        if(tempData[0] == "1"){ //find if the file is free
+                             //parse file
+                             var filehex = this.asciiHex(filename);
+
+                             var splicedWord = tempData.substring(4); //skip the availble bit and pointer
+                             var parsedData = splicedWord.split("00")[0]; //get rid of the zeros (the first array holds your stuff)
+                             var parsedPointer = tempData.substring(1, 4);
+
+                             var counter = 0; //keeps track of the amount of times there is a match between the dataHex and the parsedDate
+                            //compare each hex code
+                            for(var i = 0; filehex.length > i ; i++){
+                                //parseData 
+                                if (filehex[i] == parsedData[i]){//finds if each character is equal to the other
+                                    counter++;
+                                }//if
+                            }//for
+                            if(counter == filehex.length){ //We found the file
+                                var formatedKey = "";
+                                var currData = "";
+                                var parseCurrData = "";
+
+                                //Fetches all of the data from other blocks that are chained onto the file
+                                while(parsedPointer !== "000"){
+                                    formatedKey = this.stringToKey(parsedPointer);
+                                    
+                                    currData = sessionStorage.getItem(formatedKey);
+                                    parsedPointer = currData.substring(1, 4);
+           
+                                    //skip the availble bit and pointer
+                                    //get rid of the zeros (the first array holds your stuff)
+                                    parseCurrData = currData.substring(4).split("00")[0]; 
+       
+                                    //The split function will remove all zeros but if the last character of
+                                    //  our file data is a zero it will get chopped off. 
+                                    //  This ensures do not loose that last bit of data
+                                    if(parseCurrData.length % 2 != 0 && parsedPointer == "000"){
+                                        parseCurrData += "0";
+                                    }//if
+                                    
+                                    readData = readData + parseCurrData;
+                                }//while
+
+                                //return readData and convert it back from hex to ASCII
+                                return this.hexAscii(readData); 
+                            }//if
+                        }//if
+                    }//for
+                }//for
+            }//for
+            return null;
+        }//read
 
         //Appends zeros to after the data on the block
         //  Only used for the last block in the chain

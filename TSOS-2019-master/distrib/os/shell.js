@@ -79,6 +79,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellWrite, "write", " - writes new data to a file");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellRead, "read", " - reads from file");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -638,6 +640,20 @@ var TSOS;
                 _StdOut.putText("format incorrect: write <filename> <\"data\"> ");
             } //else
         } //write
+        shellRead(args) {
+            if (_krnDiskDriver.format) {
+                if (args.length == 1) {
+                    var fileData = _krnDiskDriver.read(args[0]);
+                    _StdOut.putText(fileData);
+                } //if
+                else {
+                    _StdOut.putText("read incorrect: read <filename> ");
+                } //else
+            } //if
+            else {
+                _StdOut.putText(" Disk not formatted ");
+            }
+        } //read
     } //Shell
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));
