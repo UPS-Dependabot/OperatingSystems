@@ -40,13 +40,21 @@ module TSOS {
             // read data from disk
             var fileName = "*file_"+pcb.PID;
             var data = _krnDiskDriver.read(fileName);
+            
+            //strips the quotes "" wrapped around the data
+            if(data[0] == "\"" && data[data.length-1] == "\""){
+                data = data.substring(1, data.length - 1);
+            }//if
 
+            var memIndex = 0;
             // Load PCB into memory and update the GUI
-            for(var i = 0; i <data.length; i++){
+            for(var bit = 0; bit <data.length; bit++){
                 //Adds each op code into Memory
-                _MemAcc.write(pcb.offset+i,data[i]+data[i+1]);
+                var opCode = data[bit]+data[bit+1];
+                _MemAcc.write(pcb.offset+memIndex,opCode);                
                 
-                i++;
+                memIndex++;
+                bit++;
             }//for
             TSOS.Control.update_Mem_GUI();
             pcb.location = "Memory";

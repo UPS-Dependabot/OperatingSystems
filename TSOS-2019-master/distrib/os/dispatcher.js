@@ -64,8 +64,14 @@ var TSOS;
             while (Segment_Length - 1 > dataIndex) {
                 currData = _MemAcc.read(pcb.offset + dataIndex);
                 //Allows us to trim the extra zeros appended to the end of the file
-                if (currData == "00") {
-                    endIndex = dataIndex;
+                //  We want to make sure that if the entire program has data in it we are not trimming
+                //  off any of the  || (dataIndex == Segment_Length && currData != "00")
+                if (currData != "00") {
+                    //The end index represents the index on the string while the data index
+                    //  represents the index of the opCode Memory. Since there are 2 chars
+                    //  per op code we know the endIndex will be twice the size of dataIndex
+                    //  because endIndex tells us where it is in the string
+                    endIndex = dataIndex * 2;
                 } //if
                 memoryData += currData;
                 dataIndex++;
