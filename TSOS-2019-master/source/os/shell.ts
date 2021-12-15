@@ -583,9 +583,10 @@ module TSOS {
                             pcb.init();
 
                             pcb.PID = _PIDNumber;
-                            pcb.segment = segmentNum;
-                            pcb.offset = segmentNum*Segment_Length;
-                            pcb.limit = pcb.offset + Segment_Length-1;
+                            //SEGMENT, OFFSET, & LIMIT do NOT get initilized here
+                            //  because they are loaded onto the disk. They get set in the
+                            //  swapper when a process gets onto memory
+
                             pcb.location = "Disk";
 
                             //stores the new process control block
@@ -612,7 +613,7 @@ module TSOS {
                             //wrap the quote "" around the program string so write doesn't strip the first 
                             //  and last character off of the prgram
                             programString = "\""+programString+"\"";
-                            _krnDiskDriver.write(fileName, programString, false);
+                            _krnDiskDriver.write(fileName, programString, true, true);
 
                             _StdOut.putText("FileName: "+fileName);
                             _StdOut.advanceLine();
@@ -806,26 +807,43 @@ module TSOS {
 
         public shellFormat(args: string[]){
           _krnDiskDriver.format();
-               
-        }
+          if(_krnDiskDriver.formatted){
+            _StdOut.putText("Sucessfully formatted disk");
+          }//if
+          else{
+            _StdOut.putText("Failed to formatted disk");
+          }//else
+        }//shellFormat
+
         //Attempts to create file and informs the user of the result
         public shellCreate(args: string[]){
 
             if(_krnDiskDriver.create(args)){
-                _StdOut.putText("File "+ args +" Created :)");
+                _StdOut.putText("File "+ args +" created :)");
             }
             else{
                 _StdOut.putText("File "+ args +" not created :(");
-            }
+                _StdOut.advanceLine();
+                _StdOut.putText("There may already be a file with the same name on the disk");
+            }//else
         }//create
 
         public shellWrite(args: string[]){
             if(args.length == 2){// Make sure that there are only two parameters in the shell
-                if(_krnDiskDriver.write(args[0],args[1], false )){
-                    _StdOut.putText("Successfully wrote to file");
+                //User must wrapp their written data with ""s
+                if(args[1][0] == "\"" && args[1][args[1].length - 1] == "\""){
+                    //Assuming User isn't directly inputing opCodes into write
+                    if(_krnDiskDriver.write(args[0],args[1], false, false)){
+                        _StdOut.putText("Successfully wrote to file");
+                    }//if
+                    else{
+                        _StdOut.putText("Failed to write to "+args[0]);
+                    }//else
                 }//if
                 else{
-                    _StdOut.putText("There is not enough space to store the program on the disk");
+                    _StdOut.putText("Wrapped data around quotes <filename> <\"data\"> ");
+                    _StdOut.advanceLine();
+                    _StdOut.putText("Ex: write <filename> <\"data\"> ");
                 }//else
             }//if
             else{
@@ -838,6 +856,9 @@ module TSOS {
             if(_krnDiskDriver.format){
                 if(args.length == 1){
                     var fileData = _krnDiskDriver.read(args[0]);
+                    if(fileData == null){
+                        _StdOut.putText("File "+args[0]+" not found in Disk Driver");
+                    }//if
                     _StdOut.putText(fileData);
                 }//if
                 else{

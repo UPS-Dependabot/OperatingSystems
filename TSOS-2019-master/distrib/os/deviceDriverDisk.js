@@ -149,8 +149,7 @@ var TSOS;
         //
         // isRole represents when a file is either being written from the write command (via the shell) or coming in via memory when is gets swapped in
         //  True - from memory, False - form the shell
-        //
-        write(filename, data, isRole) {
+        write(filename, data, isRole, isHex) {
             //Convert data and filename to hex (ascii returns as an array)
             //Then convert the arrays to strings 
             // Only strip the quotes when the user enters the data from the shell
@@ -163,7 +162,15 @@ var TSOS;
                 data = data.substring(1, data.length - 1);
             } //if
             var filehex = this.asciiHex(filename);
-            var hexdata = this.asciiHex(data);
+            var hexdata;
+            // //When when we are rolling in from memory the data is already in hex
+            // //  or a user is input opCodes via the User Program Input we are assuming 
+            // if(isHex){
+            //     hexdata = data;
+            // }//if
+            //else{
+            hexdata = this.asciiHex(data);
+            //}
             //calcualtes the number of tsbs that the file data will occupy
             var tsbToOccupy = 1;
             var dataPieces = new Array(tsbToOccupy);

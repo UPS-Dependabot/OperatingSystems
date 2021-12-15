@@ -120,6 +120,9 @@ module TSOS {
             _RunningPCB = new ProcessControlBlock();
             _RunningPCB.init();
 
+            _MostRecentlyUsedPCB = new ProcessControlBlock();
+            _MostRecentlyUsedPCB.init();
+
             _Files = new Queue();
             //----------END OF MY INTIS-----------//
 

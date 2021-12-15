@@ -22,6 +22,7 @@ module TSOS {
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
 
             _MemoryManager	=	new	MemoryManager();
+            _MemAcc = new MemoryAccessor();
 
             // Initialize the console.
             _Console = new Console();             // The command line interface / console I/O device.
@@ -134,10 +135,6 @@ module TSOS {
                 case SOFTWARE_IRQ:                    // Software Interupts
                     _Dispatcher.contextSwitch();
                     break;
-                //___________________________________________________________________ 
-                //|TODO: Add Disk Driver Interupt here for when you swap out Programs|
-                //|__________________________________________________________________|
-
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver
                     _StdIn.handleInput();

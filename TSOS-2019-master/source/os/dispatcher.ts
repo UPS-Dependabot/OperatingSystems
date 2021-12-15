@@ -15,19 +15,18 @@ module TSOS {
                     _RunningPCB.ProcesState = "Ready";      //Sets the PCB that is about to stop back to ready
 
                     //Rollout Processes only if there are too many processes in memory
-                    if(this.livingPCBS() > 3){
-                        var memoryData = "";
-                        //fetch the program data from the Running pcb
-                        // for(var i = 0; Segment_Length > i; i++){
-                        //     memoryData += _MemAcc.read(tempPCB.offset+i);
-                        // }//for
+                    // if(this.livingPCBS() > 3){
+                    //     var memoryData = "";
+                    //     memoryData = this.fetchSeg(tempPCB);
+                    //     //Roll out on the pcb from memory and save onto disk
+                    //     //  so we have room to store the next program
+                    //     _Swapper.rollOut(memoryData,tempPCB);
 
-                        this.fetchSeg(tempPCB);
-                        
-                        //Roll out on the pcb from memory and save onto disk
-                        //  so we have room to store the next program
-                        _Swapper.rollOut(memoryData,tempPCB);
-                    }//if
+                    //     //Utlizing Page Fault Algorithm Most Recently Used to determine which PCB 
+                    //     //  from disk will be rolled into memory
+                    //     _MostRecentlyUsedPCB = tempPCB;                    
+
+                    // }//if
 
                     TSOS.Control.update_PCB_GUI(_RunningPCB.PID, false); // updates the PCB GUI
 
@@ -37,26 +36,23 @@ module TSOS {
                     //Drops the PCB
                 }//else
 
-                //Sets the next PCB to running a state
                 _RunningPCB =  _readyQueue.dequeue();   //The Next Process gets set to the Running Process
-
-                //rollout PCB from Disk
                 if(_RunningPCB.location == "Disk"){
-                    //fetch the program data from the Running pcb
-                    for(var i = 0; Segment_Length > i; i++){
-                        memoryData += _MemAcc.read(tempPCB.offset+i);
-                    }//for
-                    _Swapper.rollOut();
-                    
+                    var memoryData = "";
+                    memoryData = this.fetchSeg(tempPCB);
+                    //Roll out on the pcb from memory and save onto disk
+                    //  so we have room to store the next program
+                    _Swapper.rollOut(memoryData,tempPCB); 
+                    _Swapper.rollIn(_RunningPCB);
                 }//if
+                //rollIn PCB from Disk
 
                 _RunningPCB.ProcesState = "Running";    //Sets the next PCB that is about to run to Running
                 TSOS.Control.update_PCB_GUI(_RunningPCB.PID, false); // updates the PCB GUI
 
                 _RunningPCB.isExecuting = true;         //Ensures that this process is Executing
                 _CPU.cpuUpdate();           //Sets the CPU's PC to the next Processes PC
-                                            //  To prevent from starting from where the previous process's PC left off in the program
-                
+                                            //  To prevent from starting from where the previous process's PC left off in the program      
         }//contextSwitch
 
         //finds the number of PCBS that aren't terminated
@@ -72,18 +68,24 @@ module TSOS {
             return livingProcesses;
         }//livingPCBS
 
-        //Fetches a memory segment 
+        //Fetches data from a memory segment 
         public fetchSeg(pcb){
             var memoryData = "";
             var currData = "";
             var dataIndex = 0;
+            var endIndex;
             //fetch the program data from the Running pcb
-            while( Segment_Length > dataIndex && (currData != "00")){
+            while( Segment_Length-1 > dataIndex){
                 currData = _MemAcc.read(pcb.offset+dataIndex);
+                //Allows us to trim the extra zeros appended to the end of the file
+                if(currData == "00"){
+                    endIndex = dataIndex;
+                }//if
                 memoryData += currData;
                 dataIndex++;
             }//while
-            return memoryData;
+
+            return memoryData.substring(0, endIndex);
         }//fetchSeg
         
     }//Scheduler

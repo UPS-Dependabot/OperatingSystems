@@ -19,6 +19,7 @@ var TSOS;
             _KernelBuffers = new Array(); // Buffers... for the kernel.
             _KernelInputQueue = new TSOS.Queue(); // Where device input lands before being processed out somewhere.
             _MemoryManager = new TSOS.MemoryManager();
+            _MemAcc = new TSOS.MemoryAccessor();
             // Initialize the console.
             _Console = new TSOS.Console(); // The command line interface / console I/O device.
             _Console.init();
@@ -111,9 +112,6 @@ var TSOS;
                 case SOFTWARE_IRQ: // Software Interupts
                     _Dispatcher.contextSwitch();
                     break;
-                //___________________________________________________________________ 
-                //|TODO: Add Disk Driver Interupt here for when you swap out Programs|
-                //|__________________________________________________________________|
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver
                     _StdIn.handleInput();

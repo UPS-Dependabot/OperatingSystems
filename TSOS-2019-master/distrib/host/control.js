@@ -90,6 +90,8 @@ var TSOS;
             _readyQueue = new TSOS.Queue();
             _RunningPCB = new TSOS.ProcessControlBlock();
             _RunningPCB.init();
+            _MostRecentlyUsedPCB = new TSOS.ProcessControlBlock();
+            _MostRecentlyUsedPCB.init();
             _Files = new TSOS.Queue();
             //----------END OF MY INTIS-----------//
             // ... then set the host clock pulse ...
