@@ -48,6 +48,8 @@ var _readyQueue: any = null;  // <-- Same for the Queue
 var _Dispatcher: any = null;
 var _QuantumDefault: number = 6;
 var _switched: boolean = false;  //Tells log when there was a context switch
+var _Algorithms = ["rr", "fcfs", "priority"];
+var _Algorithm = _Algorithms[0];
 
 
 //Program Control Block

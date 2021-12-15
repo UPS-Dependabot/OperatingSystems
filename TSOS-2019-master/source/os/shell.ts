@@ -163,7 +163,16 @@ module TSOS {
                                     "delete",
                                     " - deletes a file from disk");
             this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shellSetAlgorithm,
+                                "set-algorithm",
+                                " - sets the scheduling algorithm for the program");
+            this.commandList[this.commandList.length] = sc;
                                 
+            sc = new ShellCommand(this.shellGetAlgorithm,
+                                    "get-algorithm",
+                                    " - displays the current scheduling algorithm that is set");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -740,9 +749,14 @@ module TSOS {
         
         //User Sets Quantum
         public shellQuantum(args: string[]){
-            var q = parseInt(args[0]);
-            //sets the quantum in the scheduler
-            _Scheduler.setQuantum(q);
+            if(_Algorithm == "rr"){
+                var q = parseInt(args[0]);
+                //sets the quantum in the scheduler
+                _Scheduler.setQuantum(q);
+            }//if
+            else{
+                _StdOut.putText("Can only set quantum when the scheduleing algorithm is set to rr (Round Robin) ");
+            }//else
         }//quantum
 
 
@@ -890,5 +904,35 @@ module TSOS {
             }//for
             return str;
         }//helperArrString
+
+        public shellSetAlgorithm(args:string[]){
+            var isNewSet = false;
+            for(var i = 0; _Algorithms.length > i; i++){
+                if(_Algorithms[i] == args[0]){
+                    _Algorithm = args[0];
+                    _StdOut.putText("Scheduling Algorithm: "+_Algorithm);
+                    isNewSet = true;
+                }//if
+            }//for
+            
+            //All algorithms except for round robin are premptive therefore we want to set the 
+            //  Quantum to be at its highest value so a process always finishes executing before
+            //  the next context switch
+            if(_Algorithm != "rr"){
+                _Scheduler.setQuantum(Number.MAX_SAFE_INTEGER);
+            }//if
+
+            if(!isNewSet){
+                _StdOut.putText("Scheduling algorithm not reconized. PLease choose one of these options.");
+                _StdOut.advanceLine();
+                _StdOut.putText("rr, fcfs, priority");
+                _StdOut.advanceLine();
+                _StdOut.putText("Current Algorithm: "+_Algorithm);
+            }//if
+        }//shellSetAlgorithm
+
+        public shellGetAlgorithm(){
+            _StdOut.putText("Current Scheduling Algorithm: "+_Algorithm);
+        }//shellGetAlgorithm
     }//Shell
 }

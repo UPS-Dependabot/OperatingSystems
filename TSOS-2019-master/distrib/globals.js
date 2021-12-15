@@ -37,6 +37,8 @@ var _readyQueue = null; // <-- Same for the Queue
 var _Dispatcher = null;
 var _QuantumDefault = 6;
 var _switched = false; //Tells log when there was a context switch
+var _Algorithms = ["rr", "fcfs", "priority"];
+var _Algorithm = _Algorithms[0];
 //Program Control Block
 //PCBs init in control
 var _RunningPCB = null; //TSOS.ProcessControlBlock;
