@@ -51,7 +51,7 @@ module TSOS {
                         if(s == 0 && b == 0){
                             //ignore 
                             //We do not want to overwrite the block into the master boot leg
-                        }
+                        }//if
                         else{
                             var id = 0 + ":" + s + ":" + b;              
                             var block = sessionStorage.getItem(id);
@@ -489,6 +489,38 @@ module TSOS {
             }//for
             return null;
         }//isAvaibleSpace
+
+        public list(){
+            var names = new Array();
+            var s = 0;
+            var b = 0;
+                //Find location to put the file
+                while(_Disk.sectorNum > s ){
+                    while( _Disk.blockNum > b ){
+                        if(s == 0 && b == 0){
+                            //ignore 
+                            //We do not want to overwrite the block into the master boot leg
+                        }//if
+                        else{
+                            var id = 0 + ":" + s + ":" + b;              
+                            var block = sessionStorage.getItem(id);
+                            //the first character is the Availble bit
+                            if(block[0] == "1"){
+                               var hexName = block.substring(4).split("00")[0];
+                               var name = this.hexAscii(hexName)
+
+                               //filters out all of the automated files in the disk
+                               if(name.substring(0, name.length -1) != "*file_"){
+                                    names.push(name);
+                               }//if
+                            }//if
+                        }//else
+                        b++;
+                    }//while block
+                    s++;
+                }//while sector
+                return names;
+        }//list
 
     }//DeviceDriverDisk
 }

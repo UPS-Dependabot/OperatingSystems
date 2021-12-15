@@ -173,6 +173,11 @@ module TSOS {
                                     "get-algorithm",
                                     " - displays the current scheduling algorithm that is set");
             this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shellList,
+                                    "ls",
+                                    " - list all files currently in the Disk Drive");
+            this.commandList[this.commandList.length] = sc;
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -934,5 +939,20 @@ module TSOS {
         public shellGetAlgorithm(){
             _StdOut.putText("Current Scheduling Algorithm: "+_Algorithm);
         }//shellGetAlgorithm
+
+        public shellList(){
+            if(_krnDiskDriver.formatted){
+                //call ls disk driver
+                var nameList = _krnDiskDriver.list();
+
+                for(var i = 0; nameList.length > i; i++){
+                    _StdOut.putText(nameList[i]);
+                    _StdOut.advanceLine();
+                }//for
+            }//if
+            else{
+                _StdOut.putText("Cannot ls because Disk is not formatted");
+            }//else
+        }//shellList
     }//Shell
 }
