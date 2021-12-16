@@ -16,7 +16,7 @@ var TSOS;
             var running = false;
             var index = 0;
             //checks if there is a program that is running
-            if (!_readyQueue.isEmpty()) { //prevents loop from running when there are no pcbs
+            if (!_readyQueue.isEmpty() && _RunningPCB != null) { //prevents loop from running when there are no pcbs
                 running = true;
             } //if
             //Prevents an undefined _RunningPCB from entering a context
@@ -26,8 +26,10 @@ var TSOS;
                 //  OR when the current Process is Terminated)
                 //  (AND when the readyQueue has more 1 or more pcbs to switch to)
                 if ((this.currQuan > this.quantum || _RunningPCB.ProcesState == "Terminated") && _readyQueue.getSize() >= 1 && _CPU.isExecuting) {
-                    //this.contextSwitch();
-                    _Dispatcher.contextSwitch();
+                    //implements the context switch via the software interupt
+                    var param;
+                    //Create a software inturupt on the queue
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(SOFTWARE_IRQ, param));
                     this.currQuan = 0; //resets for the next process
                     _switched = true;
                 } //if

@@ -21,7 +21,9 @@ module TSOS {
             _KernelBuffers = new Array();         // Buffers... for the kernel.
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
 
+            _PCBsPriorityQueue = new Queue();
             _MemoryManager	=	new	MemoryManager();
+            _MemAcc = new MemoryAccessor();
 
             // Initialize the console.
             _Console = new Console();             // The command line interface / console I/O device.
@@ -35,7 +37,12 @@ module TSOS {
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new DeviceDriverKeyboard();     // Construct it.
             _krnKeyboardDriver.driverEntry();                    // Call the driverEntry() initialization routine.
+
+            _krnDiskDriver = new DeviceDriverDisk();             //Construct it.
+            _krnDiskDriver.driverEntry();                        //Comes from Device Driver 
+
             this.krnTrace(_krnKeyboardDriver.status);
+            this.krnTrace(_krnDiskDriver.status);  
 
             //
             // ... more?
@@ -125,6 +132,9 @@ module TSOS {
             switch (irq) {
                 case TIMER_IRQ:
                     this.krnTimerISR();               // Kernel built-in routine for timers (not the clock).
+                    break;
+                case SOFTWARE_IRQ:                    // Software Interupts
+                    _Dispatcher.contextSwitch();
                     break;
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params);   // Kernel mode device driver

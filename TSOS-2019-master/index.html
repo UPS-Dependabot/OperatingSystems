@@ -21,6 +21,8 @@
    <script type="text/javascript" src="distrib/host/cpu.js"></script>
    <script type="text/javascript" src="distrib/host/memory.js"></script>
    <script type="text/javascript" src="distrib/host/memoryAccessor.js"></script>
+   <script type="text/javascript" src="distrib/host/disk.js"></script>
+
 
 
    
@@ -40,6 +42,11 @@
    <script type="text/javascript" src="distrib/os/memoryManager.js"></script>
    <script type="text/javascript" src="distrib/os/scheduler.js"></script>
    <script type="text/javascript" src="distrib/os/dispatcher.js"></script>
+   <script type="text/javascript" src="distrib/os/deviceDriverDisk.js"></script>
+   <script type="text/javascript" src="distrib/os/swapper.js"></script>
+
+
+
 
 
 
@@ -48,7 +55,7 @@
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
-   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip3.js"></script>
+   <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip4.js"></script> -->
    
 </head>
 
@@ -141,9 +148,33 @@
          </label>
       </div>
 
+      <div id = "CPU">
+         <p class = "h3"> CPU </p>
+         <table>
+            <thead>
+               <th id = "PC">PC</th>
+               <th id = "Acc">Acc</th>
+               <th id = "Xreg">Xreg</th>
+               <th id = "Yreg">Yreg</th>
+               <th id = "Zflag">Zreg</th>
+               <th id = "IR"> IR</th>
+            </thead>
+            <tbody id = "cpuBody">
+               <tr>
+                  <td id = "cpuPC"> </td>
+                  <td id = "cpuAcc"> </td>
+                  <td id = "cpuX"> </td>
+                  <td id = "cpuY"> </td>
+                  <td id = "cpuZ"> </td>
+                  <td id = "cpuIR"> </td>
+               </tr>
+            </tbody>
+         </table>
+      <div>
+
       <div id="divMemory" style="opacity: 0.9;">
          <label>Memory</label>
-         <div id="displayMemory" style="height: 150px; overflow-y: scroll;">
+         <div id="displayMemory" style="height: 150px;  width: 300px; overflow-y: scroll;">
             <table id = "memTable"> 
                
             </table>
@@ -152,29 +183,27 @@
      </div>
    </div>
 
-   <div id = "CPU">
-      <p class = "h3"> CPU </p>
-      <table>
-         <thead>
-            <th id = "PC">PC</th>
-            <th id = "Acc">Acc</th>
-            <th id = "Xreg">Xreg</th>
-            <th id = "Yreg">Yreg</th>
-            <th id = "Zflag">Zreg</th>
-            <th id = "IR"> IR</th>
-         </thead>
-         <tbody id = "cpuBody">
-            <tr>
-               <td id = "cpuPC"> </td>
-               <td id = "cpuAcc"> </td>
-               <td id = "cpuX"> </td>
-               <td id = "cpuY"> </td>
-               <td id = "cpuZ"> </td>
-               <td id = "cpuIR"> </td>
-            </tr>
-         </tbody>
-      </table>
-   <div>
+
+   <div id = "Disk">
+      <p class = "h3" > Disk Drive</p>
+      <div id = "Disk-Display"  style="height: 150px; overflow-y: scroll;">
+         <table>
+            <thead>
+               <th id = "TSB">TSB</th>
+               <th id = "Value"> Value </th>
+            </thead>
+
+            <tbody id = "diskBody">
+               
+               <!-- <tr>
+                  <td>  0</td>
+                  <td>  324423423</td>
+               </tr> -->
+            
+            </tbody>
+         </table>
+      </div>
+   </div>
    <p class = "h3"> Process Control Block </p>
       <table id = "PCBs">
          <thead>

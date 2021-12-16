@@ -18,7 +18,9 @@ var TSOS;
             _KernelInterruptQueue = new TSOS.Queue(); // A (currently) non-priority queue for interrupt requests (IRQs).
             _KernelBuffers = new Array(); // Buffers... for the kernel.
             _KernelInputQueue = new TSOS.Queue(); // Where device input lands before being processed out somewhere.
+            _PCBsPriorityQueue = new TSOS.Queue();
             _MemoryManager = new TSOS.MemoryManager();
+            _MemAcc = new TSOS.MemoryAccessor();
             // Initialize the console.
             _Console = new TSOS.Console(); // The command line interface / console I/O device.
             _Console.init();
@@ -29,7 +31,10 @@ var TSOS;
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
             _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
+            _krnDiskDriver = new TSOS.DeviceDriverDisk(); //Construct it.
+            _krnDiskDriver.driverEntry(); //Comes from Device Driver 
             this.krnTrace(_krnKeyboardDriver.status);
+            this.krnTrace(_krnDiskDriver.status);
             //
             // ... more?
             //
@@ -104,6 +109,9 @@ var TSOS;
             switch (irq) {
                 case TIMER_IRQ:
                     this.krnTimerISR(); // Kernel built-in routine for timers (not the clock).
+                    break;
+                case SOFTWARE_IRQ: // Software Interupts
+                    _Dispatcher.contextSwitch();
                     break;
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver

@@ -16,6 +16,7 @@ const CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 seco
 const TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 const KEYBOARD_IRQ = 1;
+const SOFTWARE_IRQ = 2; // SoftwareInterupt for context switching
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -27,7 +28,8 @@ var _Mem;
 //Detects if there are programs in the MM
 var _RunningPrograms = new Array(3);
 //Memory Accessor
-var _MemAcc;
+//var _MemAcc: TSOS.MemoryAccessor;
+var _MemAcc = null;
 var _MemoryManager = null;
 //Context Switching
 var _Scheduler = null; //Had to init in control.ts. It wasn't reconizing the object when I defined it here
@@ -35,11 +37,16 @@ var _readyQueue = null; // <-- Same for the Queue
 var _Dispatcher = null;
 var _QuantumDefault = 6;
 var _switched = false; //Tells log when there was a context switch
+var _Algorithms = ["rr", "fcfs", "priority"];
+var _Algorithm = _Algorithms[0];
 //Program Control Block
+//PCBs init in control
 var _RunningPCB = null; //TSOS.ProcessControlBlock;
 var _PIDNumber = 0;
 var _PCBs = new Array(Segment_Length); //basically my resident Queue
+var _PCBsPriorityQueue = null;
 var _PStates = ["Resident", "Ready", "Running", "Terminated"];
+var _MostRecentlyUsedPCB = null;
 //var _PCBs = new TSOS.Queue;
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
@@ -57,14 +64,21 @@ var _KernelBuffers = null;
 // Standard input and output
 var _StdIn = null;
 var _StdOut = null;
+//Files
+var _FileID = 0;
+var _Files = null; // File Queue inited in console.ts
 // UI
 var _Console;
 var _OsShell;
 var _Counter = 0; //added to play around with for scrolling
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode = false;
+//Disk
+var _Disk = null;
+var _Swapper = null;
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver = null;
+var _krnDiskDriver = null; //init on krn bootstrap
 var _hardwareClockID = null;
 // For testing (and enrichment)...
 var Glados = null; // This is the function Glados() in glados-ip*.js http://alanclasses.github.io/TSOS/test/ .

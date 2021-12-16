@@ -78,6 +78,8 @@ var TSOS;
             _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
             //NOTE TO SELF: Had create some of my own inits here
+            _Disk = new TSOS.Disk();
+            _Swapper = new TSOS.Swapper();
             _Mem = new TSOS.Memory();
             _Mem.init();
             _MemAcc = new TSOS.MemoryAccessor();
@@ -88,6 +90,9 @@ var TSOS;
             _readyQueue = new TSOS.Queue();
             _RunningPCB = new TSOS.ProcessControlBlock();
             _RunningPCB.init();
+            _MostRecentlyUsedPCB = new TSOS.ProcessControlBlock();
+            _MostRecentlyUsedPCB.init();
+            _Files = new TSOS.Queue();
             //----------END OF MY INTIS-----------//
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(TSOS.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
@@ -216,10 +221,16 @@ var TSOS;
             //multipled by 3 to allocate space for each program
             for (var tableRow = 0; tableRow < (Segment_Length * 3 / 8); tableRow++) {
                 var row = document.createElement("tr");
-                //Loop 8 times because we know this is for each individual byte
+                //Loops 8 times because we know this is for each individual byte and the label
                 for (var rowCell = 0; rowCell < byteLength; rowCell++) {
-                    //This is definately a weird way of fetching the data from the Memory array but it works
                     var cell = document.createElement("td");
+                    if (rowCell == 0) { //Adds the label
+                        var labelCell = document.createElement("td");
+                        labelCell.setAttribute("style", "color:black; background: white");
+                        labelCell.innerHTML = (tableRow * 8).toString(16); //converts the row number to hex for the label
+                        row.appendChild(labelCell);
+                    }
+                    //This is definately a weird way of fetching the data from the Memory array but it works
                     cell.innerHTML = _MemAcc.read(tableRow * byteLength + rowCell);
                     //Inserts each byte into the row
                     row.appendChild(cell);
@@ -234,6 +245,52 @@ var TSOS;
                 parent.removeChild(parent.firstChild);
             }
         }
+        static createDiskDriver(key, data) {
+            //Initialize the GUI so the user can see the Disk storage 
+            var diskGUI = document.getElementById("Disk-Display");
+            //session storage is where everything in the disk is stored
+            var row = document.createElement("tr");
+            var keyCell = document.createElement("td");
+            var dataCell = document.createElement("td");
+            keyCell.setAttribute("style", "color:black; background: white");
+            keyCell.innerHTML = key;
+            var tempdata = data.toString();
+            dataCell.innerHTML = tempdata;
+            //Inserts each byte into the row
+            row.appendChild(keyCell);
+            row.appendChild(dataCell);
+            //Inserts the row into the memory GUI
+            diskGUI.appendChild(row);
+        } //createDiskDriver
+        //updates an individual row in the disk driver
+        static updateDiskDriver(key, data) {
+            //Initialize the GUI so the user can see the Disk storage 
+            var diskGUI = document.getElementById("Disk-Display");
+            //diskCells has all the cells inside of the disk GUI
+            //  The pattern goes from the td -- id to td -- data
+            //  Therefore the td with the id is always going to be one index ahead from the td data
+            var diskCells = diskGUI.getElementsByTagName('td');
+            var track = "";
+            var sector = "";
+            var block = "";
+            var id = "";
+            for (var i = 0; diskCells.length > i; i++) {
+                for (var t = 0; _Disk.trackNum > t; t++) {
+                    track = t.toString();
+                    for (var s = 0; _Disk.sectorNum > s; s++) {
+                        sector = s.toString();
+                        for (var b = 0; _Disk.blockNum > b; b++) {
+                            block = b.toString();
+                            id = track + ":" + sector + ":" + block;
+                            if (diskCells[i].innerHTML == key) { //Find the tr index
+                                diskCells[i + 1].innerHTML = data; //update the td data
+                                return; //exit this terrifiying loop
+                            } //if
+                        } //for block
+                    } //for sectors
+                } //for tracks
+            } //for diskCells
+        } //updateDiskDriver
     }
     TSOS.Control = Control;
 })(TSOS || (TSOS = {}));

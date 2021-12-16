@@ -11,10 +11,12 @@ module TSOS{
             public IR: String = "",
             public segment: number = 0,
             public isExecuting: boolean = false,
-            public offset: number = 0,
+            public offset: number = 0,  //base & offset
+            public limit: number = Segment_Length-1, //limit
             public waitTime: number = 0,
             public turnTime: number = 0,
-
+            public location: String = "",
+            public priority: number = 3
           ) {
         }//constructor
 
@@ -30,6 +32,7 @@ module TSOS{
             this.segment = -1;
             this.isExecuting = false;
             this.offset = 0;
+            this.limit = this.offset +Segment_Length-1;
             this.waitTime = 0;
             this.turnTime = 0;
 

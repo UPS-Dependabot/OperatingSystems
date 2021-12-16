@@ -13,7 +13,7 @@
 var TSOS;
 (function (TSOS) {
     class Cpu {
-        constructor(PC = 0, Acc = 0, Xreg = 0, Yreg = 0, Zflag = 0, IR = "", isExecuting = false, offset = 0) {
+        constructor(PC = 0, Acc = 0, Xreg = 0, Yreg = 0, Zflag = 0, IR = "", isExecuting = false, offset = 0, limit = 255) {
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
@@ -22,6 +22,7 @@ var TSOS;
             this.IR = IR;
             this.isExecuting = isExecuting;
             this.offset = offset;
+            this.limit = limit;
         }
         init() {
             this.PC = 0;
@@ -30,15 +31,8 @@ var TSOS;
             this.Yreg = 0;
             this.Zflag = 0;
             this.isExecuting = false;
+            this.limit = 255;
         }
-        start(pcb) {
-            // _CPU.PC = parseInt(pcb.PC);
-            // _CPU.Acc = parseInt(pcb.PC);
-            // _CPU.Xreg = parseInt(pcb.Xreg, 16);
-            // _CPU.Yreg = parseInt(pcb.Yreg, 16);
-            // _CPU.Zflag = pcb.Zflag;
-            // TSOS.Control.update_CPU_GUI();
-        } //start
         pcbUpdate() {
             _RunningPCB.PC = _CPU.PC;
             _RunningPCB.Acc = _CPU.Acc;
@@ -46,6 +40,7 @@ var TSOS;
             _RunningPCB.Yreg = _CPU.Yreg;
             _RunningPCB.Zflag = _CPU.Zflag;
             _RunningPCB.IR = _CPU.IR;
+            _RunningPCB.limit = _CPU.offset + Segment_Length - 1;
             //ensures that the ready Queue is updated
             _readyQueue[_RunningPCB.PID] = _RunningPCB;
         } //pcbupdate
@@ -64,12 +59,9 @@ var TSOS;
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
             if (this.isExecuting) {
-                //Don't go past 255 (FF) instead of 256
-                //  Didn't do this before and I ran into an infinite loop when I branched on FF
-                // while(_Mem.Mem.length -1 > this.PC ){
-                //     this.fetchOpCode(_Mem.Mem[this.PC]);
-                // }//for
-                this.fetchOpCode(_Mem.Mem[this.PC + _CPU.offset]);
+                //Ensures that the program doesn't fetch anything from outside of the memory bounds
+                if (this.PC + _CPU.offset < _RunningPCB.limit)
+                    this.fetchOpCode(_Mem.Mem[this.PC + _CPU.offset]);
             } //if
         } //cycle
         //finds the Op Code associated with the hex nnumbers

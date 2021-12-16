@@ -20,6 +20,8 @@ const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (inte
                               // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 const KEYBOARD_IRQ: number = 1;
 
+const SOFTWARE_IRQ: number = 2; // SoftwareInterupt for context switching
+
 
 
 //
@@ -36,7 +38,8 @@ var _Mem: TSOS.Memory;
 var _RunningPrograms = new  Array(3);
 
 //Memory Accessor
-var _MemAcc: TSOS.MemoryAccessor;
+//var _MemAcc: TSOS.MemoryAccessor;
+var _MemAcc: any = null;
 var _MemoryManager: any = null;
 
 //Context Switching
@@ -45,13 +48,18 @@ var _readyQueue: any = null;  // <-- Same for the Queue
 var _Dispatcher: any = null;
 var _QuantumDefault: number = 6;
 var _switched: boolean = false;  //Tells log when there was a context switch
+var _Algorithms = ["rr", "fcfs", "priority"];
+var _Algorithm = _Algorithms[0];
 
 
 //Program Control Block
+//PCBs init in control
 var _RunningPCB: any = null; //TSOS.ProcessControlBlock;
 var _PIDNumber: number = 0;
 var _PCBs = new Array(Segment_Length); //basically my resident Queue
+var _PCBsPriorityQueue: TSOS.Queue = null;
 var _PStates = ["Resident", "Ready", "Running", "Terminated"];
+var _MostRecentlyUsedPCB: any = null;
 
 //var _PCBs = new TSOS.Queue;
 var _OSclock: number = 0;  // Page 23.
@@ -76,6 +84,10 @@ var _KernelBuffers = null;
 var _StdIn:  TSOS.Console = null; 
 var _StdOut: TSOS.Console = null;
 
+//Files
+var _FileID: number = 0; 
+var _Files : any = null; // File Queue inited in console.ts
+
 // UI
 var _Console: TSOS.Console;
 var _OsShell: TSOS.Shell;
@@ -84,8 +96,13 @@ var _Counter: Number = 0;//added to play around with for scrolling
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode: boolean = false;
 
+//Disk
+var _Disk: TSOS.Disk = null;
+var _Swapper: TSOS.Swapper = null;
+
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver: TSOS.DeviceDriverKeyboard  = null;
+var _krnDiskDriver: TSOS.DeviceDriverDisk = null;    //init on krn bootstrap
 
 var _hardwareClockID: number = null;
 

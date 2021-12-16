@@ -22,7 +22,8 @@
                         public Zflag: number = 0,
                         public IR: String = "",
                         public isExecuting: boolean = false,
-                        public offset: number = 0
+                        public offset: number = 0,
+                        public limit: number = 255
                         ) {
             }
     
@@ -33,16 +34,8 @@
                 this.Yreg = 0;
                 this.Zflag = 0;
                 this.isExecuting = false;
+                this.limit = 255;
             }
-    
-            public start(pcb): void{
-                // _CPU.PC = parseInt(pcb.PC);
-                // _CPU.Acc = parseInt(pcb.PC);
-                // _CPU.Xreg = parseInt(pcb.Xreg, 16);
-                // _CPU.Yreg = parseInt(pcb.Yreg, 16);
-                // _CPU.Zflag = pcb.Zflag;
-                // TSOS.Control.update_CPU_GUI();
-            }//start
 
             public pcbUpdate():void{
                 _RunningPCB.PC = _CPU.PC;
@@ -51,6 +44,7 @@
                 _RunningPCB.Yreg = _CPU.Yreg;
                 _RunningPCB.Zflag = _CPU.Zflag;
                 _RunningPCB.IR = _CPU.IR;
+                _RunningPCB.limit = _CPU.offset+ Segment_Length-1;
                 //ensures that the ready Queue is updated
                 _readyQueue[_RunningPCB.PID] = _RunningPCB;
             }//pcbupdate
@@ -74,14 +68,9 @@
                 // Do the real work here. Be sure to set this.isExecuting appropriately.
 
                 if(this.isExecuting){ 
-                    //Don't go past 255 (FF) instead of 256
-                    //  Didn't do this before and I ran into an infinite loop when I branched on FF
-                    // while(_Mem.Mem.length -1 > this.PC ){
-                    //     this.fetchOpCode(_Mem.Mem[this.PC]);
-                    // }//for
-
-
-                    this.fetchOpCode(_Mem.Mem[this.PC + _CPU.offset]);
+                    //Ensures that the program doesn't fetch anything from outside of the memory bounds
+                    if(this.PC+ _CPU.offset < _RunningPCB.limit)
+                        this.fetchOpCode(_Mem.Mem[this.PC + _CPU.offset]);
                     
                 }//if
             }//cycle
