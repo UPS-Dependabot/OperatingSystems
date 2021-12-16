@@ -654,12 +654,13 @@ module TSOS {
                             _StdOut.advanceLine();
                             var fileName = "*file_"+pcb.PID;
                             _krnDiskDriver.create(fileName);
-                            //write takes in a string so I need to convert valid program 
-                            //from an array to string
+                            //The disk's write takes in a string so I need to convert valid program 
+                            //  from an array to string
                             var programString = "";
                             for(var data = 0 ; validProgram.length > data; data++){
                                 programString += validProgram[data];
                             }//for
+
                             //wrap the quote "" around the program string so write doesn't strip the first 
                             //  and last character off of the prgram
                             programString = "\""+programString+"\"";
@@ -675,8 +676,6 @@ module TSOS {
                             _StdOut.advanceLine();
                             _StdOut.putText("To load more than 3 programs at a time please format the Disk Drive.");
                         }//else
-
-                        //Todo: add condition checking for when disk is completly full
                     }//if
                     else{
                         //Send to Memory Accessor to store in Memory  
@@ -770,24 +769,17 @@ module TSOS {
         //Kills a program
         public shellKill (args: string[]){
             var executePID = parseInt(args[0]);
+    
+            _Mem.clearMem(_PCBs[executePID].segment);  
+            _RunningPrograms[_PCBs[executePID].segment] = false;     //Opens a space in memory
 
-            //checks if the PID exists
-            //if(_PCB[executePID] != null){
+            _PCBs[executePID].ProcesState = "Terminated";
+            _PCBs[executePID].isExecuting = false;
+            
+            //Update the GUI
+            TSOS.Control.update_PCB_GUI(executePID, false);
+            TSOS.Control.update_Mem_GUI();
 
-                
-                _Mem.clearMem(_PCBs[executePID].segment);  
-                _RunningPrograms[_PCBs[executePID].segment] = false;     //Opens a space in memory
-        
-                _PCBs[executePID].ProcesState = "Terminated";
-                _PCBs[executePID].isExecuting = false;
-                
-
-                //Update the GUI
-                TSOS.Control.update_PCB_GUI(executePID, false);
-                TSOS.Control.update_Mem_GUI();
-
-                
-            //}//if
         }//kill
         
         //User Sets Quantum

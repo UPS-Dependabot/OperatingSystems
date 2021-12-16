@@ -14,12 +14,12 @@ module TSOS {
 
         //Rolls a file out of Memory and into Disk
         public rollOut(data, pcb){
-            _MostRecentlyUsedPCB = pcb;
             // Put the PCB onto the disk
             var fileName = "*file_"+pcb.PID;
             _krnDiskDriver.create(fileName);
             _krnDiskDriver.write(fileName, data, true);
             pcb.location = "Disk";
+
             // clear mem segment so that a new file from the disk can rollIn to Memory
             _Mem.clearMem(pcb.segment);
             TSOS.Control.update_Mem_GUI();

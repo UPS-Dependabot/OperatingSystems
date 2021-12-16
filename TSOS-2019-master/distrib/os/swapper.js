@@ -8,7 +8,7 @@ var TSOS;
         //RollIn and Roll Out are invoked at the dispatcher when there 
         //Rolls a file out of Memory and into Disk
         rollOut(data, pcb) {
-            _MostRecentlyUsedPCB = pcb;
+            //_MostRecentlyUsedPCB = pcb;
             // Put the PCB onto the disk
             var fileName = "*file_" + pcb.PID;
             _krnDiskDriver.create(fileName);

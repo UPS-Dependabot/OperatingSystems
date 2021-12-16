@@ -55,14 +55,14 @@ var TSOS;
                                 for (var i = 0; pointerChars.length > i; i++) {
                                     block = this.stringModifier(block, i + 1, pointerChars[i]); //adds the pointer into the block. Replaces bits 1, 2, 3 
                                 } //for
-                                // newNameData =  this.asciiHex(filename); //converts the file name to ascii
                                 //This discusting line is:
                                 //   1 - combination of the unavailble bit and pointer (in this case we will always grab the first four bits)
                                 //   2 -  name of new file
-                                //   3 - rest of the data from the block (starts after the length of the newData + starting point of the lat piece of code) 
+                                //   3 - rest of the data from the block (starts after the length of the newData + starting point of the last piece of code) 
                                 var newData = block.substring(0, 4) + newNameData + block.substring(4 + newNameData.length, block.length);
+                                //Update Disk
                                 sessionStorage.setItem(id, newData);
-                                TSOS.Control.updateDiskDriver(id, newData); //adds the hex data for the fileformat into the Disk Drive
+                                TSOS.Control.updateDiskDriver(id, newData);
                                 isCreated = true;
                             } //if
                         } //else
@@ -83,7 +83,7 @@ var TSOS;
             return hexString;
         } //asciiHex
         hexAscii(hexx) {
-            var hex = hexx.toString(); //force conversion
+            var hex = hexx.toString();
             var str = '';
             for (var i = 0; i < hex.length; i += 2)
                 str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
@@ -97,7 +97,7 @@ var TSOS;
             for (var t = 1; t < _Disk.trackNum; t++) {
                 for (var s = 0; s < _Disk.sectorNum; s++) {
                     for (var b = 0; b < _Disk.blockNum; b++) {
-                        id = t + ":" + s + ":" + b; //fetches the id
+                        id = t + ":" + s + ":" + b;
                         tempData = sessionStorage.getItem(id);
                         if (tempData[0] == "0") { //find if the file is free
                             var newData = this.stringModifier(tempData, 0, '1');

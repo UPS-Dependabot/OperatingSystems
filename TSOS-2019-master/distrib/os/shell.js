@@ -519,8 +519,8 @@ var TSOS;
                             _StdOut.advanceLine();
                             var fileName = "*file_" + pcb.PID;
                             _krnDiskDriver.create(fileName);
-                            //write takes in a string so I need to convert valid program 
-                            //from an array to string
+                            //The disk's write takes in a string so I need to convert valid program 
+                            //  from an array to string
                             var programString = "";
                             for (var data = 0; validProgram.length > data; data++) {
                                 programString += validProgram[data];
@@ -538,7 +538,6 @@ var TSOS;
                             _StdOut.advanceLine();
                             _StdOut.putText("To load more than 3 programs at a time please format the Disk Drive.");
                         } //else
-                        //Todo: add condition checking for when disk is completly full
                     } //if
                     else {
                         //Send to Memory Accessor to store in Memory  
@@ -618,8 +617,6 @@ var TSOS;
         //Kills a program
         shellKill(args) {
             var executePID = parseInt(args[0]);
-            //checks if the PID exists
-            //if(_PCB[executePID] != null){
             _Mem.clearMem(_PCBs[executePID].segment);
             _RunningPrograms[_PCBs[executePID].segment] = false; //Opens a space in memory
             _PCBs[executePID].ProcesState = "Terminated";
@@ -627,7 +624,6 @@ var TSOS;
             //Update the GUI
             TSOS.Control.update_PCB_GUI(executePID, false);
             TSOS.Control.update_Mem_GUI();
-            //}//if
         } //kill
         //User Sets Quantum
         shellQuantum(args) {
