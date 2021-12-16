@@ -15,8 +15,8 @@ module TSOS{
             public limit: number = Segment_Length-1, //limit
             public waitTime: number = 0,
             public turnTime: number = 0,
-            public location: String = ""
-
+            public location: String = "",
+            public priority: number = 3
           ) {
         }//constructor
 

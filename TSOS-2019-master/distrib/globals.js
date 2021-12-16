@@ -44,6 +44,7 @@ var _Algorithm = _Algorithms[0];
 var _RunningPCB = null; //TSOS.ProcessControlBlock;
 var _PIDNumber = 0;
 var _PCBs = new Array(Segment_Length); //basically my resident Queue
+var _PCBsPriorityQueue = null;
 var _PStates = ["Resident", "Ready", "Running", "Terminated"];
 var _MostRecentlyUsedPCB = null;
 //var _PCBs = new TSOS.Queue;

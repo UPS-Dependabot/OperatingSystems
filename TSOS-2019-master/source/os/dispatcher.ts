@@ -28,7 +28,13 @@ module TSOS {
 
                     // }//if
 
+
+
                     TSOS.Control.update_PCB_GUI(_RunningPCB.PID, false); // updates the PCB GUI
+
+                    //Note to self: because there we are implementing non-premeptive priority the
+                    //  Priotiy Queue will never need to append anything baack on because it will already 
+                    //  be terminated by the time it executes a context switch
 
                     _readyQueue.enqueue(tempPCB);//The running process gets appended to the end of the Queue
                 }//if
@@ -36,7 +42,10 @@ module TSOS {
                     //Drops the PCB
                 }//else
 
+                
                 _RunningPCB =  _readyQueue.dequeue();   //The Next Process gets set to the Running Process
+                
+
                 if(_RunningPCB.location == "Disk"){
                     var memoryData = "";
                     memoryData = this.fetchSeg(tempPCB);

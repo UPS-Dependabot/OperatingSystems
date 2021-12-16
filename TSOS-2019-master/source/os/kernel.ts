@@ -21,6 +21,7 @@ module TSOS {
             _KernelBuffers = new Array();         // Buffers... for the kernel.
             _KernelInputQueue = new Queue();      // Where device input lands before being processed out somewhere.
 
+            _PCBsPriorityQueue = new Queue();
             _MemoryManager	=	new	MemoryManager();
             _MemAcc = new MemoryAccessor();
 

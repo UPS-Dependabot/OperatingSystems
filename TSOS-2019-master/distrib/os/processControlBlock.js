@@ -3,7 +3,7 @@ var TSOS;
     class ProcessControlBlock {
         constructor(PID = 0, PC = 0, ProcesState = "Resident", Acc = 0, Xreg = 0, Yreg = 0, Zflag = 0, IR = "", segment = 0, isExecuting = false, offset = 0, //base & offset
         limit = Segment_Length - 1, //limit
-        waitTime = 0, turnTime = 0, location = "") {
+        waitTime = 0, turnTime = 0, location = "", priority = 3) {
             this.PID = PID;
             this.PC = PC;
             this.ProcesState = ProcesState;
@@ -19,6 +19,7 @@ var TSOS;
             this.waitTime = waitTime;
             this.turnTime = turnTime;
             this.location = location;
+            this.priority = priority;
         } //constructor
         init() {
             this.PID = 0;

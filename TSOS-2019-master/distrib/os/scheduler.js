@@ -16,7 +16,7 @@ var TSOS;
             var running = false;
             var index = 0;
             //checks if there is a program that is running
-            if (!_readyQueue.isEmpty()) { //prevents loop from running when there are no pcbs
+            if (!_readyQueue.isEmpty() && _RunningPCB != null) { //prevents loop from running when there are no pcbs
                 running = true;
             } //if
             //Prevents an undefined _RunningPCB from entering a context

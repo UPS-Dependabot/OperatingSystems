@@ -21,6 +21,9 @@ var TSOS;
                 //     _MostRecentlyUsedPCB = tempPCB;                    
                 // }//if
                 TSOS.Control.update_PCB_GUI(_RunningPCB.PID, false); // updates the PCB GUI
+                //Note to self: because there we are implementing non-premeptive priority the
+                //  Priotiy Queue will never need to append anything baack on because it will already 
+                //  be terminated by the time it executes a context switch
                 _readyQueue.enqueue(tempPCB); //The running process gets appended to the end of the Queue
             } //if
             else {
