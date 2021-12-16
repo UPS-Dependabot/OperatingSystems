@@ -496,8 +496,8 @@ module TSOS {
                             if(block[0] == "1"){
                                var hexName = block.substring(4).split("00")[0];
                                var name = this.hexAscii(hexName)
-                               //filters out all of the automated files in the disk
-                               if(name.substring(0, name.length -1) != "*file_"){
+                               //filters out all of the automated files in the disk and hidden files
+                               if(name.substring(0, name.length -1) != "*file_" && name[0] != "."){
                                     names.push(name);
                                }//if
                             }//if
