@@ -120,9 +120,6 @@ module TSOS {
             _RunningPCB = new ProcessControlBlock();
             _RunningPCB.init();
 
-            _MostRecentlyUsedPCB = new ProcessControlBlock();
-            _MostRecentlyUsedPCB.init();
-
             _Files = new Queue();
             //----------END OF MY INTIS-----------//
 
@@ -188,9 +185,6 @@ module TSOS {
                 td.innerHTML = String(_PCBs[pcb].PID);
                 row.appendChild(td);
 
-                //Convert to Hex
-                //  got rid of the PC.toString(16) because it was breaking
-
                 td = document.createElement("td");
                 td.className = "PC";
                 td.innerHTML = String(parseInt(_PCBs[pcb].PC));
@@ -225,7 +219,11 @@ module TSOS {
                 td.innerHTML = _PCBs[pcb].IR;
                 row.appendChild(td);
 
-                
+                td = document.createElement("td");
+                td.className = "Loc";
+                td.innerHTML = String(_PCBs[pcb].location);
+                row.appendChild(td);
+
                 //Inserts the row
                 tb.appendChild(row);
             }//if create
@@ -233,13 +231,13 @@ module TSOS {
                 //fetches the row of the PCB in the GUI
                 var pcbRow  = document.getElementById(" "+pcb);
                 //List of all headers
-                var headers = new Array(8);
-                headers = ["PID", "PC" , "ProcesState", "Acc", "Xreg", "Yreg", "Zflag", "IR"];
+                var headers = new Array(9); //updated
+                headers = ["PID", "PC" , "ProcesState", "Acc", "Xreg", "Yreg", "Zflag", "IR", "Loc"];
 
                 //All feilds in the pcb
-                var feilds = new Array(8); 
+                var feilds = new Array(9); 
                 feilds = [pcb, _PCBs[pcb].PC, _PCBs[pcb].ProcesState, _PCBs[pcb].Acc, _PCBs[pcb].Xreg, _PCBs[pcb].Yreg,
-                             _PCBs[pcb].Zflag, _PCBs[pcb].IR];
+                             _PCBs[pcb].Zflag, _PCBs[pcb].IR, _PCBs[pcb].location];
 
                 //Inserts each header from the PCB into the GUI
                 for(var header: number = 0; header < headers.length; header++){
@@ -254,7 +252,6 @@ module TSOS {
                     }
                 }//for       
             }//else
-
        }//updatePCB
         
         //Takes in the current PCB and updates the CPU accordingly

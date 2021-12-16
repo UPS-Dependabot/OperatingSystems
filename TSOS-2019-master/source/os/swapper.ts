@@ -23,6 +23,7 @@ module TSOS {
             // clear mem segment so that a new file from the disk can rollIn to Memory
             _Mem.clearMem(pcb.segment);
             TSOS.Control.update_Mem_GUI();
+            //TSOS.Control.update_PCB_GUI(pcb, false);
             
             //Indicaates that there is a free segment when Memory reassigns
             // the segment to the next pcb

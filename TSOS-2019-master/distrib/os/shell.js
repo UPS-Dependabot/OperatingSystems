@@ -83,9 +83,9 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellDelete, "delete", " - deletes a file from disk");
             this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellSetAlgorithm, "set-algorithm", " - sets the scheduling algorithm for the program");
+            sc = new TSOS.ShellCommand(this.shellSetSchedule, "set-schedule", " - sets the scheduling algorithm for the program");
             this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellGetAlgorithm, "get-algorithm", " - displays the current scheduling algorithm that is set");
+            sc = new TSOS.ShellCommand(this.shellGetSchedule, "get-schedule", " - displays the current scheduling algorithm that is set");
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellList, "ls", " - list all files currently in the Disk Drive");
             this.commandList[this.commandList.length] = sc;
@@ -640,7 +640,6 @@ var TSOS;
             for (var i in _PCBs) {
                 if (_PCBs[i].ProcesState == "Resident") {
                     _PCBs[i].ProcesState = "Ready"; //Sets the state to Ready (Basically just for the GUI)
-                    //TSOS.Control.update_PCB_GUI(_PCBs[i], false);// updates the GUI                    
                     _PCBs[i].isExecuting = true;
                 } //if
             } //for
@@ -767,7 +766,7 @@ var TSOS;
             } //for
             return str;
         } //helperArrString
-        shellSetAlgorithm(args) {
+        shellSetSchedule(args) {
             var isNewSet = false;
             for (var i = 0; _Algorithms.length > i; i++) {
                 if (_Algorithms[i] == args[0]) {
@@ -807,7 +806,7 @@ var TSOS;
                 _StdOut.putText("Current Algorithm: " + _Algorithm);
             } //if
         } //shellSetAlgorithm
-        shellGetAlgorithm() {
+        shellGetSchedule() {
             _StdOut.putText("Current Scheduling Algorithm: " + _Algorithm);
         } //shellGetAlgorithm
         shellList() {

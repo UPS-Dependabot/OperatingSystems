@@ -8,7 +8,6 @@ var TSOS;
         //RollIn and Roll Out are invoked at the dispatcher when there 
         //Rolls a file out of Memory and into Disk
         rollOut(data, pcb) {
-            //_MostRecentlyUsedPCB = pcb;
             // Put the PCB onto the disk
             var fileName = "*file_" + pcb.PID;
             _krnDiskDriver.create(fileName);
@@ -17,6 +16,7 @@ var TSOS;
             // clear mem segment so that a new file from the disk can rollIn to Memory
             _Mem.clearMem(pcb.segment);
             TSOS.Control.update_Mem_GUI();
+            //TSOS.Control.update_PCB_GUI(pcb, false);
             //Indicaates that there is a free segment when Memory reassigns
             // the segment to the next pcb
             _RunningPrograms[pcb.segment] = false;

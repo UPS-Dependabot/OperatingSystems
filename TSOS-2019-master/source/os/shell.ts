@@ -164,13 +164,13 @@ module TSOS {
                                     " - deletes a file from disk");
             this.commandList[this.commandList.length] = sc;
 
-            sc = new ShellCommand(this.shellSetAlgorithm,
-                                "set-algorithm",
+            sc = new ShellCommand(this.shellSetSchedule,
+                                "set-schedule",
                                 " - sets the scheduling algorithm for the program");
             this.commandList[this.commandList.length] = sc;
                                 
-            sc = new ShellCommand(this.shellGetAlgorithm,
-                                    "get-algorithm",
+            sc = new ShellCommand(this.shellGetSchedule,
+                                    "get-schedule",
                                     " - displays the current scheduling algorithm that is set");
             this.commandList[this.commandList.length] = sc;
 
@@ -799,7 +799,6 @@ module TSOS {
             for(var i in _PCBs){
                 if(_PCBs[i].ProcesState == "Resident"){
                     _PCBs[i].ProcesState = "Ready"; //Sets the state to Ready (Basically just for the GUI)
-                    //TSOS.Control.update_PCB_GUI(_PCBs[i], false);// updates the GUI                    
                     _PCBs[i].isExecuting = true;    
                 }//if
             }//for
@@ -940,7 +939,7 @@ module TSOS {
             return str;
         }//helperArrString
 
-        public shellSetAlgorithm(args:string[]){
+        public shellSetSchedule(args:string[]){
             var isNewSet = false;
             for(var i = 0; _Algorithms.length > i; i++){
                 if(_Algorithms[i] == args[0]){
@@ -986,7 +985,7 @@ module TSOS {
             }//if
         }//shellSetAlgorithm
 
-        public shellGetAlgorithm(){
+        public shellGetSchedule(){
             _StdOut.putText("Current Scheduling Algorithm: "+_Algorithm);
         }//shellGetAlgorithm
 
