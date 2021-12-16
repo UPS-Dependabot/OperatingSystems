@@ -178,6 +178,17 @@ module TSOS {
                                     "ls",
                                     " - list all files currently in the Disk Drive");
             this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shellCopy,
+                                    "copy",
+                                    " - copy <currFile> <newFile> Copies all data from the current file to the new file");
+            this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand(this.shellRename,
+                                    "rename",
+                                    " - rename <currFileName> <newFileName> Renames the file");
+            this.commandList[this.commandList.length] = sc;
+
             // Display the initial prompt.
             this.putPrompt();
         }
@@ -652,7 +663,7 @@ module TSOS {
                             //wrap the quote "" around the program string so write doesn't strip the first 
                             //  and last character off of the prgram
                             programString = "\""+programString+"\"";
-                            _krnDiskDriver.write(fileName, programString, true, true);
+                            _krnDiskDriver.write(fileName, programString, true);
 
                             _StdOut.putText("FileName: "+fileName);
                             _StdOut.advanceLine();
@@ -879,7 +890,7 @@ module TSOS {
                 //User must wrapp their written data with ""s
                 if(args[1][0] == "\"" && args[1][args[1].length - 1] == "\""){
                     //Assuming User isn't directly inputing opCodes into write
-                    if(_krnDiskDriver.write(args[0],args[1], false, false)){
+                    if(_krnDiskDriver.write(args[0],args[1], false)){
                         _StdOut.putText("Successfully wrote to file");
                     }//if
                     else{
@@ -964,7 +975,7 @@ module TSOS {
                         _PCBsPriorityQueue.dequeue();
                     }//for
                 }//if
-                
+
                 var currLength = _readyQueue.getSize();
                 if(_Algorithm == "priority"){
                     for(var i = 0; currLength > i; i++){
@@ -1001,5 +1012,33 @@ module TSOS {
                 _StdOut.putText("Cannot ls because Disk is not formatted");
             }//else
         }//shellList
+
+        public shellCopy( args:string[]){
+            if(args.length == 2){
+                if(_krnDiskDriver.copy(args[0], args[1])){
+                    _StdOut.putText("Successfully copied file "+args[0]+" to new file "+args[1]);
+                }//if
+                else{
+                    _StdOut.putText("Copy failed");
+                }//else
+            }//if
+            else{
+                _StdOut.putText("Correct Formatt: copy <currFile> <newFile>");
+            }//else
+        }//shellCopy
+
+        public shellRename(args:string[]){
+            if(args.length == 2){
+                if(_krnDiskDriver.rename(args[0], args[1])){
+                    _StdOut.putText("Renamed file "+args[0]+"to file"+args[1]);
+                }//if
+                else{
+                    _StdOut.putText("Rename failed");
+                }//else
+            }//if
+            else{
+                _StdOut.putText("Correct Formatt: rename <currFileName> <newFileName>");
+            }//else
+        }//rename
     }//Shell
 }

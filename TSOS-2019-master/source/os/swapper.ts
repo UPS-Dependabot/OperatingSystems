@@ -18,7 +18,7 @@ module TSOS {
             // Put the PCB onto the disk
             var fileName = "*file_"+pcb.PID;
             _krnDiskDriver.create(fileName);
-            _krnDiskDriver.write(fileName, data, true, true);
+            _krnDiskDriver.write(fileName, data, true);
             pcb.location = "Disk";
             // clear mem segment so that a new file from the disk can rollIn to Memory
             _Mem.clearMem(pcb.segment);

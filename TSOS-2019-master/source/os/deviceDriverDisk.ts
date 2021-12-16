@@ -173,7 +173,7 @@ module TSOS {
         //
         // isRole represents when a file is either being written from the write command (via the shell) or coming in via memory when is gets swapped in
         //  True - from memory, False - form the shell
-        public write(filename, data,  isRole, isHex){
+        public write(filename, data,  isRole){
             //Convert data and filename to hex (ascii returns as an array)
             //Then convert the arrays to strings 
 
@@ -188,16 +188,7 @@ module TSOS {
             }//if
             
             var filehex = this.asciiHex(filename);
-            var hexdata;
-            
-            // //When when we are rolling in from memory the data is already in hex
-            // //  or a user is input opCodes via the User Program Input we are assuming 
-            // if(isHex){
-            //     hexdata = data;
-            // }//if
-            //else{
-            hexdata = this.asciiHex(data);
-            //}
+            var hexdata = this.asciiHex(data);
 
             //calcualtes the number of tsbs that the file data will occupy
             var tsbToOccupy = 1;
@@ -508,7 +499,6 @@ module TSOS {
                             if(block[0] == "1"){
                                var hexName = block.substring(4).split("00")[0];
                                var name = this.hexAscii(hexName)
-
                                //filters out all of the automated files in the disk
                                if(name.substring(0, name.length -1) != "*file_"){
                                     names.push(name);
@@ -522,5 +512,75 @@ module TSOS {
                 return names;
         }//list
 
+        copy(currFileName, newFileName){
+            var isCopy = false;
+            var s = 0;
+            var b = 0;
+                //Find location to put the file
+                while(_Disk.sectorNum > s && !isCopy){
+                    while( _Disk.blockNum > b && !isCopy ){
+                        if(s == 0 && b == 0){
+                            //ignore 
+                            //We do not want to overwrite the block into the master boot leg
+                        }//if
+                        else{
+                            var id = 0 + ":" + s + ":" + b;              
+                            var block = sessionStorage.getItem(id);
+                            //the first character is the Availble bit
+                            if(block[0] == "1"){
+                                //Look for the current file name in the disk
+                               var hexName = block.substring(4).split("00")[0];
+                               var name = this.hexAscii(hexName)
+                               if(name == currFileName){
+                                   //creates the copied file and writes the same memory into disk
+                                    this.create(newFileName);
+                                    var copyData = "\""+this.read(currFileName)+"\"";
+                                    this.write(newFileName,copyData, false);
+                                    isCopy = true;
+                               }//if
+                            }//if
+                        }//else
+                        b++;
+                    }//while block
+                    s++;
+                }//while sector
+            return isCopy;
+        }//copy
+
+        rename(currName, newName){
+            var isRename = false;
+            var s = 0;
+            var b = 0;
+                //Find location to put the file
+                while(_Disk.sectorNum > s && !isRename){
+                    while( _Disk.blockNum > b && !isRename ){
+                        if(s == 0 && b == 0){
+                            //ignore 
+                            //We do not want to overwrite the block into the master boot leg
+                        }//if
+                        else{
+                            var id = 0 + ":" + s + ":" + b;              
+                            var block = sessionStorage.getItem(id);
+                            //the first character is the Availble bit
+                            if(block[0] == "1"){
+                                //Look for the current file name in the disk
+                               var hexName = block.substring(4).split("00")[0];
+                               var name = this.hexAscii(hexName);
+                               if(name == currName){
+                                    //Changes the name in the disk
+                                    var firstBits = block.substring(0,4); 
+                                    var dataName = firstBits+this.appendZeros(this.asciiHex(newName));
+                                    sessionStorage.setItem(id, dataName);
+                                    TSOS.Control.updateDiskDriver(id, dataName);
+                                    isRename = true;
+                               }//if
+                            }//if
+                        }//else
+                        b++;
+                    }//while block
+                    s++;
+                }//while sector
+            return isRename;
+        }//rename
     }//DeviceDriverDisk
 }

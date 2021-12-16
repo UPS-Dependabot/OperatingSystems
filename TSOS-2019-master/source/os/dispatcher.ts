@@ -45,17 +45,17 @@ module TSOS {
                 
                 _RunningPCB =  _readyQueue.dequeue();   //The Next Process gets set to the Running Process
                 
-
-                if(_RunningPCB.location == "Disk"){
-                    var memoryData = "";
-                    memoryData = this.fetchSeg(tempPCB);
-                    //Roll out on the pcb from memory and save onto disk
-                    //  so we have room to store the next program
-                    _Swapper.rollOut(memoryData,tempPCB); 
-                    _Swapper.rollIn(_RunningPCB);
+                if(_RunningPCB != null){
+                    if(_RunningPCB.location == "Disk"){
+                        var memoryData = "";
+                        memoryData = this.fetchSeg(tempPCB);
+                        //Roll out on the pcb from memory and save onto disk
+                        //  so we have room to store the next program
+                        _Swapper.rollOut(memoryData,tempPCB); 
+                        _Swapper.rollIn(_RunningPCB);
+                    }//if
+                    //rollIn PCB from Disk
                 }//if
-                //rollIn PCB from Disk
-
                 _RunningPCB.ProcesState = "Running";    //Sets the next PCB that is about to run to Running
                 TSOS.Control.update_PCB_GUI(_RunningPCB.PID, false); // updates the PCB GUI
 
