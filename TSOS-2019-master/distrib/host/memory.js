@@ -17,7 +17,7 @@ var TSOS;
         } //getMem
         clearMem(base) {
             var start = Segment_Length * base;
-            var end = start + Segment_Length - 1;
+            var end = start + Segment_Length;
             for (var i = start; end > i; i++) {
                 this.Mem[i] = "00"; // Everything begins at 00 in hex
             } //for

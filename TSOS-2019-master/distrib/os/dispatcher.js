@@ -27,7 +27,11 @@ var TSOS;
                 if (_RunningPCB.location == "Disk") {
                     var memoryData = "";
                     memoryData = this.fetchSeg(tempPCB);
-                    _Swapper.rollOut(memoryData, tempPCB);
+                    //Only rollout when there are no more open segments left in memory
+                    //  we do not want to waste space
+                    if (_MemoryManager.segmentAllocation() >= 3) {
+                        _Swapper.rollOut(memoryData, tempPCB);
+                    } //if
                     _Swapper.rollIn(_RunningPCB);
                 } //if
             } //if

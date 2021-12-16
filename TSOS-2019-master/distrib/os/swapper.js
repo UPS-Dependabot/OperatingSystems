@@ -16,7 +16,7 @@ var TSOS;
             // clear mem segment so that a new file from the disk can rollIn to Memory
             _Mem.clearMem(pcb.segment);
             TSOS.Control.update_Mem_GUI();
-            //TSOS.Control.update_PCB_GUI(pcb, false);
+            TSOS.Control.update_PCB_GUI(pcb.PID, false);
             //Indicaates that there is a free segment when Memory reassigns
             // the segment to the next pcb
             _RunningPrograms[pcb.segment] = false;
@@ -44,8 +44,10 @@ var TSOS;
                 memIndex++;
                 bit++;
             } //for
+            //Updates
             TSOS.Control.update_Mem_GUI();
             pcb.location = "Memory";
+            TSOS.Control.update_PCB_GUI(pcb.PID, false);
             // delete the file that held the data on the disk
             _krnDiskDriver.delete(fileName);
         } //rollin
