@@ -83,9 +83,9 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellDelete, "delete", " - deletes a file from disk");
             this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellSetAlgorithm, "set-algorithm", " - sets the scheduling algorithm for the program");
+            sc = new TSOS.ShellCommand(this.shellSetSchedule, "setschedule", " - sets the scheduling algorithm for the program");
             this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellGetAlgorithm, "get-algorithm", " - displays the current scheduling algorithm that is set");
+            sc = new TSOS.ShellCommand(this.shellGetSchedule, "getschedule", " - displays the current scheduling algorithm that is set");
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellList, "ls", " - list all files currently in the Disk Drive");
             this.commandList[this.commandList.length] = sc;
@@ -640,7 +640,6 @@ var TSOS;
             for (var i in _PCBs) {
                 if (_PCBs[i].ProcesState == "Resident") {
                     _PCBs[i].ProcesState = "Ready"; //Sets the state to Ready (Basically just for the GUI)
-                    //TSOS.Control.update_PCB_GUI(_PCBs[i], false);// updates the GUI                    
                     _PCBs[i].isExecuting = true;
                 } //if
             } //for
@@ -767,7 +766,7 @@ var TSOS;
             } //for
             return str;
         } //helperArrString
-        shellSetAlgorithm(args) {
+        shellSetSchedule(args) {
             var isNewSet = false;
             for (var i = 0; _Algorithms.length > i; i++) {
                 if (_Algorithms[i] == args[0]) {
@@ -807,15 +806,26 @@ var TSOS;
                 _StdOut.putText("Current Algorithm: " + _Algorithm);
             } //if
         } //shellSetAlgorithm
-        shellGetAlgorithm() {
+        shellGetSchedule() {
             _StdOut.putText("Current Scheduling Algorithm: " + _Algorithm);
         } //shellGetAlgorithm
-        shellList() {
+        shellList(args) {
             if (_krnDiskDriver.formatted) {
+                var showHidden = false;
+                if (args[0] == "-l") {
+                    showHidden = true;
+                } //if
                 //call ls disk driver
-                var nameList = _krnDiskDriver.list();
+                var nameList = _krnDiskDriver.list(showHidden);
                 for (var i = 0; nameList.length > i; i++) {
                     _StdOut.putText(nameList[i]);
+                    if (showHidden) {
+                        //Every Ascii Character is equal to a single byte therefore we can just take the
+                        //  length of writen data + the name of the file that is store to calulate the total 
+                        //  size
+                        var size = nameList[i].length + _krnDiskDriver.read(nameList[i]).length;
+                        _StdOut.putText("| size (bytes): " + size);
+                    } //if
                     _StdOut.advanceLine();
                 } //for
             } //if

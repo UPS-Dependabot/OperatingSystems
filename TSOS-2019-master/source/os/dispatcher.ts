@@ -10,7 +10,7 @@ module TSOS {
         }//init
 
         public contextSwitch(){
-                //aves the running process
+                //saves the running process
                 var tempPCB = _RunningPCB; 
                 if(tempPCB.ProcesState != "Terminated"){ 
                     //Sets the PCB that is about to stop back to ready
@@ -27,6 +27,9 @@ module TSOS {
                 }//if
                 else{
                     //Drops the PCB
+                    //When a process is terminated delete its file from the disk to ensure that we save space
+                    var fileName = "*file_"+tempPCB.PID;
+                    _krnDiskDriver.delete(fileName);
                 }//else
 
                 
@@ -37,7 +40,11 @@ module TSOS {
                         var memoryData = "";
                         memoryData = this.fetchSeg(tempPCB);
 
-                        _Swapper.rollOut(memoryData,tempPCB); 
+                        //Only rollout when there are no more open segments left in memory
+                        //  we do not want to waste space
+                        if(_MemoryManager.segmentAllocation() >= 3){
+                            _Swapper.rollOut(memoryData,tempPCB); 
+                        }//if
                         _Swapper.rollIn(_RunningPCB);
                     }//if
                 }//if
