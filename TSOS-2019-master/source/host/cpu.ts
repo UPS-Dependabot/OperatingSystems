@@ -71,8 +71,7 @@
                     //Ensures that the program doesn't fetch anything from outside of the memory bounds
                     if(this.PC+ _CPU.offset < _RunningPCB.limit)
                         this.fetchOpCode(_Mem.Mem[this.PC + _CPU.offset]);
-                    
-                }//if
+                    }//if
             }//cycle
     
             //finds the Op Code associated with the hex nnumbers

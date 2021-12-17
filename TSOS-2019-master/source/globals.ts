@@ -49,7 +49,7 @@ var _Dispatcher: any = null;
 var _QuantumDefault: number = 6;
 var _switched: boolean = false;  //Tells log when there was a context switch
 var _Algorithms = ["rr", "fcfs", "priority"];
-var _Algorithm = _Algorithms[0];
+var _Algorithm = _Algorithms[0]; // Set to Round Robin
 
 
 //Program Control Block
@@ -59,7 +59,6 @@ var _PIDNumber: number = 0;
 var _PCBs = new Array(Segment_Length); //basically my resident Queue
 var _PCBsPriorityQueue: TSOS.Queue = null;
 var _PStates = ["Resident", "Ready", "Running", "Terminated"];
-var _MostRecentlyUsedPCB: any = null;
 
 //var _PCBs = new TSOS.Queue;
 var _OSclock: number = 0;  // Page 23.

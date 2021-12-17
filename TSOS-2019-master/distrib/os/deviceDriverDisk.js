@@ -425,7 +425,7 @@ var TSOS;
             } //for
             return null;
         } //isAvaibleSpace
-        list() {
+        list(showHidden) {
             var names = new Array();
             var s = 0;
             var b = 0;
@@ -443,8 +443,8 @@ var TSOS;
                         if (block[0] == "1") {
                             var hexName = block.substring(4).split("00")[0];
                             var name = this.hexAscii(hexName);
-                            //filters out all of the automated files in the disk and hidden files
-                            if (name.substring(0, name.length - 1) != "*file_" && name[0] != ".") {
+                            //filters out all of the automated files in the disk and hidden files unless the user specificies
+                            if ((name.substring(0, name.length - 1) != "*file_" && name[0] != ".") || showHidden) {
                                 names.push(name);
                             } //if
                         } //if

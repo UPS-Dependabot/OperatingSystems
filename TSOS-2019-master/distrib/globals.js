@@ -38,7 +38,7 @@ var _Dispatcher = null;
 var _QuantumDefault = 6;
 var _switched = false; //Tells log when there was a context switch
 var _Algorithms = ["rr", "fcfs", "priority"];
-var _Algorithm = _Algorithms[0];
+var _Algorithm = _Algorithms[0]; // Set to Round Robin
 //Program Control Block
 //PCBs init in control
 var _RunningPCB = null; //TSOS.ProcessControlBlock;
@@ -46,7 +46,6 @@ var _PIDNumber = 0;
 var _PCBs = new Array(Segment_Length); //basically my resident Queue
 var _PCBsPriorityQueue = null;
 var _PStates = ["Resident", "Ready", "Running", "Terminated"];
-var _MostRecentlyUsedPCB = null;
 //var _PCBs = new TSOS.Queue;
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
